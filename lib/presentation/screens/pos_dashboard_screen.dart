@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../widgets/app_button.dart';
+import '../widgets/pos_navigation_drawer.dart';
 
 class Product {
   final String name;
@@ -100,12 +101,6 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
     });
   }
 
-  void _removeFromCart(OrderItem item) {
-    setState(() {
-      _cart.removeWhere((cartItem) => cartItem.product.name == item.product.name);
-    });
-  }
-
   void _updateQuantity(OrderItem item, int delta) {
     setState(() {
       final index = _cart.indexWhere((cartItem) => cartItem.product.name == item.product.name);
@@ -156,6 +151,7 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: false, // Mencegah keyboard memicu overflow vertikal
       backgroundColor: AppColors.neutral100,
+      drawer: const PosNavigationDrawer(), // Drawer menu melayang
       body: SafeArea(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -195,7 +191,7 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
   Widget _buildTopNavBar() {
     return Container(
       height: 72,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.only(left: 16, right: 16), // Padding seimbang di ujung kanan
       decoration: const BoxDecoration(
         color: AppColors.white,
         border: Border(
@@ -204,9 +200,13 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
       ),
       child: Row(
         children: [
-          IconButton(
-            icon: const Icon(Icons.menu, color: AppColors.neutral800),
-            onPressed: () {},
+          Builder(
+            builder: (context) {
+              return IconButton(
+                icon: const Icon(Icons.menu, color: AppColors.neutral800),
+                onPressed: () => Scaffold.of(context).openDrawer(),
+              );
+            },
           ),
           const SizedBox(width: 8),
           Container(
@@ -229,38 +229,42 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
               style: AppTypography.bodyLBold.copyWith(color: AppColors.neutral900),
             ),
           ),
-          const Spacer(), // Mendorong search bar ke ujung kanan navbar
-          Container(
-            width: 340, // Lebar ideal agar tidak kependekan
-            height: 44, // Tinggi standar agar simetris
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            decoration: BoxDecoration(
-              color: AppColors.neutral100,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.neutral200, width: 1.5),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.search, color: AppColors.neutral400, size: 20),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: TextField(
-                    onChanged: (val) {
-                      setState(() {
-                        _searchQuery = val;
-                      });
-                    },
-                    style: AppTypography.bodyMRegular.copyWith(color: AppColors.neutral900),
-                    decoration: InputDecoration(
-                      hintText: 'Search Product...',
-                      hintStyle: AppTypography.bodyMRegular.copyWith(color: AppColors.neutral400),
-                      border: InputBorder.none,
-                      isDense: true,
-                      contentPadding: EdgeInsets.zero, // Teks & Ikon simetris sempurna di tengah secara vertikal!
+          
+          const SizedBox(width: 48), // Spasi pemisah logo dengan search bar
+          
+          // Search Bar Memanjang Penuh (Expanded)
+          Expanded(
+            child: Container(
+              height: 44, // Tinggi standar agar simetris
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: AppColors.neutral100,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppColors.neutral200, width: 1.5),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.search, color: AppColors.neutral400, size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: TextField(
+                      onChanged: (val) {
+                        setState(() {
+                          _searchQuery = val;
+                        });
+                      },
+                      style: AppTypography.bodyMRegular.copyWith(color: AppColors.neutral900),
+                      decoration: InputDecoration(
+                        hintText: 'Search Product...',
+                        hintStyle: AppTypography.bodyMRegular.copyWith(color: AppColors.neutral400),
+                        border: InputBorder.none,
+                        isDense: true,
+                        contentPadding: EdgeInsets.zero, // Teks & Ikon simetris sempurna di tengah secara vertikal!
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
@@ -387,10 +391,10 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
       padding: const EdgeInsets.all(16),
       child: GridView.builder(
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3, // Menggunakan 3 kolom agar visual produk lebih longgar
+          crossAxisCount: 4, // Diubah menjadi 4 kolom sesuai request terbaru
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
-          childAspectRatio: 0.85,
+          childAspectRatio: 0.78, // Diatur rasionya agar konten vertikal (nama & harga) muat dengan rapi
         ),
         itemCount: products.length,
         itemBuilder: (context, index) {
