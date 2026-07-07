@@ -36,6 +36,6 @@ void main() {
     expect(find.text('Order Details'), findsOneWidget);
 
     // Verify that all total prices are formatted in Rupiah (Rp 0)
-    expect(find.text('Rp 0'), findsNWidgets(4)); // Subtotal, Tax, Voucher, Total
+    expect(find.text('Rp 0'), findsNWidgets(3)); // Subtotal, Tax, Total
   });
 }

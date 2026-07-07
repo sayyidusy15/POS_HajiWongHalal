@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../widgets/app_button.dart';
+import '../widgets/payment_modal.dart';
 import '../widgets/pos_navigation_drawer.dart';
 
 class Product {
@@ -124,7 +125,7 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
   }
 
   double get _tax {
-    return _subtotal * 0.1; // Pajak 10%
+    return _subtotal * 0.03; // Pajak 3%
   }
 
   double get _total {
@@ -229,13 +230,13 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
               style: AppTypography.bodyLBold.copyWith(color: AppColors.neutral900),
             ),
           ),
+          const Spacer(), // Mendorong search bar ke ujung kanan navbar
           
-          const SizedBox(width: 48), // Spasi pemisah logo dengan search bar
-          
-          // Search Bar Memanjang Penuh (Expanded)
-          Expanded(
+          // Search Bar di Ujung Kanan Navbar (lebar maksimal, responsif)
+          Flexible(
             child: Container(
-              height: 44, // Tinggi standar agar simetris
+              constraints: const BoxConstraints(maxWidth: 420),
+              height: 44,
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
                 color: AppColors.neutral100,
@@ -259,7 +260,7 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
                         hintStyle: AppTypography.bodyMRegular.copyWith(color: AppColors.neutral400),
                         border: InputBorder.none,
                         isDense: true,
-                        contentPadding: EdgeInsets.zero, // Teks & Ikon simetris sempurna di tengah secara vertikal!
+                        contentPadding: EdgeInsets.zero,
                       ),
                     ),
                   ),
@@ -590,9 +591,7 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
               children: [
                 _buildReceiptRow('Subtotal', _formatRupiah(_subtotal)),
                 const SizedBox(height: 8),
-                _buildReceiptRow('Tax (10%)', _formatRupiah(_tax)),
-                const SizedBox(height: 8),
-                _buildReceiptRow('Voucher', _formatRupiah(0)),
+                _buildReceiptRow('Tax (3%)', _formatRupiah(_tax)),
                 const SizedBox(height: 12),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -621,35 +620,33 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
               isEnabled: _cart.isNotEmpty,
               onPressed: _cart.isEmpty
                   ? null
-                  : () {
-                      showDialog(
+                  : () async {
+                      final bool? isPaid = await showDialog<bool>(
                         context: context,
-                        builder: (ctx) => AlertDialog(
-                          title: const Text('Konfirmasi Pembayaran'),
-                          content: Text('Proses transaksi total ${_formatRupiah(_total)}?'),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(ctx),
-                              child: const Text('Batal'),
-                            ),
-                            ElevatedButton(
-                              onPressed: () {
-                                Navigator.pop(ctx);
-                                setState(() {
-                                  _cart.clear();
-                                });
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: const Text('Transaksi Berhasil Diproses!'),
-                                    backgroundColor: AppColors.primary500,
-                                  ),
-                                );
-                              },
-                              child: const Text('Proses'),
-                            ),
-                          ],
+                        barrierDismissible: false, // Hanya tutup lewat tombol "X" atau "Confirm"
+                        builder: (ctx) => PaymentModal(
+                          totalAmount: _total,
+                          subtotal: _subtotal,
+                          tax: _tax,
+                          isDineIn: _isDineIn,
                         ),
                       );
+
+                      if (isPaid == true) {
+                        setState(() {
+                          _cart.clear();
+                        });
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: const Text('Transaksi Berhasil Diproses!'),
+                              backgroundColor: AppColors.primary500,
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            ),
+                          );
+                        }
+                      }
                     },
             ),
           ),
