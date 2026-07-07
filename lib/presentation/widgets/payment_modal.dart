@@ -8,12 +8,15 @@ class PaymentModal extends StatefulWidget {
   final double tax;
   final bool isDineIn;
 
+  final String customerName;
+
   const PaymentModal({
     super.key,
     required this.totalAmount,
     required this.subtotal,
     required this.tax,
     required this.isDineIn,
+    required this.customerName,
   });
 
   @override
@@ -244,7 +247,7 @@ class _PaymentModalState extends State<PaymentModal> {
                                 const Icon(Icons.person_outline, size: 18, color: AppColors.neutral500),
                                 const SizedBox(width: 8),
                                 Text(
-                                  'Customer: John Doe',
+                                  'Customer: ${widget.customerName}',
                                   style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral800, fontWeight: FontWeight.bold),
                                 ),
                               ],

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
+import '../widgets/add_customer_modal.dart';
 import '../widgets/app_button.dart';
 import '../widgets/payment_modal.dart';
+import '../widgets/product_detail_modal.dart';
 import '../widgets/pos_navigation_drawer.dart';
 
 class Product {
@@ -40,6 +42,7 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
   String _activeCategory = 'All Menu';
   String _searchQuery = '';
   bool _isDineIn = true;
+  String _selectedCustomer = 'John Doe'; // Menyimpan nama customer aktif untuk pesanan
   
   // Keranjang Belanja Dinamis
   final List<OrderItem> _cart = [];
@@ -132,13 +135,15 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
     return _subtotal + _tax;
   }
 
-  // Mendapatkan kuantitas item produk tertentu yang ada di keranjang
+  // Mendapatkan kuantitas item produk tertentu yang ada di keranjang (termasuk variasi kustom)
   int _getProductQuantityInCart(Product product) {
-    final index = _cart.indexWhere((item) => item.product.name == product.name);
-    if (index >= 0) {
-      return _cart[index].quantity;
+    int totalQty = 0;
+    for (var item in _cart) {
+      if (item.product.name == product.name || item.product.name.startsWith('${product.name} (')) {
+        totalQty += item.quantity;
+      }
     }
-    return 0;
+    return totalQty;
   }
 
   @override
@@ -389,8 +394,8 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
 
     return Container(
       color: AppColors.white,
-      padding: const EdgeInsets.all(16),
       child: GridView.builder(
+        padding: const EdgeInsets.only(top: 12, left: 16, right: 16, bottom: 16), // Padding internal agar badge melayang memiliki ruang atas dan terpotong rapi saat di-scroll
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 4, // Diubah menjadi 4 kolom sesuai request terbaru
           crossAxisSpacing: 16,
@@ -403,87 +408,115 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
           final quantityInCart = _getProductQuantityInCart(p);
 
           return GestureDetector(
-            onTap: () => _addToCart(p),
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: quantityInCart > 0 ? AppColors.primary500 : AppColors.neutral200,
-                  width: quantityInCart > 0 ? 1.5 : 1,
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Gambar produk placeholder (Wireframe)
-                  Expanded(
-                    child: Container(
-                      margin: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppColors.neutral100,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Stack(
-                        children: [
-                          Center(
+            onTap: () async {
+              final result = await showDialog<Map<String, dynamic>>(
+                context: context,
+                barrierDismissible: true, // Kasir bisa ketuk area overlay luar untuk tutup/batal
+                builder: (ctx) => ProductDetailModal(product: p),
+              );
+              if (result != null) {
+                final Product customizedProduct = result['product'] as Product;
+                final int qty = result['quantity'] as int;
+                setState(() {
+                  final index = _cart.indexWhere((item) => item.product.name == customizedProduct.name);
+                  if (index >= 0) {
+                    _cart[index].quantity += qty;
+                  } else {
+                    _cart.add(OrderItem(product: customizedProduct, quantity: qty));
+                  }
+                });
+              }
+            },
+            child: Stack(
+              clipBehavior: Clip.none, // Agar badge melayang bisa terpotong sedikit keluar dari batas card
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: quantityInCart > 0 ? AppColors.primary500 : AppColors.neutral200,
+                      width: quantityInCart > 0 ? 1.5 : 1,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Gambar produk placeholder (Wireframe)
+                      Expanded(
+                        child: Container(
+                          margin: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: AppColors.neutral100,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Center(
                             child: Icon(
                               p.icon,
                               color: AppColors.neutral400,
                               size: 32,
                             ),
                           ),
-                          // Badge kuantitas produk terpilih (seperti di screenshot)
-                          if (quantityInCart > 0)
-                            Positioned(
-                              right: 8,
-                              bottom: 8,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: AppColors.primary500,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Text(
-                                  'x $quantityInCart',
-                                  style: AppTypography.bodyXsRegular.copyWith(
-                                    color: AppColors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 12, right: 12, bottom: 12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              p.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTypography.bodySRegular.copyWith(
+                                color: AppColors.neutral900,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
+                            const SizedBox(height: 4),
+                            Text(
+                              _formatRupiah(p.price),
+                              style: AppTypography.bodyXsRegular.copyWith(
+                                color: AppColors.primary500,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // Lingkaran Hijau Badge Jumlah Item dipesan (Melayang di Pojok Kanan Atas)
+                if (quantityInCart > 0)
+                  Positioned(
+                    top: -6,
+                    right: -6,
+                    child: Container(
+                      width: 24,
+                      height: 24,
+                      decoration: const BoxDecoration(
+                        color: AppColors.primary500,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          )
                         ],
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        '$quantityInCart',
+                        style: AppTypography.bodyXsRegular.copyWith(
+                          color: AppColors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 12, right: 12, bottom: 12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          p.name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: AppTypography.bodySRegular.copyWith(
-                            color: AppColors.neutral900,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          _formatRupiah(p.price),
-                          style: AppTypography.bodyXsRegular.copyWith(
-                            color: AppColors.primary500,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+              ],
             ),
           );
         },
@@ -514,10 +547,20 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
               childAspectRatio: 2.5, // Disesuaikan aspek rasionya agar tidak overflow di lebar 290px
               physics: const NeverScrollableScrollPhysics(),
               children: [
-                _buildActionGridButton('Customer', Icons.people_outline),
-                _buildActionGridButton('Tables', Icons.table_restaurant_outlined),
-                _buildActionGridButton('Discount', Icons.local_offer_outlined),
-                _buildActionGridButton('Save Bill', Icons.file_download_outlined),
+                _buildActionGridButton('Customer', Icons.people_outline, () async {
+                  final String? result = await showDialog<String>(
+                    context: context,
+                    builder: (ctx) => const AddCustomerModal(),
+                  );
+                  if (result != null && result.isNotEmpty) {
+                    setState(() {
+                      _selectedCustomer = result;
+                    });
+                  }
+                }),
+                _buildActionGridButton('Tables', Icons.table_restaurant_outlined, () {}),
+                _buildActionGridButton('Discount', Icons.local_offer_outlined, () {}),
+                _buildActionGridButton('Save Bill', Icons.file_download_outlined, () {}),
               ],
             ),
           ),
@@ -531,9 +574,28 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Order Details',
-                      style: AppTypography.bodyLBold.copyWith(color: AppColors.neutral800),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Order Details',
+                          style: AppTypography.bodyLBold.copyWith(color: AppColors.neutral800),
+                        ),
+                        const SizedBox(height: 2),
+                        Row(
+                          children: [
+                            const Icon(Icons.person_outline, size: 14, color: AppColors.neutral500),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Customer: $_selectedCustomer',
+                              style: AppTypography.bodyXsRegular.copyWith(
+                                color: AppColors.neutral600,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                     if (_cart.isNotEmpty)
                       TextButton(
@@ -629,6 +691,7 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
                           subtotal: _subtotal,
                           tax: _tax,
                           isDineIn: _isDineIn,
+                          customerName: _selectedCustomer,
                         ),
                       );
 
@@ -655,7 +718,7 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
     );
   }
 
-  Widget _buildActionGridButton(String label, IconData icon) {
+  Widget _buildActionGridButton(String label, IconData icon, VoidCallback onTap) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.white,
@@ -665,7 +728,7 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () {},
+          onTap: onTap,
           borderRadius: BorderRadius.circular(10),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
