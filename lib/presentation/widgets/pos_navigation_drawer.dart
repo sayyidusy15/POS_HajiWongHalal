@@ -3,8 +3,8 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../main.dart';
 import '../screens/login_screen.dart';
-import '../screens/pos_tables_screen.dart';
 import '../screens/pos_order_screen.dart';
+import '../screens/pos_tables_editor_screen.dart';
 
 class PosNavigationDrawer extends StatelessWidget {
   final Function(String)? onTableSelected;
@@ -120,17 +120,16 @@ class PosNavigationDrawer extends StatelessWidget {
                       _buildMenuItem(
                         icon: Icons.table_restaurant_outlined,
                         label: 'Tables',
-                        isActive: false,
-                        onTap: () async {
-                          Navigator.pop(context); // Close drawer
-                          final String? selectedTable = await Navigator.push<String>(
-                            context,
-                            MaterialPageRoute(builder: (context) => const PosTablesScreen()),
-                          );
-                          if (selectedTable != null && onTableSelected != null) {
-                            onTableSelected!(selectedTable);
-                          }
-                        },
+                        isActive: activeRoute == 'tables_editor',
+                        onTap: activeRoute == 'tables_editor'
+                            ? () => Navigator.pop(context)
+                            : () {
+                                Navigator.pop(context); // Close drawer
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const PosTablesEditorScreen()),
+                                );
+                              },
                       ),
                       const SizedBox(height: 12),
                       _buildMenuItem(

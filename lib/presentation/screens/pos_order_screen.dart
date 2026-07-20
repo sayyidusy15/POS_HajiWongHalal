@@ -177,6 +177,53 @@ class _PosOrderScreenState extends State<PosOrderScreen> {
           icon: const Icon(Icons.menu),
           onPressed: () => _scaffoldKey.currentState?.openDrawer(),
         ),
+        actions: [
+          // Search bar ID (Icon & Text perfectly aligned)
+          Center(
+            child: Container(
+              width: 220,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                border: Border.all(color: AppColors.neutral300),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Icon(Icons.search, size: 18, color: AppColors.neutral500),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: TextField(
+                      onChanged: (val) {
+                        setState(() {
+                          _searchQuery = val;
+                          _currentPage = 1; // Reset to page 1
+                        });
+                      },
+                      style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral800),
+                      decoration: InputDecoration(
+                        hintText: 'Search order ID...',
+                        hintStyle: AppTypography.bodyXsRegular.copyWith(color: AppColors.neutral400),
+                        border: InputBorder.none,
+                        isDense: true,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          // Tombol Sort Dropdown
+          Center(child: _buildSortButton()),
+          const SizedBox(width: 12),
+          // Tombol Filter Modal
+          Center(child: _buildFilterButton()),
+          const SizedBox(width: 24),
+        ],
       ),
       drawer: PosNavigationDrawer(activeRoute: 'order'),
       body: Padding(
@@ -252,65 +299,7 @@ class _PosOrderScreenState extends State<PosOrderScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Header Tabel Utama
-                    Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Row(
-                        children: [
-                          Text(
-                            'Order',
-                            style: AppTypography.bodyLBold.copyWith(
-                              color: AppColors.neutral900,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            ),
-                          ),
-                          const Spacer(),
-                          // Search bar ID (Icon & Text perfectly aligned)
-                          Container(
-                            width: 220,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: AppColors.white,
-                              border: Border.all(color: AppColors.neutral300),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.search, size: 18, color: AppColors.neutral500),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: TextField(
-                                    onChanged: (val) {
-                                      setState(() {
-                                        _searchQuery = val;
-                                        _currentPage = 1; // Reset to page 1
-                                      });
-                                    },
-                                    style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral800),
-                                    decoration: InputDecoration(
-                                      hintText: 'Search order ID...',
-                                      hintStyle: AppTypography.bodyXsRegular.copyWith(color: AppColors.neutral400),
-                                      border: InputBorder.none,
-                                      isDense: true,
-                                      contentPadding: EdgeInsets.zero,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          // Tombol Sort Dropdown
-                          _buildSortButton(),
-                          const SizedBox(width: 12),
-                          // Tombol Filter Modal
-                          _buildFilterButton(),
-                        ],
-                      ),
-                    ),
+                    const SizedBox(height: 12),
                     const Divider(height: 1, thickness: 1, color: AppColors.neutral200),
 
                     // Data Table Headers

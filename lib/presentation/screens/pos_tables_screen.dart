@@ -4,7 +4,7 @@ import '../../core/theme/app_typography.dart';
 
 // Model data untuk Meja
 class TableModel {
-  final int id;
+  final String id;
   final String name;
   final int capacity;
   final String shape; // 'circle', 'square', 'rectangle'
@@ -16,6 +16,8 @@ class TableModel {
   final String? orderId;
   final String? customerName;
   final double? price;
+  final String floor; // 'Lantai 1', 'Lantai 2', 'Lantai 3'
+  final int rotationAngle; // 0, 90, 180, 270
 
   const TableModel({
     required this.id,
@@ -24,12 +26,14 @@ class TableModel {
     required this.shape,
     required this.x,
     required this.y,
-    this.width = 70,
-    this.height = 70,
+    required this.width,
+    required this.height,
     required this.isUsed,
     this.orderId,
     this.customerName,
     this.price,
+    this.floor = 'Lantai 1',
+    this.rotationAngle = 0,
   });
 }
 
@@ -41,81 +45,101 @@ class PosTablesScreen extends StatefulWidget {
 }
 
 class _PosTablesScreenState extends State<PosTablesScreen> {
-  // Mock Data Meja
+  // TransformationController for InteractiveViewer scaling
+  final TransformationController _transformationController = TransformationController();
+
+  // Active Floor layout filter
+  String _selectedFloor = 'Lantai 1'; // 'Lantai 1', 'Lantai 2', 'Lantai 3'
+
+  // Cashier coordinates per floor (same as layout editor)
+  double _cashierX1 = 440.0, _cashierY1 = 200.0;
+  double _cashierX2 = 440.0, _cashierY2 = 200.0;
+  double _cashierX3 = 440.0, _cashierY3 = 200.0;
+
+  double get _cashierX {
+    if (_selectedFloor == 'Lantai 2') return _cashierX2;
+    if (_selectedFloor == 'Lantai 3') return _cashierX3;
+    return _cashierX1;
+  }
+  
+  double get _cashierY {
+    if (_selectedFloor == 'Lantai 2') return _cashierY2;
+    if (_selectedFloor == 'Lantai 3') return _cashierY3;
+    return _cashierY1;
+  }
+
+  // Mock Data Meja matching layout editor instances exactly
   final List<TableModel> _tables = const [
-    // Top-Right Grid
-    TableModel(id: 1, name: 'Table 1', capacity: 2, shape: 'circle', x: 580, y: 70, isUsed: false),
-    TableModel(id: 2, name: 'Table 2', capacity: 2, shape: 'circle', x: 670, y: 70, isUsed: false),
-    TableModel(id: 4, name: 'Table 4', capacity: 2, shape: 'circle', x: 580, y: 160, isUsed: false),
-    TableModel(
-      id: 3, 
-      name: 'Table 3', 
-      capacity: 2, 
-      shape: 'circle', 
-      x: 670, 
-      y: 160, 
-      isUsed: true,
-      orderId: 'Order #0293E10',
-      customerName: 'Emily Brown',
-      price: 120.00,
-    ),
+    // --- LANTAI 1 ---
+    // Circles (2 seats)
+    TableModel(id: 'T1', name: '01', capacity: 2, shape: 'circle', x: 80, y: 100, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+    TableModel(id: 'T2', name: '02', capacity: 2, shape: 'circle', x: 170, y: 100, width: 50, height: 50, isUsed: true, orderId: 'Order #0293E10', customerName: 'Emily Brown', price: 245000, floor: 'Lantai 1'),
+    TableModel(id: 'T3', name: '03', capacity: 2, shape: 'circle', x: 260, y: 100, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+    TableModel(id: 'T4', name: '04', capacity: 2, shape: 'circle', x: 350, y: 100, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
 
-    // Left horizontal line
-    TableModel(id: 8, name: 'Table 8', capacity: 2, shape: 'circle', x: 80, y: 160, isUsed: false),
-    TableModel(id: 7, name: 'Table 7', capacity: 2, shape: 'circle', x: 170, y: 160, isUsed: false),
-    TableModel(id: 6, name: 'Table 6', capacity: 2, shape: 'circle', x: 260, y: 160, isUsed: false),
-    TableModel(id: 5, name: 'Table 5', capacity: 2, shape: 'circle', x: 350, y: 160, isUsed: false),
+    // Squares (4 seats)
+    TableModel(id: 'T5', name: '05', capacity: 4, shape: 'square', x: 80, y: 200, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+    TableModel(id: 'T6', name: '06', capacity: 4, shape: 'square', x: 170, y: 200, width: 50, height: 50, isUsed: true, orderId: 'Order #201OB99', customerName: 'Michael Johnson', price: 345000, floor: 'Lantai 1'),
+    TableModel(id: 'T7', name: '07', capacity: 4, shape: 'square', x: 260, y: 200, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+    TableModel(id: 'T8', name: '08', capacity: 4, shape: 'square', x: 350, y: 200, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
 
-    // Middle Area: Squares
-    TableModel(
-      id: 10, 
-      name: 'Table 10', 
-      capacity: 4, 
-      shape: 'square', 
-      x: 170, 
-      y: 280, 
-      isUsed: true,
-      orderId: 'Order #201OB99',
-      customerName: 'Michael Johnson',
-      price: 105.25,
-    ),
-    TableModel(id: 9, name: 'Table 9', capacity: 4, shape: 'square', x: 260, y: 280, isUsed: false),
-    TableModel(id: 11, name: 'Table 11', capacity: 4, shape: 'square', x: 170, y: 380, isUsed: false),
-    TableModel(id: 12, name: 'Table 12', capacity: 4, shape: 'square', x: 260, y: 380, isUsed: false),
+    // Middle Squares (4 seats)
+    TableModel(id: 'T9', name: '09', capacity: 4, shape: 'square', x: 80, y: 320, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+    TableModel(id: 'T10', name: '10', capacity: 4, shape: 'square', x: 170, y: 320, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+    TableModel(id: 'T11', name: '11', capacity: 4, shape: 'square', x: 260, y: 320, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+    TableModel(id: 'T12', name: '12', capacity: 4, shape: 'square', x: 350, y: 320, width: 50, height: 50, isUsed: true, orderId: 'Order #883AD90', customerName: 'Sophia Williams', price: 189000, floor: 'Lantai 1'),
 
-    // Middle Area: Rectangles (width=160, height=80)
-    TableModel(id: 13, name: 'Table 13', capacity: 6, shape: 'rectangle', x: 580, y: 280, width: 160, height: 80, isUsed: false),
-    TableModel(
-      id: 14, 
-      name: 'Table 14', 
-      capacity: 6, 
-      shape: 'rectangle', 
-      x: 580, 
-      y: 380, 
-      width: 160, 
-      height: 80, 
-      isUsed: true,
-      orderId: 'Order #883AD90',
-      customerName: 'Sophia Williams',
-      price: 185.00,
-    ),
-    TableModel(id: 15, name: 'Table 15', capacity: 6, shape: 'rectangle', x: 580, y: 480, width: 160, height: 80, isUsed: false),
+    // Long Rectangles (6 seats)
+    TableModel(id: 'T13', name: '13', capacity: 6, shape: 'rectangle', x: 580, y: 200, width: 110, height: 60, isUsed: false, floor: 'Lantai 1'),
+    TableModel(id: 'T14', name: '14', capacity: 6, shape: 'rectangle', x: 580, y: 320, width: 110, height: 60, isUsed: false, floor: 'Lantai 1'),
+    TableModel(id: 'T15', name: '15', capacity: 6, shape: 'rectangle', x: 580, y: 440, width: 110, height: 60, isUsed: true, orderId: 'Order #332FF88', customerName: 'Jack Reacher', price: 760000, floor: 'Lantai 1'),
 
-    // Bottom horizontal line
-    TableModel(id: 20, name: 'Table 20', capacity: 2, shape: 'circle', x: 260, y: 580, isUsed: false),
-    TableModel(id: 19, name: 'Table 19', capacity: 2, shape: 'circle', x: 350, y: 580, isUsed: false),
-    TableModel(id: 18, name: 'Table 18', capacity: 2, shape: 'circle', x: 440, y: 580, isUsed: false),
-    TableModel(id: 17, name: 'Table 17', capacity: 2, shape: 'circle', x: 530, y: 580, isUsed: false),
-    TableModel(id: 16, name: 'Table 16', capacity: 2, shape: 'circle', x: 620, y: 580, isUsed: false),
+    // Bottom Circles (2 seats)
+    TableModel(id: 'T16', name: '16', capacity: 2, shape: 'circle', x: 80, y: 580, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+    TableModel(id: 'T17', name: '17', capacity: 2, shape: 'circle', x: 170, y: 580, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+    TableModel(id: 'T18', name: '18', capacity: 2, shape: 'circle', x: 260, y: 580, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+    TableModel(id: 'T19', name: '19', capacity: 2, shape: 'circle', x: 350, y: 580, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+    TableModel(id: 'T20', name: '20', capacity: 2, shape: 'circle', x: 440, y: 580, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+
+    // --- LANTAI 2 ---
+    TableModel(id: 'T21', name: '21', capacity: 2, shape: 'circle', x: 100, y: 150, width: 50, height: 50, isUsed: false, floor: 'Lantai 2'),
+    TableModel(id: 'T22', name: '22', capacity: 2, shape: 'circle', x: 200, y: 150, width: 50, height: 50, isUsed: true, orderId: 'Order #L2O01', customerName: 'Bruce Wayne', price: 145000, floor: 'Lantai 2'),
+    TableModel(id: 'T23', name: '23', capacity: 2, shape: 'circle', x: 300, y: 150, width: 50, height: 50, isUsed: false, floor: 'Lantai 2'),
+    TableModel(id: 'T24', name: '24', capacity: 4, shape: 'square', x: 100, y: 250, width: 50, height: 50, isUsed: false, floor: 'Lantai 2'),
+    TableModel(id: 'T25', name: '25', capacity: 4, shape: 'square', x: 200, y: 250, width: 50, height: 50, isUsed: false, floor: 'Lantai 2'),
+    TableModel(id: 'T26', name: '26', capacity: 4, shape: 'square', x: 300, y: 250, width: 50, height: 50, isUsed: true, orderId: 'Order #L2O02', customerName: 'Clark Kent', price: 290000, floor: 'Lantai 2'),
+    TableModel(id: 'T27', name: '27', capacity: 6, shape: 'rectangle', x: 500, y: 200, width: 110, height: 60, isUsed: false, floor: 'Lantai 2'),
+    TableModel(id: 'T28', name: '28', capacity: 6, shape: 'rectangle', x: 500, y: 320, width: 110, height: 60, isUsed: false, floor: 'Lantai 2'),
+    TableModel(id: 'T29', name: '29', capacity: 2, shape: 'circle', x: 100, y: 400, width: 50, height: 50, isUsed: false, floor: 'Lantai 2'),
+    TableModel(id: 'T30', name: '30', capacity: 2, shape: 'circle', x: 200, y: 400, width: 50, height: 50, isUsed: false, floor: 'Lantai 2'),
+
+    // --- LANTAI 3 ---
+    TableModel(id: 'T31', name: '31', capacity: 2, shape: 'circle', x: 150, y: 120, width: 50, height: 50, isUsed: false, floor: 'Lantai 3'),
+    TableModel(id: 'T32', name: '32', capacity: 2, shape: 'circle', x: 250, y: 120, width: 50, height: 50, isUsed: false, floor: 'Lantai 3'),
+    TableModel(id: 'T33', name: '33', capacity: 4, shape: 'square', x: 150, y: 220, width: 50, height: 50, isUsed: false, floor: 'Lantai 3'),
+    TableModel(id: 'T34', name: '34', capacity: 4, shape: 'square', x: 250, y: 220, width: 50, height: 50, isUsed: true, orderId: 'Order #L3O01', customerName: 'Diana Prince', price: 95000, floor: 'Lantai 3'),
+    TableModel(id: 'T35', name: '35', capacity: 6, shape: 'rectangle', x: 450, y: 180, width: 110, height: 60, isUsed: false, floor: 'Lantai 3'),
+    TableModel(id: 'T36', name: '36', capacity: 6, shape: 'rectangle', x: 450, y: 300, width: 110, height: 60, isUsed: false, floor: 'Lantai 3'),
+    TableModel(id: 'T37', name: '37', capacity: 4, shape: 'square', x: 150, y: 340, width: 50, height: 50, isUsed: false, floor: 'Lantai 3'),
+    TableModel(id: 'T38', name: '38', capacity: 4, shape: 'square', x: 250, y: 340, width: 50, height: 50, isUsed: false, floor: 'Lantai 3'),
+    TableModel(id: 'T39', name: '39', capacity: 2, shape: 'circle', x: 150, y: 460, width: 50, height: 50, isUsed: false, floor: 'Lantai 3'),
+    TableModel(id: 'T40', name: '40', capacity: 2, shape: 'circle', x: 250, y: 460, width: 50, height: 50, isUsed: false, floor: 'Lantai 3'),
   ];
 
-  // State Manajemen Screen
-  int? _selectedTableId = 5; // Meja 5 terpilih secara default
+  // State Management Screen
+  String? _selectedTableId = 'T5'; // Table 5 selected by default
   String _activeListTab = 'All Table'; // 'All Table', 'Available', 'Used'
   String _searchQuery = '';
   String _selectedCapacityFilter = 'All Capacity'; // 'All Capacity', '2 Seats', '4 Seats', '6 Seats'
 
   final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Zoom out canvas visually to match editor scale initially
+    _transformationController.value = Matrix4.diagonal3Values(0.7, 0.7, 1.0);
+  }
 
   @override
   void dispose() {
@@ -125,12 +149,15 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // 1. Filter Meja untuk Panel Kiri (Daftar Meja)
-    final filteredListTables = _tables.where((table) {
-      // Filter berdasarkan Search
+    // 1. Filter tables for this floor
+    final List<TableModel> floorTablesList = _tables.where((t) => t.floor == _selectedFloor).toList();
+
+    // 2. Filter list of tables for Left Panel
+    final filteredListTables = floorTablesList.where((table) {
+      // Filter by Search
       final matchesSearch = table.name.toLowerCase().contains(_searchQuery.toLowerCase());
       
-      // Filter berdasarkan Tab
+      // Filter by Tab
       bool matchesTab = true;
       if (_activeListTab == 'Available') {
         matchesTab = !table.isUsed;
@@ -176,10 +203,6 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
                               _buildPillToggle(),
                               const SizedBox(height: 16),
 
-                              // Search Bar
-                              _buildSearchBar(),
-                              const SizedBox(height: 16),
-
                               // List Meja (Scrollable)
                               Expanded(
                                 child: _buildTableListView(filteredListTables),
@@ -204,13 +227,6 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
                           borderRadius: BorderRadius.circular(16),
                           child: Stack(
                             children: [
-                              // Subtle Dotted Grid Background
-                              Positioned.fill(
-                                child: CustomPaint(
-                                  painter: DottedGridPainter(),
-                                ),
-                              ),
-
                               // Header Peta (Legend & Dropdown Kapasitas)
                               Positioned(
                                 top: 20,
@@ -219,27 +235,29 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
                                 child: _buildMapHeader(),
                               ),
 
-                              // Visual Map Content (Responsive scaling container)
+                              // Interactive Tables Canvas Stack (Scrollable/Zoomable 4000x4000 canvas matching layout editor)
                               Positioned.fill(
-                                top: 80,
-                                bottom: 20,
-                                left: 24,
-                                right: 24,
-                                child: Center(
-                                  child: FittedBox(
-                                    fit: BoxFit.contain,
-                                    child: SizedBox(
-                                      width: 800,
-                                      height: 680,
-                                      child: Stack(
-                                        children: [
-                                          // Cashier Block
-                                          _buildCashierBlock(),
+                                child: InteractiveViewer(
+                                  transformationController: _transformationController,
+                                  boundaryMargin: const EdgeInsets.all(1000),
+                                  minScale: 0.1,
+                                  maxScale: 1.5,
+                                  child: SizedBox(
+                                    width: 4000,
+                                    height: 4000,
+                                    child: Stack(
+                                      children: [
+                                        // Subtle Dotted Grid Background (zooms & moves inside child container)
+                                        const Positioned.fill(
+                                          child: _DottedGridBackground(),
+                                        ),
 
-                                          // Map Tables
-                                          ..._tables.map((table) => _buildMapTableItem(table)),
-                                        ],
-                                      ),
+                                        // Cashier Block
+                                        _buildCashierBlock(),
+
+                                        // Map Tables for selected floor
+                                        ...floorTablesList.map((table) => _buildMapTableItem(table)),
+                                      ],
                                     ),
                                   ),
                                 ),
@@ -286,6 +304,75 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
           ),
           Row(
             children: [
+              // Search table name bar (perfectly centered icon & text)
+              Container(
+                width: 160,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  border: Border.all(color: AppColors.neutral300),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.search, size: 18, color: AppColors.neutral500),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        onChanged: (val) {
+                          setState(() {
+                            _searchQuery = val;
+                          });
+                        },
+                        style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral800),
+                        decoration: InputDecoration(
+                          hintText: 'Search table...',
+                          hintStyle: AppTypography.bodyXsRegular.copyWith(color: AppColors.neutral400),
+                          border: InputBorder.none,
+                          isDense: true,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              // Floor selector dropdown button
+              Container(
+                height: 42,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  border: Border.all(color: AppColors.neutral300),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: _selectedFloor,
+                    dropdownColor: AppColors.white,
+                    style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral800, fontWeight: FontWeight.bold),
+                    items: ['Lantai 1', 'Lantai 2', 'Lantai 3'].map((item) {
+                      return DropdownMenuItem(
+                        value: item,
+                        child: Text(item, style: const TextStyle(color: AppColors.neutral800)),
+                      );
+                    }).toList(),
+                    onChanged: (val) {
+                      if (val != null) {
+                        setState(() {
+                          _selectedFloor = val;
+                          _selectedTableId = null; // reset selection
+                        });
+                      }
+                    },
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
               // Cancel Button
               SizedBox(
                 height: 42,
@@ -394,52 +481,6 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
     );
   }
 
-  // 2. Left Panel: Search Bar
-  Widget _buildSearchBar() {
-    return Container(
-      height: 46,
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.neutral300, width: 1),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: Row(
-        children: [
-          const Icon(Icons.search, color: AppColors.neutral400, size: 20),
-          const SizedBox(width: 8),
-          Expanded(
-            child: TextField(
-              controller: _searchController,
-              onChanged: (val) {
-                setState(() {
-                  _searchQuery = val;
-                });
-              },
-              decoration: InputDecoration(
-                hintText: 'Search table name...',
-                hintStyle: AppTypography.bodySRegular.copyWith(color: AppColors.neutral400),
-                border: InputBorder.none,
-                isDense: true,
-                contentPadding: EdgeInsets.zero,
-              ),
-              style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral800),
-            ),
-          ),
-          if (_searchQuery.isNotEmpty)
-            GestureDetector(
-              onTap: () {
-                _searchController.clear();
-                setState(() {
-                  _searchQuery = '';
-                });
-              },
-              child: const Icon(Icons.close, color: AppColors.neutral500, size: 16),
-            ),
-        ],
-      ),
-    );
-  }
 
   // 2. Left Panel: Scrollable ListView
   Widget _buildTableListView(List<TableModel> listTables) {
@@ -508,7 +549,7 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
               : null,
           trailing: table.isUsed
               ? Text(
-                  '\$ ${table.price?.toStringAsFixed(2)}',
+                  table.price != null ? 'Rp ' + table.price!.toInt().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.') : 'Rp 0',
                   style: AppTypography.bodyMBold.copyWith(
                     color: AppColors.neutral900,
                   ),
@@ -529,14 +570,22 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         // Legend Indicators
-        Row(
-          children: [
-            _buildLegendItem('Available', const Color(0xFFFFFFFF), border: AppColors.neutral400),
-            const SizedBox(width: 16),
-            _buildLegendItem('Used', Colors.transparent, isStriped: true),
-            const SizedBox(width: 16),
-            _buildLegendItem('Selected', AppColors.primary500),
-          ],
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: AppColors.white.withValues(alpha: 0.9),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: AppColors.neutral300),
+          ),
+          child: Row(
+            children: [
+              _buildLegendItem('Available', const Color(0xFFFFFFFF), border: AppColors.neutral400),
+              const SizedBox(width: 16),
+              _buildLegendItem('Used', Colors.transparent, isStriped: true),
+              const SizedBox(width: 16),
+              _buildLegendItem('Selected', AppColors.primary500),
+            ],
+          ),
         ),
 
         // Dropdown Capacity Filter
@@ -551,6 +600,7 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
               value: _selectedCapacityFilter,
+              dropdownColor: AppColors.white,
               icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.neutral600),
               style: AppTypography.bodySRegular.copyWith(
                 color: AppColors.neutral800,
@@ -567,7 +617,7 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
                   .map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
-                  child: Text(value),
+                  child: Text(value, style: const TextStyle(color: AppColors.neutral800)),
                 );
               }).toList(),
             ),
@@ -611,26 +661,22 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
   // 3. Right Area: Cashier Block widget
   Widget _buildCashierBlock() {
     return Positioned(
-      left: 80,
-      top: 280,
-      width: 70,
-      height: 170,
+      left: _cashierX,
+      top: _cashierY,
+      width: 50,
+      height: 120,
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.neutral100,
+          color: const Color(0xFF1E293B),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppColors.neutral300, width: 1.5),
         ),
         alignment: Alignment.center,
-        child: RotatedBox(
-          quarterTurns: 3,
-          child: Text(
-            'Cashier',
-            style: AppTypography.bodySRegular.copyWith(
-              color: AppColors.neutral500,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.5,
-            ),
+        child: Text(
+          'CASHIER',
+          style: AppTypography.bodyXsRegular.copyWith(
+            color: AppColors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 10,
           ),
         ),
       ),
@@ -720,7 +766,7 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
                           // Nomor Meja
                           Center(
                             child: Text(
-                              table.id.toString(),
+                              table.name,
                               style: AppTypography.bodyLBold.copyWith(
                                 color: isSelected 
                                     ? AppColors.white 
@@ -802,70 +848,7 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
   }
 }
 
-// --- CLIPPER DEFINITIONS ---
-
-class _CircleClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    path.addOval(Rect.fromLTWH(0, 0, size.width, size.height));
-    return path;
-  }
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
-}
-
-class _RoundedRectClipper extends CustomClipper<Path> {
-  final double radius;
-  _RoundedRectClipper({required this.radius});
-
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    path.addRRect(RRect.fromRectAndRadius(
-      Rect.fromLTWH(0, 0, size.width, size.height),
-      Radius.circular(radius),
-    ));
-    return path;
-  }
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
-}
-
-// --- PAINTER DEFINITIONS ---
-
-// 1. Grid Pola Titik
-class DottedGridPainter extends CustomPainter {
-  final double dotRadius;
-  final double spacing;
-  final Color dotColor;
-
-  DottedGridPainter({
-    this.dotRadius = 1.0,
-    this.spacing = 15.0,
-    this.dotColor = const Color(0xFFD8D7D7), // AppColors.neutral300
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = dotColor
-      ..style = PaintingStyle.fill;
-
-    for (double x = spacing; x < size.width; x += spacing) {
-      for (double y = spacing; y < size.height; y += spacing) {
-        canvas.drawCircle(Offset(x, y), dotRadius, paint);
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-// 2. Arsir Garis Diagonal (Used State)
+// Custom Painter untuk Menggambar Pola Garis Diagonal (Arsir)
 class DiagonalStripesPainter extends CustomPainter {
   final Color color;
   final double stripeWidth;
@@ -873,25 +856,87 @@ class DiagonalStripesPainter extends CustomPainter {
 
   DiagonalStripesPainter({
     required this.color,
-    this.stripeWidth = 2,
-    this.gap = 5,
+    this.stripeWidth = 2.0,
+    this.gap = 4.0,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
+    final Paint paint = Paint()
       ..color = color
       ..strokeWidth = stripeWidth
       ..style = PaintingStyle.stroke;
 
     final double step = stripeWidth + gap;
-    // Gambar garis diagonal dari kiri-atas ke kanan-bawah
+    // Gambar garis diagonal dari kiri-bawah ke kanan-atas
     for (double i = -size.height; i < size.width; i += step) {
       canvas.drawLine(
-        Offset(i, 0),
-        Offset(i + size.height, size.height),
+        Offset(i, size.height),
+        Offset(i + size.height, 0),
         paint,
       );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// Clipper Lingkaran
+class _CircleClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    return Path()..addOval(Rect.fromLTWH(0, 0, size.width, size.height));
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
+}
+
+// Clipper Rounded Rectangle
+class _RoundedRectClipper extends CustomClipper<Path> {
+  final double radius;
+  _RoundedRectClipper({required this.radius});
+
+  @override
+  Path getClip(Size size) {
+    return Path()
+      ..addRRect(RRect.fromRectAndRadius(
+        Rect.fromLTWH(0, 0, size.width, size.height),
+        Radius.circular(radius),
+      ));
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
+}
+
+// Custom Painter to draw a clean dotted grid background for layout alignment
+class _DottedGridBackground extends StatelessWidget {
+  const _DottedGridBackground();
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      painter: _GridPainter(),
+    );
+  }
+}
+
+class _GridPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Paint paint = Paint()
+      ..color = AppColors.neutral300
+      ..strokeWidth = 1.0;
+
+    const double gap = 20.0;
+    
+    // Draw horizontal/vertical dots
+    for (double x = 0; x < size.width; x += gap) {
+      for (double y = 0; y < size.height; y += gap) {
+        canvas.drawCircle(Offset(x, y), 1.0, paint);
+      }
     }
   }
 
