@@ -8,6 +8,8 @@ import '../widgets/product_detail_modal.dart';
 import '../widgets/pos_navigation_drawer.dart';
 import '../widgets/discount_modal.dart';
 import '../widgets/order_review_modal.dart';
+import '../widgets/clear_order_modal.dart';
+import '../widgets/payment_success_modal.dart';
 import 'pos_tables_screen.dart';
 
 class Product {
@@ -141,6 +143,16 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
       _cart.clear();
       _appliedDiscount = null; // Clear discount when clearing cart
     });
+  }
+
+  void _handleClearAll() async {
+    final bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => const ClearOrderModal(),
+    );
+    if (confirm == true) {
+      _clearCart();
+    }
   }
 
   double get _subtotal {
@@ -753,7 +765,7 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
                     ),
                     if (_cart.isNotEmpty)
                       TextButton(
-                        onPressed: _clearCart,
+                        onPressed: _handleClearAll,
                         style: TextButton.styleFrom(
                           padding: EdgeInsets.zero,
                           minimumSize: Size.zero,
@@ -865,34 +877,58 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
 
                       // 2. Jika kasir setuju, lanjut ke PaymentModal
                       if (mounted) {
-                        final bool? isPaid = await showDialog<bool>(
+                        final Map<String, dynamic>? paymentResult = await showDialog<Map<String, dynamic>>(
                           context: context,
                           barrierDismissible: false, // Hanya tutup lewat tombol "X" atau "Confirm"
                           builder: (ctx) => PaymentModal(
                             totalAmount: _total,
                             subtotal: _subtotal,
                             tax: _tax,
+                            discountAmount: _discountAmount,
                             isDineIn: _isDineIn,
                             customerName: _selectedCustomer,
                           ),
                         );
 
-                        if (isPaid == true) {
-                          setState(() {
-                            _cart.clear();
-                            _selectedTable = null;
-                            _appliedDiscount = null;
-                            _showToast = false;
-                          });
+                        if (paymentResult != null && paymentResult['success'] == true) {
+                          // Tampilkan PaymentSuccessModal setelah konfirmasi pembayaran berhasil
                           if (mounted) {
-                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                            final bool? resetForNewOrder = await showDialog<bool>(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (ctx) => PaymentSuccessModal(
+                                method: paymentResult['method'],
+                                total: _total,
+                                paid: paymentResult['paid'] ?? 0.0,
+                                change: paymentResult['change'] ?? 0.0,
+                                subtotal: _subtotal,
+                                discountAmount: _discountAmount,
+                                tax: _tax,
+                                customerName: _selectedCustomer,
+                                cartItems: _cart,
+                                isDineIn: _isDineIn,
+                                tableName: _selectedTable,
+                              ),
+                            );
+
+                            if (resetForNewOrder == true) {
                               setState(() {
-                                _showToast = true;
-                                _toastTitle = 'Transaction Success';
-                                _toastSubtitle = 'Transaksi Berhasil Diproses!';
-                                _toastHighlightText = null;
+                                _cart.clear();
+                                _selectedTable = null;
+                                _appliedDiscount = null;
+                                _showToast = false;
                               });
-                            });
+                              if (mounted) {
+                                WidgetsBinding.instance.addPostFrameCallback((_) {
+                                  setState(() {
+                                    _showToast = true;
+                                    _toastTitle = 'Transaction Success';
+                                    _toastSubtitle = 'Transaksi Berhasil Diproses!';
+                                    _toastHighlightText = null;
+                                  });
+                                });
+                              }
+                            }
                           }
                         }
                       }
