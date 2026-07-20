@@ -497,11 +497,15 @@ class _PosOrderScreenState extends State<PosOrderScreen> {
                   size: 20,
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  title,
-                  style: AppTypography.bodySRegular.copyWith(
-                    color: isActive ? AppColors.neutral800 : AppColors.neutral600,
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Text(
+                    title,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: AppTypography.bodySRegular.copyWith(
+                      color: isActive ? AppColors.neutral800 : AppColors.neutral600,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ],
@@ -509,6 +513,8 @@ class _PosOrderScreenState extends State<PosOrderScreen> {
             // Bottom count: Large text
             Text(
               '$count',
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
@@ -545,6 +551,8 @@ class _PosOrderScreenState extends State<PosOrderScreen> {
             flex: 2,
             child: Text(
               order.id,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
               style: AppTypography.bodySRegular.copyWith(
                 color: AppColors.neutral900,
                 fontWeight: FontWeight.bold,
@@ -557,18 +565,22 @@ class _PosOrderScreenState extends State<PosOrderScreen> {
             flex: 2,
             child: Row(
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: _getStatusBgColor(order.status),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: Text(
-                    order.status,
-                    style: AppTypography.bodyXsRegular.copyWith(
-                      color: _getStatusTextColor(order.status),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 11,
+                Flexible(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: _getStatusBgColor(order.status),
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: Text(
+                      order.status,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      style: AppTypography.bodyXsRegular.copyWith(
+                        color: _getStatusTextColor(order.status),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 11,
+                      ),
                     ),
                   ),
                 ),
@@ -583,11 +595,15 @@ class _PosOrderScreenState extends State<PosOrderScreen> {
               children: [
                 Text(
                   _formatDateTime(order.date),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                   style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral800),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   _formatTimeOnly(order.date),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                   style: AppTypography.bodyXsRegular.copyWith(color: AppColors.neutral500),
                 ),
               ],
@@ -604,25 +620,31 @@ class _PosOrderScreenState extends State<PosOrderScreen> {
                   : Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: AppColors.neutral100,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                order.customerName,
-                                style: AppTypography.bodySRegular.copyWith(
-                                  color: AppColors.neutral800,
-                                  fontWeight: FontWeight.w600,
+                        Flexible(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: AppColors.neutral100,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    order.customerName,
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: AppTypography.bodySRegular.copyWith(
+                                      color: AppColors.neutral800,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 4),
-                              const Icon(Icons.open_in_new, size: 12, color: AppColors.neutral500),
-                            ],
+                                const SizedBox(width: 4),
+                                const Icon(Icons.open_in_new, size: 12, color: AppColors.neutral500),
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -634,6 +656,8 @@ class _PosOrderScreenState extends State<PosOrderScreen> {
             flex: 2,
             child: Text(
               order.orderType,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
               style: AppTypography.bodySRegular.copyWith(
                 color: AppColors.neutral800,
                 fontWeight: FontWeight.w500,
@@ -645,6 +669,8 @@ class _PosOrderScreenState extends State<PosOrderScreen> {
             flex: 1,
             child: Text(
               '${order.qty}',
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
               style: AppTypography.bodySRegular.copyWith(
                 color: AppColors.neutral800,
                 fontWeight: FontWeight.bold,
@@ -656,6 +682,8 @@ class _PosOrderScreenState extends State<PosOrderScreen> {
             flex: 2,
             child: Text(
               _formatRupiah(order.total),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
               style: AppTypography.bodySRegular.copyWith(
                 color: AppColors.neutral900,
                 fontWeight: FontWeight.bold,
