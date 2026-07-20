@@ -3,9 +3,11 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../main.dart';
 import '../screens/login_screen.dart';
+import '../screens/pos_tables_screen.dart';
 
 class PosNavigationDrawer extends StatelessWidget {
-  const PosNavigationDrawer({super.key});
+  final Function(String)? onTableSelected;
+  const PosNavigationDrawer({super.key, this.onTableSelected});
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +101,16 @@ class PosNavigationDrawer extends StatelessWidget {
                         icon: Icons.table_restaurant_outlined,
                         label: 'Tables',
                         isActive: false,
-                        onTap: () {},
+                        onTap: () async {
+                          Navigator.pop(context); // Close drawer
+                          final String? selectedTable = await Navigator.push<String>(
+                            context,
+                            MaterialPageRoute(builder: (context) => const PosTablesScreen()),
+                          );
+                          if (selectedTable != null && onTableSelected != null) {
+                            onTableSelected!(selectedTable);
+                          }
+                        },
                       ),
                       const SizedBox(height: 12),
                       _buildMenuItem(
