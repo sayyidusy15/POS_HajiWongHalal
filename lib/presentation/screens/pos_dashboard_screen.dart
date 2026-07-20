@@ -7,6 +7,7 @@ import '../widgets/payment_modal.dart';
 import '../widgets/product_detail_modal.dart';
 import '../widgets/pos_navigation_drawer.dart';
 import '../widgets/discount_modal.dart';
+import '../widgets/order_review_modal.dart';
 import 'pos_tables_screen.dart';
 
 class Product {
@@ -26,10 +27,16 @@ class Product {
 class OrderItem {
   final Product product;
   int quantity;
+  final String? size;
+  final List<String>? addons;
+  final String? notes;
 
   OrderItem({
     required this.product,
     this.quantity = 1,
+    this.size,
+    this.addons,
+    this.notes,
   });
 }
 
@@ -470,7 +477,7 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
 
           return GestureDetector(
             onTap: () async {
-              final result = await showDialog<Map<String, dynamic>>(
+          final result = await showDialog<Map<String, dynamic>>(
                 context: context,
                 barrierDismissible: true, // Kasir bisa ketuk area overlay luar untuk tutup/batal
                 builder: (ctx) => ProductDetailModal(product: p),
@@ -478,12 +485,23 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
               if (result != null) {
                 final Product customizedProduct = result['product'] as Product;
                 final int qty = result['quantity'] as int;
+                final String? size = result['size'] as String?;
+                final List<String>? addons = result['addons'] != null ? List<String>.from(result['addons'] as Iterable) : null;
+                final String? notes = result['notes'] as String?;
                 setState(() {
-                  final index = _cart.indexWhere((item) => item.product.name == customizedProduct.name);
+                  final index = _cart.indexWhere((item) => 
+                      item.product.name == customizedProduct.name &&
+                      item.notes == notes);
                   if (index >= 0) {
                     _cart[index].quantity += qty;
                   } else {
-                    _cart.add(OrderItem(product: customizedProduct, quantity: qty));
+                    _cart.add(OrderItem(
+                      product: customizedProduct, 
+                      quantity: qty,
+                      size: size,
+                      addons: addons,
+                      notes: notes,
+                    ));
                   }
                 });
               }
@@ -826,34 +844,56 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
               onPressed: _cart.isEmpty
                   ? null
                   : () async {
-                      final bool? isPaid = await showDialog<bool>(
+                      // 1. Tampilkan Order Review Modal terlebih dahulu
+                      final bool? proceedToPayment = await showDialog<bool>(
                         context: context,
-                        barrierDismissible: false, // Hanya tutup lewat tombol "X" atau "Confirm"
-                        builder: (ctx) => PaymentModal(
-                          totalAmount: _total,
-                          subtotal: _subtotal,
-                          tax: _tax,
-                          isDineIn: _isDineIn,
+                        builder: (ctx) => OrderReviewModal(
+                          cartItems: _cart,
                           customerName: _selectedCustomer,
+                          tableName: _selectedTable,
+                          isDineIn: _isDineIn,
+                          subtotal: _subtotal,
+                          discountAmount: _discountAmount,
+                          tax: _tax,
+                          total: _total,
                         ),
                       );
 
-                      if (isPaid == true) {
-                        setState(() {
-                          _cart.clear();
-                          _selectedTable = null;
-                          _appliedDiscount = null;
-                          _showToast = false;
-                        });
-                        if (mounted) {
-                          WidgetsBinding.instance.addPostFrameCallback((_) {
-                            setState(() {
-                              _showToast = true;
-                              _toastTitle = 'Transaction Success';
-                              _toastSubtitle = 'Transaksi Berhasil Diproses!';
-                              _toastHighlightText = null;
-                            });
+                      if (proceedToPayment != true) {
+                        return; // Kasir membatalkan/kembali ke dashboard
+                      }
+
+                      // 2. Jika kasir setuju, lanjut ke PaymentModal
+                      if (mounted) {
+                        final bool? isPaid = await showDialog<bool>(
+                          context: context,
+                          barrierDismissible: false, // Hanya tutup lewat tombol "X" atau "Confirm"
+                          builder: (ctx) => PaymentModal(
+                            totalAmount: _total,
+                            subtotal: _subtotal,
+                            tax: _tax,
+                            isDineIn: _isDineIn,
+                            customerName: _selectedCustomer,
+                          ),
+                        );
+
+                        if (isPaid == true) {
+                          setState(() {
+                            _cart.clear();
+                            _selectedTable = null;
+                            _appliedDiscount = null;
+                            _showToast = false;
                           });
+                          if (mounted) {
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              setState(() {
+                                _showToast = true;
+                                _toastTitle = 'Transaction Success';
+                                _toastSubtitle = 'Transaksi Berhasil Diproses!';
+                                _toastHighlightText = null;
+                              });
+                            });
+                          }
                         }
                       }
                     },

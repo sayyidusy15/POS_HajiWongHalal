@@ -346,6 +346,8 @@ class _ProductDetailModalState extends State<ProductDetailModal> {
                                 'product': customProduct,
                                 'quantity': _quantity,
                                 'notes': _notesController.text,
+                                'size': _selectedSize,
+                                'addons': List<String>.from(_selectedAddons),
                               });
                             },
                             style: ElevatedButton.styleFrom(
