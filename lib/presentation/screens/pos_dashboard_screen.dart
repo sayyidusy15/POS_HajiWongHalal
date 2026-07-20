@@ -6,6 +6,7 @@ import '../widgets/app_button.dart';
 import '../widgets/payment_modal.dart';
 import '../widgets/product_detail_modal.dart';
 import '../widgets/pos_navigation_drawer.dart';
+import '../widgets/discount_modal.dart';
 import 'pos_tables_screen.dart';
 
 class Product {
@@ -50,6 +51,10 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
   bool _showToast = false;
   String _toastTitle = '';
   String _toastSubtitle = '';
+  String? _toastHighlightText;
+
+  // Active Discount
+  DiscountResult? _appliedDiscount;
   
   // Keranjang Belanja Dinamis
   final List<OrderItem> _cart = [];
@@ -127,6 +132,7 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
   void _clearCart() {
     setState(() {
       _cart.clear();
+      _appliedDiscount = null; // Clear discount when clearing cart
     });
   }
 
@@ -134,12 +140,17 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
     return _cart.fold(0.0, (sum, item) => sum + (item.product.price * item.quantity));
   }
 
+  double get _discountAmount {
+    if (_appliedDiscount == null) return 0.0;
+    return _appliedDiscount!.discountAmount.clamp(0.0, _subtotal);
+  }
+
   double get _tax {
-    return _subtotal * 0.03; // Pajak 3%
+    return (_subtotal - _discountAmount) * 0.03; // Pajak 3% dihitung setelah diskon
   }
 
   double get _total {
-    return _subtotal + _tax;
+    return (_subtotal - _discountAmount) + _tax;
   }
 
   // Mendapatkan kuantitas item produk tertentu yang ada di keranjang (termasuk variasi kustom)
@@ -180,6 +191,7 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
                 _showToast = true;
                 _toastTitle = 'Table Selected';
                 _toastSubtitle = 'Order set for table: $formattedNum';
+                _toastHighlightText = null;
               });
             });
           }
@@ -228,6 +240,7 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
                   child: _CustomSuccessToast(
                     title: _toastTitle,
                     subtitle: _toastSubtitle,
+                    highlightText: _toastHighlightText,
                     onDismiss: () {
                       setState(() {
                         _showToast = false;
@@ -626,12 +639,47 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
                           _showToast = true;
                           _toastTitle = 'Table Selected';
                           _toastSubtitle = 'Order set for table: $formattedNum';
+                          _toastHighlightText = null;
                         });
                       });
                     }
                   }
                 }),
-                _buildActionGridButton('Discount', Icons.local_offer_outlined, () {}),
+                _buildActionGridButton('Discount', Icons.local_offer_outlined, () async {
+                  final DiscountResult? result = await showDialog<DiscountResult>(
+                    context: context,
+                    builder: (ctx) => DiscountModal(subtotal: _subtotal),
+                  );
+                  if (result != null) {
+                    setState(() {
+                      _appliedDiscount = result;
+                      _showToast = false;
+                    });
+                    if (mounted) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        setState(() {
+                          _showToast = true;
+                          _toastTitle = 'Discount Applied';
+                          
+                          // Format highlight text e.g., "25% off" or "$5.00 off" or "Code R4D082024"
+                          if (result.type == 'preset') {
+                            _toastHighlightText = '${result.value.replaceAll('-', '').trim()} off';
+                            _toastSubtitle = '(${result.name})';
+                          } else if (result.type == 'percentage') {
+                            _toastHighlightText = '${result.value} off';
+                            _toastSubtitle = '(Percentage Discount)';
+                          } else if (result.type == 'price') {
+                            _toastHighlightText = '${result.value} off';
+                            _toastSubtitle = '(Price Discount)';
+                          } else if (result.type == 'code') {
+                            _toastHighlightText = 'Code ${result.value}';
+                            _toastSubtitle = '(Discount Code)';
+                          }
+                        });
+                      });
+                    }
+                  }
+                }),
                 _buildActionGridButton('Save Bill', Icons.file_download_outlined, () {}),
               ],
             ),
@@ -741,6 +789,13 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
               children: [
                 _buildReceiptRow('Subtotal', _formatRupiah(_subtotal)),
                 const SizedBox(height: 8),
+                if (_appliedDiscount != null) ...[
+                  _buildReceiptRow(
+                    'Discount (${_appliedDiscount!.name == "Discount Code" ? _appliedDiscount!.value : _appliedDiscount!.name})',
+                    '- ' + _formatRupiah(_discountAmount),
+                  ),
+                  const SizedBox(height: 8),
+                ],
                 _buildReceiptRow('Tax (3%)', _formatRupiah(_tax)),
                 const SizedBox(height: 12),
                 Row(
@@ -787,6 +842,7 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
                         setState(() {
                           _cart.clear();
                           _selectedTable = null;
+                          _appliedDiscount = null;
                           _showToast = false;
                         });
                         if (mounted) {
@@ -795,6 +851,7 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
                               _showToast = true;
                               _toastTitle = 'Transaction Success';
                               _toastSubtitle = 'Transaksi Berhasil Diproses!';
+                              _toastHighlightText = null;
                             });
                           });
                         }
@@ -988,10 +1045,14 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral500),
+        Expanded(
+          child: Text(
+            label,
+            overflow: TextOverflow.ellipsis,
+            style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral500),
+          ),
         ),
+        const SizedBox(width: 8),
         Text(
           value,
           style: AppTypography.bodySRegular.copyWith(
@@ -1008,11 +1069,13 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
 class _CustomSuccessToast extends StatefulWidget {
   final String title;
   final String subtitle;
+  final String? highlightText;
   final VoidCallback onDismiss;
 
   const _CustomSuccessToast({
     required this.title,
     required this.subtitle,
+    this.highlightText,
     required this.onDismiss,
   });
 
@@ -1100,12 +1163,34 @@ class _CustomSuccessToastState extends State<_CustomSuccessToast> with SingleTic
                         ),
                       ),
                       const SizedBox(height: 2),
-                      Text(
-                        widget.subtitle,
-                        style: AppTypography.bodyXsRegular.copyWith(
-                          color: AppColors.neutral600,
+                      if (widget.highlightText != null)
+                        RichText(
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text: widget.highlightText,
+                                style: AppTypography.bodyXsRegular.copyWith(
+                                  color: AppColors.error500, // pink/orange color
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const TextSpan(text: ' '),
+                              TextSpan(
+                                text: widget.subtitle,
+                                style: AppTypography.bodyXsRegular.copyWith(
+                                  color: AppColors.neutral600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      else
+                        Text(
+                          widget.subtitle,
+                          style: AppTypography.bodyXsRegular.copyWith(
+                            color: AppColors.neutral600,
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ),
