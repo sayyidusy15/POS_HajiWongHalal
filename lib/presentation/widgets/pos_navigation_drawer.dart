@@ -4,10 +4,17 @@ import '../../core/theme/app_typography.dart';
 import '../../main.dart';
 import '../screens/login_screen.dart';
 import '../screens/pos_tables_screen.dart';
+import '../screens/pos_order_screen.dart';
 
 class PosNavigationDrawer extends StatelessWidget {
   final Function(String)? onTableSelected;
-  const PosNavigationDrawer({super.key, this.onTableSelected});
+  final String activeRoute;
+
+  const PosNavigationDrawer({
+    super.key,
+    this.onTableSelected,
+    this.activeRoute = 'pos',
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -77,17 +84,30 @@ class PosNavigationDrawer extends StatelessWidget {
                       _buildMenuItem(
                         icon: Icons.home_outlined,
                         label: 'Point of Sale',
-                        isActive: true,
-                        onTap: () => Navigator.pop(context),
+                        isActive: activeRoute == 'pos',
+                        onTap: activeRoute == 'pos' 
+                            ? () => Navigator.pop(context) 
+                            : () {
+                                Navigator.pop(context); // Close drawer
+                                Navigator.pop(context); // Pop back to dashboard
+                              },
                       ),
                       const SizedBox(height: 12),
                       
-                      // Menu-Menu Inaktif
+                      // Menu-Menu Inaktif / Aktif: Order
                       _buildMenuItem(
                         icon: Icons.shopping_bag_outlined,
                         label: 'Order',
-                        isActive: false,
-                        onTap: () {},
+                        isActive: activeRoute == 'order',
+                        onTap: activeRoute == 'order'
+                            ? () => Navigator.pop(context)
+                            : () {
+                                Navigator.pop(context); // Close drawer
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const PosOrderScreen()),
+                                );
+                              },
                       ),
                       const SizedBox(height: 12),
                       _buildMenuItem(
