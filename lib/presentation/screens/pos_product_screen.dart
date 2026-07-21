@@ -4,6 +4,7 @@ import '../../core/theme/app_typography.dart';
 import '../widgets/pos_navigation_drawer.dart';
 import '../widgets/custom_success_toast.dart';
 import '../widgets/delete_confirmation_modal.dart';
+import '../widgets/add_product_modal.dart';
 
 class ProductModel {
   final String id;
@@ -61,6 +62,7 @@ class _PosProductScreenState extends State<PosProductScreen> {
 
   // Mock Products Data
   late List<ProductModel> _products;
+  final List<String> _globalCategories = ['Burger', 'Fried Chicken', 'Drink', 'Snack'];
 
   @override
   void initState() {
@@ -773,7 +775,7 @@ class _PosProductScreenState extends State<PosProductScreen> {
                         value: tempCategory,
                         dropdownColor: AppColors.white,
                         isExpanded: true,
-                        items: ['All', 'Burger', 'Fried Chicken', 'Drink', 'Snack']
+                        items: ['All', ..._globalCategories]
                             .map((item) => DropdownMenuItem(value: item, child: Text(item, style: const TextStyle(color: AppColors.neutral800))))
                             .toList(),
                         onChanged: (val) {
@@ -958,380 +960,28 @@ class _PosProductScreenState extends State<PosProductScreen> {
     }
   }
 
-  // 3. Add Product Modal
+  // 3. Add Product Modal (Multi-step flow)
   void _showAddProductModal() async {
-    final nameCtrl = TextEditingController();
-    final descCtrl = TextEditingController();
-    final priceCtrl = TextEditingController();
-    final stockCtrl = TextEditingController();
-    String categoryVal = 'Burger';
-    String statusVal = 'Active';
-
-    final ProductModel? newProduct = await showDialog<ProductModel>(
-      context: context,
-      barrierColor: Colors.black.withValues(alpha: 0.5),
-      builder: (ctx) => StatefulBuilder(
-        builder: (dialogCtx, setModalState) => Dialog(
-          backgroundColor: Colors.transparent,
-          child: SingleChildScrollView(
-            child: Container(
-              width: 460,
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: AppColors.white,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text('Add New Product', style: AppTypography.bodyLBold.copyWith(fontWeight: FontWeight.bold, fontSize: 18)),
-                  const SizedBox(height: 20),
-                  Text('Product Name', style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 6),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(border: Border.all(color: AppColors.neutral300), borderRadius: BorderRadius.circular(8)),
-                    child: TextField(controller: nameCtrl, decoration: const InputDecoration(hintText: 'e.g. Classic Crispyburger', border: InputBorder.none)),
-                  ),
-                  const SizedBox(height: 14),
-                  Text('Description', style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 6),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(border: Border.all(color: AppColors.neutral300), borderRadius: BorderRadius.circular(8)),
-                    child: TextField(controller: descCtrl, decoration: const InputDecoration(hintText: 'Short item summary...', border: InputBorder.none)),
-                  ),
-                  const SizedBox(height: 14),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Category', style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 6),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10),
-                              decoration: BoxDecoration(border: Border.all(color: AppColors.neutral300), borderRadius: BorderRadius.circular(8)),
-                              child: DropdownButtonHideUnderline(
-                                child: DropdownButton<String>(
-                                  value: categoryVal,
-                                  isExpanded: true,
-                                  dropdownColor: AppColors.white,
-                                  items: ['Burger', 'Fried Chicken', 'Drink', 'Snack'].map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
-                                  onChanged: (v) => setModalState(() => categoryVal = v!),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Status', style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 6),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10),
-                              decoration: BoxDecoration(border: Border.all(color: AppColors.neutral300), borderRadius: BorderRadius.circular(8)),
-                              child: DropdownButtonHideUnderline(
-                                child: DropdownButton<String>(
-                                  value: statusVal,
-                                  isExpanded: true,
-                                  dropdownColor: AppColors.white,
-                                  items: ['Active', 'Draft', 'Inactive'].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
-                                  onChanged: (v) => setModalState(() => statusVal = v!),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 14),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Price (Rp)', style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 6),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
-                              decoration: BoxDecoration(border: Border.all(color: AppColors.neutral300), borderRadius: BorderRadius.circular(8)),
-                              child: TextField(controller: priceCtrl, keyboardType: TextInputType.number, decoration: const InputDecoration(hintText: '45000', border: InputBorder.none)),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Stock', style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 6),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
-                              decoration: BoxDecoration(border: Border.all(color: AppColors.neutral300), borderRadius: BorderRadius.circular(8)),
-                              child: TextField(controller: stockCtrl, keyboardType: TextInputType.number, decoration: const InputDecoration(hintText: '120', border: InputBorder.none)),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () => Navigator.pop(ctx, null),
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            side: const BorderSide(color: AppColors.neutral300),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                          ),
-                          child: const Text('Cancel'),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            final String name = nameCtrl.text.trim();
-                            final double? price = double.tryParse(priceCtrl.text.trim());
-                            if (name.isNotEmpty && price != null) {
-                              Navigator.pop(
-                                ctx,
-                                ProductModel(
-                                  id: '#BP' + (100 + _products.length).toString(),
-                                  name: name,
-                                  description: descCtrl.text.trim().isEmpty ? 'Freshly prepared item' : descCtrl.text.trim(),
-                                  category: categoryVal,
-                                  price: price,
-                                  stock: int.tryParse(stockCtrl.text.trim()),
-                                  status: statusVal,
-                                  icon: _getIconForCategory(categoryVal),
-                                ),
-                              );
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary500,
-                            foregroundColor: AppColors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                            elevation: 0,
-                          ),
-                          child: const Text('Add Product'),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
+    final ProductModel? newProduct = await AddProductModal.show(context, categories: _globalCategories);
 
     if (newProduct != null) {
       setState(() {
         _products.insert(0, newProduct);
       });
-      _triggerToast('Product Added', '${newProduct.name} successfully created', isSuccess: true);
+      _triggerToast(
+        'Product Successfully Added!',
+        '${newProduct.name} has been added to your menu',
+        isSuccess: true,
+      );
     }
   }
 
   // 4. Edit Product Modal
   void _showEditProductModal(ProductModel product) async {
-    final nameCtrl = TextEditingController(text: product.name);
-    final descCtrl = TextEditingController(text: product.description);
-    final priceCtrl = TextEditingController(text: product.price.toInt().toString());
-    final stockCtrl = TextEditingController(text: product.stock?.toString() ?? '');
-    String categoryVal = product.category;
-    String statusVal = product.status;
-
-    final ProductModel? updated = await showDialog<ProductModel>(
-      context: context,
-      barrierColor: Colors.black.withValues(alpha: 0.5),
-      builder: (ctx) => StatefulBuilder(
-        builder: (dialogCtx, setModalState) => Dialog(
-          backgroundColor: Colors.transparent,
-          child: SingleChildScrollView(
-            child: Container(
-              width: 460,
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: AppColors.white,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text('Edit Product', style: AppTypography.bodyLBold.copyWith(fontWeight: FontWeight.bold, fontSize: 18)),
-                  const SizedBox(height: 20),
-                  Text('Product Name', style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 6),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(border: Border.all(color: AppColors.neutral300), borderRadius: BorderRadius.circular(8)),
-                    child: TextField(controller: nameCtrl, decoration: const InputDecoration(border: InputBorder.none)),
-                  ),
-                  const SizedBox(height: 14),
-                  Text('Description', style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 6),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(border: Border.all(color: AppColors.neutral300), borderRadius: BorderRadius.circular(8)),
-                    child: TextField(controller: descCtrl, decoration: const InputDecoration(border: InputBorder.none)),
-                  ),
-                  const SizedBox(height: 14),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Category', style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 6),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10),
-                              decoration: BoxDecoration(border: Border.all(color: AppColors.neutral300), borderRadius: BorderRadius.circular(8)),
-                              child: DropdownButtonHideUnderline(
-                                child: DropdownButton<String>(
-                                  value: categoryVal,
-                                  isExpanded: true,
-                                  dropdownColor: AppColors.white,
-                                  items: ['Burger', 'Fried Chicken', 'Drink', 'Snack'].map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
-                                  onChanged: (v) => setModalState(() => categoryVal = v!),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Status', style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 6),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10),
-                              decoration: BoxDecoration(border: Border.all(color: AppColors.neutral300), borderRadius: BorderRadius.circular(8)),
-                              child: DropdownButtonHideUnderline(
-                                child: DropdownButton<String>(
-                                  value: statusVal,
-                                  isExpanded: true,
-                                  dropdownColor: AppColors.white,
-                                  items: ['Active', 'Draft', 'Inactive'].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
-                                  onChanged: (v) => setModalState(() => statusVal = v!),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 14),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Price (Rp)', style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 6),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
-                              decoration: BoxDecoration(border: Border.all(color: AppColors.neutral300), borderRadius: BorderRadius.circular(8)),
-                              child: TextField(controller: priceCtrl, keyboardType: TextInputType.number, decoration: const InputDecoration(border: InputBorder.none)),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Stock', style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 6),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
-                              decoration: BoxDecoration(border: Border.all(color: AppColors.neutral300), borderRadius: BorderRadius.circular(8)),
-                              child: TextField(controller: stockCtrl, keyboardType: TextInputType.number, decoration: const InputDecoration(border: InputBorder.none)),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () => Navigator.pop(ctx, null),
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            side: const BorderSide(color: AppColors.neutral300),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                          ),
-                          child: const Text('Cancel'),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            final String name = nameCtrl.text.trim();
-                            final double? price = double.tryParse(priceCtrl.text.trim());
-                            if (name.isNotEmpty && price != null) {
-                              Navigator.pop(
-                                ctx,
-                                ProductModel(
-                                  id: product.id,
-                                  name: name,
-                                  description: descCtrl.text.trim(),
-                                  category: categoryVal,
-                                  price: price,
-                                  stock: int.tryParse(stockCtrl.text.trim()),
-                                  status: statusVal,
-                                  icon: _getIconForCategory(categoryVal),
-                                ),
-                              );
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary500,
-                            foregroundColor: AppColors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                            elevation: 0,
-                          ),
-                          child: const Text('Save Changes'),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
+    final ProductModel? updated = await AddProductModal.show(
+      context,
+      initialProduct: product,
+      categories: _globalCategories,
     );
 
     if (updated != null) {
@@ -1341,16 +991,12 @@ class _PosProductScreenState extends State<PosProductScreen> {
           _products[idx] = updated;
         }
       });
-      _triggerToast('Product Updated', '${updated.name} details saved', isSuccess: true);
+      _triggerToast(
+        'Product Successfully Updated!',
+        '${updated.name} details have been saved',
+        isSuccess: true,
+      );
     }
-  }
-
-  IconData _getIconForCategory(String category) {
-    if (category == 'Burger') return Icons.lunch_dining_outlined;
-    if (category == 'Fried Chicken') return Icons.kebab_dining_outlined;
-    if (category == 'Drink') return Icons.local_drink_outlined;
-    if (category == 'Snack') return Icons.cookie_outlined;
-    return Icons.fastfood_outlined;
   }
 
   // Default Mock Products
