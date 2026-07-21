@@ -299,12 +299,9 @@ class _PosOrderScreenState extends State<PosOrderScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const SizedBox(height: 12),
-                    const Divider(height: 1, thickness: 1, color: AppColors.neutral200),
-
                     // Data Table Headers
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
                       child: Row(
                         children: [
                           _buildColumnHead('ID', 2),
@@ -342,7 +339,7 @@ class _PosOrderScreenState extends State<PosOrderScreen> {
 
                     // Footer Pagination
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -532,7 +529,7 @@ class _PosOrderScreenState extends State<PosOrderScreen> {
 
   Widget _buildOrderRow(OrderModel order) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
       child: Row(
         children: [
           // 1. ID

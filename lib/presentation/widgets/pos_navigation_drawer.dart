@@ -5,6 +5,7 @@ import '../../main.dart';
 import '../screens/login_screen.dart';
 import '../screens/pos_order_screen.dart';
 import '../screens/pos_tables_editor_screen.dart';
+import '../screens/pos_product_screen.dart';
 
 class PosNavigationDrawer extends StatelessWidget {
   final Function(String)? onTableSelected;
@@ -16,10 +17,32 @@ class PosNavigationDrawer extends StatelessWidget {
     this.activeRoute = 'pos',
   });
 
+  void _navigateToRoute(BuildContext context, Widget targetScreen) {
+    Navigator.pop(context); // Close drawer
+    if (activeRoute == 'pos') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => targetScreen),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => targetScreen),
+      );
+    }
+  }
+
+  void _navigateToPos(BuildContext context) {
+    Navigator.pop(context); // Close drawer
+    if (activeRoute != 'pos') {
+      Navigator.popUntil(context, (route) => route.isFirst);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: const Color(0xFFEBEBEB), // Warna abu-abu muda sesuai mockup gambar
+      backgroundColor: const Color(0xFFEBEBEB), // Light gray background
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
           topRight: Radius.circular(16),
@@ -32,7 +55,7 @@ class PosNavigationDrawer extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // 1. BARIS PALING ATAS: Ikon Close saja
+              // 1. TOP ROW: Close Icon Only
               Align(
                 alignment: Alignment.topRight,
                 child: IconButton(
@@ -42,7 +65,7 @@ class PosNavigationDrawer extends StatelessWidget {
               ),
               const SizedBox(height: 4),
 
-              // 2. LOGO DAN NAMA TOKO (Haji Wong Halal & Storefront Icon)
+              // 2. STORE LOGO AND NAME
               Row(
                 children: [
                   Container(
@@ -71,45 +94,38 @@ class PosNavigationDrawer extends StatelessWidget {
               ),
               const SizedBox(height: 12),
 
-              // Garis pembatas di bawah nama toko
+              // Divider below store name
               const Divider(color: AppColors.neutral300, thickness: 1.2),
               const SizedBox(height: 16),
 
-              // 3. BAGIAN NAVIGASI UTAMA (TENGAH)
+              // 3. MAIN NAVIGATION MENU
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      // Menu Aktif: Point of Sale (Home icon)
+                      // Point of Sale
                       _buildMenuItem(
                         icon: Icons.home_outlined,
                         label: 'Point of Sale',
                         isActive: activeRoute == 'pos',
                         onTap: activeRoute == 'pos' 
                             ? () => Navigator.pop(context) 
-                            : () {
-                                Navigator.pop(context); // Close drawer
-                                Navigator.pop(context); // Pop back to dashboard
-                              },
+                            : () => _navigateToPos(context),
                       ),
                       const SizedBox(height: 12),
                       
-                      // Menu-Menu Inaktif / Aktif: Order
+                      // Order
                       _buildMenuItem(
                         icon: Icons.shopping_bag_outlined,
                         label: 'Order',
                         isActive: activeRoute == 'order',
                         onTap: activeRoute == 'order'
                             ? () => Navigator.pop(context)
-                            : () {
-                                Navigator.pop(context); // Close drawer
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const PosOrderScreen()),
-                                );
-                              },
+                            : () => _navigateToRoute(context, const PosOrderScreen()),
                       ),
                       const SizedBox(height: 12),
+
+                      // Customer
                       _buildMenuItem(
                         icon: Icons.people_outline,
                         label: 'Customer',
@@ -117,28 +133,30 @@ class PosNavigationDrawer extends StatelessWidget {
                         onTap: () {},
                       ),
                       const SizedBox(height: 12),
+
+                      // Tables
                       _buildMenuItem(
                         icon: Icons.table_restaurant_outlined,
                         label: 'Tables',
                         isActive: activeRoute == 'tables_editor',
                         onTap: activeRoute == 'tables_editor'
                             ? () => Navigator.pop(context)
-                            : () {
-                                Navigator.pop(context); // Close drawer
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const PosTablesEditorScreen()),
-                                );
-                              },
+                            : () => _navigateToRoute(context, const PosTablesEditorScreen()),
                       ),
                       const SizedBox(height: 12),
+
+                      // Product
                       _buildMenuItem(
                         icon: Icons.inventory_2_outlined,
                         label: 'Product',
-                        isActive: false,
-                        onTap: () {},
+                        isActive: activeRoute == 'product',
+                        onTap: activeRoute == 'product'
+                            ? () => Navigator.pop(context)
+                            : () => _navigateToRoute(context, const PosProductScreen()),
                       ),
                       const SizedBox(height: 12),
+
+                      // Report
                       _buildMenuItem(
                         icon: Icons.analytics_outlined,
                         label: 'Report',
@@ -146,6 +164,8 @@ class PosNavigationDrawer extends StatelessWidget {
                         onTap: () {},
                       ),
                       const SizedBox(height: 12),
+
+                      // Inventory
                       _buildMenuItem(
                         icon: Icons.warehouse_outlined,
                         label: 'Inventory',
@@ -153,6 +173,8 @@ class PosNavigationDrawer extends StatelessWidget {
                         onTap: () {},
                       ),
                       const SizedBox(height: 12),
+
+                      // Setting
                       _buildMenuItem(
                         icon: Icons.settings_outlined,
                         label: 'Setting',
@@ -164,25 +186,23 @@ class PosNavigationDrawer extends StatelessWidget {
                 ),
               ),
 
-              // 4. BAGIAN FOOTER (BAWAH)
+              // 4. FOOTER (Logout)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Garis pembatas di atas Logout
                   const Divider(color: AppColors.neutral300, thickness: 1.2),
                   const SizedBox(height: 12),
-
-                  // Tombol Logout (Menjadi elemen paling bawah di drawer)
                   _buildMenuItem(
                     icon: Icons.logout,
                     label: 'Logout',
                     isActive: false,
                     textColor: AppColors.neutral900,
                     onTap: () {
-                      isStaffLoggedIn = false; // Reset status login global
-                      Navigator.pushReplacement(
+                      isStaffLoggedIn = false;
+                      Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(builder: (context) => const LoginScreen()),
+                        (route) => false,
                       );
                     },
                   ),
@@ -207,7 +227,7 @@ class PosNavigationDrawer extends StatelessWidget {
     return Container(
       height: 52,
       decoration: BoxDecoration(
-        color: isActive ? const Color(0xFF333333) : Colors.transparent, // Hitam/abu gelap saat aktif
+        color: isActive ? const Color(0xFF333333) : Colors.transparent,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Material(
