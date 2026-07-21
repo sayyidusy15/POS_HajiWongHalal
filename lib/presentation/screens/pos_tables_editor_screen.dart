@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../widgets/pos_navigation_drawer.dart';
+import '../widgets/custom_success_toast.dart';
 
 class TableEditorModel {
   final String id;
@@ -125,7 +126,8 @@ class _PosTablesEditorScreenState extends State<PosTablesEditorScreen> {
   String _typeFilter = 'All Type'; // 'All Type', 'Circle', 'Square', 'Rectangle'
   
   // Toast Notification state
-  String _toastMessage = '';
+  String _toastTitle = '';
+  String _toastSubtitle = '';
   bool _toastVisible = false;
   bool _toastIsSuccess = true;
 
@@ -136,8 +138,8 @@ class _PosTablesEditorScreenState extends State<PosTablesEditorScreen> {
   void initState() {
     super.initState();
     _tables = _generateDefaultTables();
-    // Start canvas with a zoomed-out scale of 0.7 to increase apparent canvas area size
-    _transformationController.value = Matrix4.diagonal3Values(0.7, 0.7, 1.0);
+    // Start canvas with a zoomed-out scale of 0.6 to increase apparent canvas area size and show bottom tables clearly
+    _transformationController.value = Matrix4.diagonal3Values(0.6, 0.6, 1.0);
   }
 
   // Formatting currency helper
@@ -226,8 +228,27 @@ class _PosTablesEditorScreenState extends State<PosTablesEditorScreen> {
             ],
           ),
 
-          // 3. FLOAT TOAST NOTIFICATIONS overlay
-          if (_toastVisible) _buildToastNotificationBanner(),
+          // 3. FLOAT TOAST NOTIFICATIONS overlay (Using shared CustomSuccessToast component)
+          if (_toastVisible)
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: CustomSuccessToast(
+                  title: _toastTitle,
+                  subtitle: _toastSubtitle,
+                  isSuccess: _toastIsSuccess,
+                  onDismiss: () {
+                    if (mounted) {
+                      setState(() {
+                        _toastVisible = false;
+                      });
+                    }
+                  },
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -591,7 +612,7 @@ class _PosTablesEditorScreenState extends State<PosTablesEditorScreen> {
             // C. INTERACTIVE TABLES CANVAS STACK (Massive 4000x4000 layout)
             InteractiveViewer(
               transformationController: _transformationController,
-              boundaryMargin: const EdgeInsets.all(1000), // Massive margin so user can pan anywhere
+              boundaryMargin: const EdgeInsets.all(2500), // Massive margin so user can pan anywhere extensively downwards
               minScale: 0.1, // Zoom out extensively
               maxScale: 1.5,
               child: SizedBox(
@@ -861,7 +882,7 @@ class _PosTablesEditorScreenState extends State<PosTablesEditorScreen> {
                   _tables.removeWhere((t) => t.id == selectedTable.id);
                   _selectedTableId = '';
                 });
-                _showToastAlert('Table deleted successfully', success: true);
+                _showToastAlert('Table Deleted', 'Table ${selectedTable.name} deleted successfully', success: true);
               },
             ),
           ],
@@ -888,63 +909,18 @@ class _PosTablesEditorScreenState extends State<PosTablesEditorScreen> {
     );
   }
 
-  Widget _buildToastNotificationBanner() {
-    return Positioned(
-      top: 24,
-      right: 24,
-      child: Material(
-        color: Colors.transparent,
-        child: AnimatedOpacity(
-          opacity: _toastVisible ? 1.0 : 0.0,
-          duration: const Duration(milliseconds: 300),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            decoration: BoxDecoration(
-              color: _toastIsSuccess ? const Color(0xFF289656) : AppColors.neutral800,
-              borderRadius: BorderRadius.circular(8),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                )
-              ],
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  _toastIsSuccess ? Icons.check_circle_outline : Icons.info_outline,
-                  color: AppColors.white,
-                  size: 18,
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  _toastMessage,
-                  style: AppTypography.bodySRegular.copyWith(
-                    color: AppColors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   // Toast trigger controller helper
-  void _showToastAlert(String message, {bool success = true}) {
+  void _showToastAlert(String title, String subtitle, {bool success = true}) {
     setState(() {
-      _toastMessage = message;
-      _toastIsSuccess = success;
-      _toastVisible = true;
+      _toastVisible = false;
     });
-    Future.delayed(const Duration(seconds: 2), () {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         setState(() {
-          _toastVisible = false;
+          _toastTitle = title;
+          _toastSubtitle = subtitle;
+          _toastIsSuccess = success;
+          _toastVisible = true;
         });
       }
     });
@@ -967,7 +943,7 @@ class _PosTablesEditorScreenState extends State<PosTablesEditorScreen> {
       _isEditMode = false;
       _selectedTableId = '';
     });
-    _showToastAlert('Table layout saved successfully', success: true);
+    _showToastAlert('Layout Saved', 'Table layout saved successfully', success: true);
   }
 
   void _showResetConfirmDialog() async {
@@ -1056,7 +1032,7 @@ class _PosTablesEditorScreenState extends State<PosTablesEditorScreen> {
         _cashierX2 = 440.0; _cashierY2 = 200.0;
         _cashierX3 = 440.0; _cashierY3 = 200.0;
       });
-      _showToastAlert('Layout reset to default', success: false);
+      _showToastAlert('Layout Reset', 'Layout reset to default state', success: false);
     }
   }
 
@@ -1286,9 +1262,9 @@ class _PosTablesEditorScreenState extends State<PosTablesEditorScreen> {
       setState(() {
         _tables.add(newTable);
       });
-      _showToastAlert('Table successfully added to ${newTable.floor}', success: true);
+      _showToastAlert('Table Added', 'Table ${newTable.name} added to ${newTable.floor}', success: true);
     } else {
-      _showToastAlert('Table creation cancelled', success: false);
+      _showToastAlert('Cancelled', 'Table creation cancelled', success: false);
     }
   }
 
@@ -1520,7 +1496,7 @@ class _PosTablesEditorScreenState extends State<PosTablesEditorScreen> {
           }
         }
       });
-      _showToastAlert('Table settings saved', success: true);
+      _showToastAlert('Table Updated', 'Settings for Table ${updated.name} saved', success: true);
     }
   }
 
@@ -1553,11 +1529,11 @@ class _PosTablesEditorScreenState extends State<PosTablesEditorScreen> {
     list.add(TableEditorModel(id: 'T15', name: '15', capacity: 6, x: 580, y: 440, width: 110, height: 60, tableType: 'Rectangle', status: 'Used', usedAmount: 760000, floor: 'Lantai 1'));
 
     // Bottom Circles (2 seats)
-    list.add(TableEditorModel(id: 'T16', name: '16', capacity: 2, x: 80, y: 580, width: 50, height: 50, tableType: 'Circle', floor: 'Lantai 1'));
-    list.add(TableEditorModel(id: 'T17', name: '17', capacity: 2, x: 170, y: 580, width: 50, height: 50, tableType: 'Circle', floor: 'Lantai 1'));
-    list.add(TableEditorModel(id: 'T18', name: '18', capacity: 2, x: 260, y: 580, width: 50, height: 50, tableType: 'Circle', floor: 'Lantai 1'));
-    list.add(TableEditorModel(id: 'T19', name: '19', capacity: 2, x: 350, y: 580, width: 50, height: 50, tableType: 'Circle', floor: 'Lantai 1'));
-    list.add(TableEditorModel(id: 'T20', name: '20', capacity: 2, x: 440, y: 580, width: 50, height: 50, tableType: 'Circle', floor: 'Lantai 1'));
+    list.add(TableEditorModel(id: 'T16', name: '16', capacity: 2, x: 80, y: 440, width: 50, height: 50, tableType: 'Circle', floor: 'Lantai 1'));
+    list.add(TableEditorModel(id: 'T17', name: '17', capacity: 2, x: 170, y: 440, width: 50, height: 50, tableType: 'Circle', floor: 'Lantai 1'));
+    list.add(TableEditorModel(id: 'T18', name: '18', capacity: 2, x: 260, y: 440, width: 50, height: 50, tableType: 'Circle', floor: 'Lantai 1'));
+    list.add(TableEditorModel(id: 'T19', name: '19', capacity: 2, x: 350, y: 440, width: 50, height: 50, tableType: 'Circle', floor: 'Lantai 1'));
+    list.add(TableEditorModel(id: 'T20', name: '20', capacity: 2, x: 440, y: 440, width: 50, height: 50, tableType: 'Circle', floor: 'Lantai 1'));
 
     // --- LANTAI 2 ---
     list.add(TableEditorModel(id: 'T21', name: '21', capacity: 2, x: 100, y: 150, width: 50, height: 50, tableType: 'Circle', floor: 'Lantai 2'));

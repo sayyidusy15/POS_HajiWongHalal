@@ -95,11 +95,11 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
     TableModel(id: 'T15', name: '15', capacity: 6, shape: 'rectangle', x: 580, y: 440, width: 110, height: 60, isUsed: true, orderId: 'Order #332FF88', customerName: 'Jack Reacher', price: 760000, floor: 'Lantai 1'),
 
     // Bottom Circles (2 seats)
-    TableModel(id: 'T16', name: '16', capacity: 2, shape: 'circle', x: 80, y: 580, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
-    TableModel(id: 'T17', name: '17', capacity: 2, shape: 'circle', x: 170, y: 580, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
-    TableModel(id: 'T18', name: '18', capacity: 2, shape: 'circle', x: 260, y: 580, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
-    TableModel(id: 'T19', name: '19', capacity: 2, shape: 'circle', x: 350, y: 580, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
-    TableModel(id: 'T20', name: '20', capacity: 2, shape: 'circle', x: 440, y: 580, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+    TableModel(id: 'T16', name: '16', capacity: 2, shape: 'circle', x: 80, y: 440, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+    TableModel(id: 'T17', name: '17', capacity: 2, shape: 'circle', x: 170, y: 440, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+    TableModel(id: 'T18', name: '18', capacity: 2, shape: 'circle', x: 260, y: 440, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+    TableModel(id: 'T19', name: '19', capacity: 2, shape: 'circle', x: 350, y: 440, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+    TableModel(id: 'T20', name: '20', capacity: 2, shape: 'circle', x: 440, y: 440, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
 
     // --- LANTAI 2 ---
     TableModel(id: 'T21', name: '21', capacity: 2, shape: 'circle', x: 100, y: 150, width: 50, height: 50, isUsed: false, floor: 'Lantai 2'),
@@ -138,7 +138,7 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
   void initState() {
     super.initState();
     // Zoom out canvas visually to match editor scale initially
-    _transformationController.value = Matrix4.diagonal3Values(0.7, 0.7, 1.0);
+    _transformationController.value = Matrix4.diagonal3Values(0.6, 0.6, 1.0);
   }
 
   @override
@@ -239,7 +239,7 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
                               Positioned.fill(
                                 child: InteractiveViewer(
                                   transformationController: _transformationController,
-                                  boundaryMargin: const EdgeInsets.all(1000),
+                                  boundaryMargin: const EdgeInsets.all(2500),
                                   minScale: 0.1,
                                   maxScale: 1.5,
                                   child: SizedBox(

@@ -10,6 +10,7 @@ import '../widgets/discount_modal.dart';
 import '../widgets/order_review_modal.dart';
 import '../widgets/clear_order_modal.dart';
 import '../widgets/payment_success_modal.dart';
+import '../widgets/custom_success_toast.dart';
 import 'pos_tables_screen.dart';
 
 class Product {
@@ -256,7 +257,7 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
                 left: 0,
                 right: 0,
                 child: Center(
-                  child: _CustomSuccessToast(
+                  child: CustomSuccessToast(
                     title: _toastTitle,
                     subtitle: _toastSubtitle,
                     highlightText: _toastHighlightText,
@@ -1141,175 +1142,6 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
   }
 }
 
-// Custom Top Floating Success Toast with progress loading bar and check checkmark icon
-class _CustomSuccessToast extends StatefulWidget {
-  final String title;
-  final String subtitle;
-  final String? highlightText;
-  final VoidCallback onDismiss;
-
-  const _CustomSuccessToast({
-    required this.title,
-    required this.subtitle,
-    this.highlightText,
-    required this.onDismiss,
-  });
-
-  @override
-  State<_CustomSuccessToast> createState() => _CustomSuccessToastState();
-}
-
-class _CustomSuccessToastState extends State<_CustomSuccessToast> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 3),
-    );
-    _controller.forward();
-    _controller.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        widget.onDismiss();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 380,
-      margin: const EdgeInsets.only(top: 24),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Green circle check icon
-                Container(
-                  width: 28,
-                  height: 28,
-                  decoration: const BoxDecoration(
-                    color: AppColors.primary500,
-                    shape: BoxShape.circle,
-                  ),
-                  alignment: Alignment.center,
-                  child: const Icon(
-                    Icons.check,
-                    color: AppColors.white,
-                    size: 18,
-                  ),
-                ),
-                const SizedBox(width: 12),
-
-                // Text details
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        widget.title,
-                        style: AppTypography.bodyMBold.copyWith(
-                          color: AppColors.neutral900,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      if (widget.highlightText != null)
-                        RichText(
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text: widget.highlightText,
-                                style: AppTypography.bodyXsRegular.copyWith(
-                                  color: AppColors.error500, // pink/orange color
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const TextSpan(text: ' '),
-                              TextSpan(
-                                text: widget.subtitle,
-                                style: AppTypography.bodyXsRegular.copyWith(
-                                  color: AppColors.neutral600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      else
-                        Text(
-                          widget.subtitle,
-                          style: AppTypography.bodyXsRegular.copyWith(
-                            color: AppColors.neutral600,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-
-                // Close Button
-                GestureDetector(
-                  onTap: widget.onDismiss,
-                  child: const Icon(
-                    Icons.close,
-                    color: AppColors.neutral500,
-                    size: 20,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Loading Progress Bar at the bottom
-          AnimatedBuilder(
-            animation: _controller,
-            builder: (context, child) {
-              return Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  height: 4,
-                  // The bar shrinks from right to left (width goes from 100% to 0%)
-                  width: 380 * (1.0 - _controller.value),
-                  decoration: const BoxDecoration(
-                    color: AppColors.primary500,
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(12),
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 // Custom Painter untuk visual wireframe diagonal X
 class WireframeBoxPainter extends CustomPainter {
