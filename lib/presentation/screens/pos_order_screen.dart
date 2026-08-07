@@ -166,6 +166,7 @@ class _PosOrderScreenState extends State<PosOrderScreen> {
         : [];
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       key: _scaffoldKey,
       backgroundColor: const Color(0xFFF3F4F6), // light gray background
       appBar: AppBar(

@@ -6,7 +6,8 @@ class DiscountResult {
   final String name;
   final String value;
   final String type; // 'code', 'preset', 'percentage', 'price'
-  final double discountAmount; // computed discount amount or raw value depending on type
+  final double
+  discountAmount; // computed discount amount or raw value depending on type
 
   const DiscountResult({
     required this.name,
@@ -26,12 +27,18 @@ class DiscountModal extends StatefulWidget {
 
 class _DiscountModalState extends State<DiscountModal> {
   String _activeTab = 'New'; // 'New', 'Preset', 'By Percentage', 'By Price'
-  
+
   // Tab controllers & states
-  final TextEditingController _codeController = TextEditingController(text: 'R4D082024');
-  final TextEditingController _percentageController = TextEditingController(text: '15');
-  final TextEditingController _priceController = TextEditingController(text: '5.00');
-  
+  final TextEditingController _codeController = TextEditingController(
+    text: 'R4D082024',
+  );
+  final TextEditingController _percentageController = TextEditingController(
+    text: '15',
+  );
+  final TextEditingController _priceController = TextEditingController(
+    text: '5.00',
+  );
+
   int _selectedPresetIndex = 1; // Default selected preset is Row 2 (index 1)
 
   final List<Map<String, dynamic>> _presets = const [
@@ -50,10 +57,13 @@ class _DiscountModalState extends State<DiscountModal> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
-      child: Container(
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      behavior: HitTestBehavior.opaque,
+      child: Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
+        child: Container(
         width: 480,
         decoration: BoxDecoration(
           color: AppColors.white,
@@ -63,7 +73,7 @@ class _DiscountModalState extends State<DiscountModal> {
               color: Colors.black.withValues(alpha: 0.15),
               blurRadius: 24,
               offset: const Offset(0, 8),
-            )
+            ),
           ],
         ),
         clipBehavior: Clip.antiAlias,
@@ -124,7 +134,11 @@ class _DiscountModalState extends State<DiscountModal> {
               ),
               const SizedBox(height: 20),
 
-              const Divider(height: 1, thickness: 1, color: AppColors.neutral200),
+              const Divider(
+                height: 1,
+                thickness: 1,
+                color: AppColors.neutral200,
+              ),
 
               // 4. FOOTER / BUTTONS
               Padding(
@@ -136,14 +150,21 @@ class _DiscountModalState extends State<DiscountModal> {
                         onPressed: () => Navigator.pop(context),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
-                          side: const BorderSide(color: AppColors.neutral300, width: 1.5),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          side: const BorderSide(
+                            color: AppColors.neutral300,
+                            width: 1.5,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                           foregroundColor: AppColors.neutral800,
                           backgroundColor: AppColors.white,
                         ),
                         child: Text(
                           'Cancel',
-                          style: AppTypography.bodyMRegular.copyWith(fontWeight: FontWeight.bold),
+                          style: AppTypography.bodyMRegular.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
@@ -155,7 +176,9 @@ class _DiscountModalState extends State<DiscountModal> {
                           backgroundColor: AppColors.primary500,
                           foregroundColor: AppColors.white,
                           padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                           elevation: 0,
                         ),
                         child: Text(
@@ -174,6 +197,7 @@ class _DiscountModalState extends State<DiscountModal> {
           ),
         ),
       ),
+    ),
     );
   }
 
@@ -197,7 +221,7 @@ class _DiscountModalState extends State<DiscountModal> {
                     color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
-                  )
+                  ),
                 ]
               : null,
         ),
@@ -268,9 +292,14 @@ class _DiscountModalState extends State<DiscountModal> {
               borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(color: AppColors.neutral300),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 12,
+            ),
           ),
-          style: AppTypography.bodyMRegular.copyWith(color: AppColors.neutral800),
+          style: AppTypography.bodyMRegular.copyWith(
+            color: AppColors.neutral800,
+          ),
         ),
       ],
     );
@@ -291,11 +320,13 @@ class _DiscountModalState extends State<DiscountModal> {
 
           return Container(
             decoration: BoxDecoration(
-              color: isSelected 
-                  ? AppColors.primary50.withValues(alpha: 0.7) 
+              color: isSelected
+                  ? AppColors.primary50.withValues(alpha: 0.7)
                   : Colors.transparent,
               border: index < _presets.length - 1
-                  ? const Border(bottom: BorderSide(color: AppColors.neutral100, width: 1))
+                  ? const Border(
+                      bottom: BorderSide(color: AppColors.neutral100, width: 1),
+                    )
                   : null,
             ),
             child: ListTile(
@@ -318,7 +349,10 @@ class _DiscountModalState extends State<DiscountModal> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 4,
+              ),
             ),
           );
         }),
@@ -364,9 +398,14 @@ class _DiscountModalState extends State<DiscountModal> {
               borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(color: AppColors.neutral300),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 12,
+            ),
           ),
-          style: AppTypography.bodyMRegular.copyWith(color: AppColors.neutral800),
+          style: AppTypography.bodyMRegular.copyWith(
+            color: AppColors.neutral800,
+          ),
         ),
       ],
     );
@@ -410,9 +449,14 @@ class _DiscountModalState extends State<DiscountModal> {
               borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(color: AppColors.neutral300),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 12,
+            ),
           ),
-          style: AppTypography.bodyMRegular.copyWith(color: AppColors.neutral800),
+          style: AppTypography.bodyMRegular.copyWith(
+            color: AppColors.neutral800,
+          ),
         ),
       ],
     );

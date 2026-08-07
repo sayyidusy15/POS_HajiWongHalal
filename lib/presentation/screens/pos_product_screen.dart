@@ -42,8 +42,9 @@ class _PosProductScreenState extends State<PosProductScreen> {
 
   // State Management
   String _searchQuery = '';
-  String _sortOrder = 'Default'; // 'Default', 'Name (A-Z)', 'Price (Low to High)', 'Price (High to Low)'
-  
+  String _sortOrder =
+      'Default'; // 'Default', 'Name (A-Z)', 'Price (Low to High)', 'Price (High to Low)'
+
   // Advanced Filter State
   String _filterCategory = 'All';
   double? _filterMinPrice;
@@ -62,7 +63,12 @@ class _PosProductScreenState extends State<PosProductScreen> {
 
   // Mock Products Data
   late List<ProductModel> _products;
-  final List<String> _globalCategories = ['Burger', 'Fried Chicken', 'Drink', 'Snack'];
+  final List<String> _globalCategories = [
+    'Burger',
+    'Fried Chicken',
+    'Drink',
+    'Snack',
+  ];
 
   @override
   void initState() {
@@ -116,7 +122,8 @@ class _PosProductScreenState extends State<PosProductScreen> {
       }
 
       // Category Filter
-      if (_filterCategory != 'All' && p.category != _filterCategory) return false;
+      if (_filterCategory != 'All' && p.category != _filterCategory)
+        return false;
 
       // Min Price
       if (_filterMinPrice != null && p.price < _filterMinPrice!) return false;
@@ -125,8 +132,10 @@ class _PosProductScreenState extends State<PosProductScreen> {
       if (_filterMaxPrice != null && p.price > _filterMaxPrice!) return false;
 
       // Stock Filter
-      if (_filterStock == 'In Stock' && (p.stock == null || p.stock! <= 0)) return false;
-      if (_filterStock == 'Out of Stock' && (p.stock != null && p.stock! > 0)) return false;
+      if (_filterStock == 'In Stock' && (p.stock == null || p.stock! <= 0))
+        return false;
+      if (_filterStock == 'Out of Stock' && (p.stock != null && p.stock! > 0))
+        return false;
 
       return true;
     }).toList();
@@ -143,11 +152,17 @@ class _PosProductScreenState extends State<PosProductScreen> {
     // Pagination calculations
     final int totalItems = filtered.length;
     final int totalPages = (totalItems / _rowsPerPage).ceil().clamp(1, 999);
-    final int startIndex = ((_currentPage - 1) * _rowsPerPage).clamp(0, totalItems);
+    final int startIndex = ((_currentPage - 1) * _rowsPerPage).clamp(
+      0,
+      totalItems,
+    );
     final int endIndex = (startIndex + _rowsPerPage).clamp(0, totalItems);
-    final List<ProductModel> pageItems = startIndex < totalItems ? filtered.sublist(startIndex, endIndex) : [];
+    final List<ProductModel> pageItems = startIndex < totalItems
+        ? filtered.sublist(startIndex, endIndex)
+        : [];
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       key: _scaffoldKey,
       backgroundColor: const Color(0xFFF3F4F6), // Light gray background
       appBar: AppBar(
@@ -174,7 +189,11 @@ class _PosProductScreenState extends State<PosProductScreen> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const Icon(Icons.search, size: 18, color: AppColors.neutral500),
+                  const Icon(
+                    Icons.search,
+                    size: 18,
+                    color: AppColors.neutral500,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: TextField(
@@ -184,10 +203,14 @@ class _PosProductScreenState extends State<PosProductScreen> {
                           _currentPage = 1;
                         });
                       },
-                      style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral800),
+                      style: AppTypography.bodySRegular.copyWith(
+                        color: AppColors.neutral800,
+                      ),
                       decoration: InputDecoration(
                         hintText: 'Search product name...',
-                        hintStyle: AppTypography.bodyXsRegular.copyWith(color: AppColors.neutral400),
+                        hintStyle: AppTypography.bodyXsRegular.copyWith(
+                          color: AppColors.neutral400,
+                        ),
                         border: InputBorder.none,
                         isDense: true,
                         contentPadding: EdgeInsets.zero,
@@ -221,7 +244,7 @@ class _PosProductScreenState extends State<PosProductScreen> {
                     color: Colors.black.withValues(alpha: 0.03),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
-                  )
+                  ),
                 ],
               ),
               child: Column(
@@ -229,7 +252,10 @@ class _PosProductScreenState extends State<PosProductScreen> {
                 children: [
                   // Data Table Headers
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0,
+                      vertical: 10.0,
+                    ),
                     child: Row(
                       children: [
                         _buildColumnHead('ID', 2),
@@ -242,7 +268,11 @@ class _PosProductScreenState extends State<PosProductScreen> {
                       ],
                     ),
                   ),
-                  const Divider(height: 1, thickness: 1, color: AppColors.neutral200),
+                  const Divider(
+                    height: 1,
+                    thickness: 1,
+                    color: AppColors.neutral200,
+                  ),
 
                   // Data Rows (List View)
                   Expanded(
@@ -261,7 +291,11 @@ class _PosProductScreenState extends State<PosProductScreen> {
                           ),
                   ),
 
-                  const Divider(height: 1, thickness: 1, color: AppColors.neutral200),
+                  const Divider(
+                    height: 1,
+                    thickness: 1,
+                    color: AppColors.neutral200,
+                  ),
 
                   // Footer Pagination
                   _buildTableFooter(totalItems, totalPages),
@@ -326,9 +360,23 @@ class _PosProductScreenState extends State<PosProductScreen> {
               });
             }
           },
-          items: ['Default', 'Name (A-Z)', 'Price (Low to High)', 'Price (High to Low)']
-              .map((item) => DropdownMenuItem(value: item, child: Text(item, style: const TextStyle(color: AppColors.neutral800))))
-              .toList(),
+          items:
+              [
+                    'Default',
+                    'Name (A-Z)',
+                    'Price (Low to High)',
+                    'Price (High to Low)',
+                  ]
+                  .map(
+                    (item) => DropdownMenuItem(
+                      value: item,
+                      child: Text(
+                        item,
+                        style: const TextStyle(color: AppColors.neutral800),
+                      ),
+                    ),
+                  )
+                  .toList(),
         ),
       ),
     );
@@ -337,7 +385,11 @@ class _PosProductScreenState extends State<PosProductScreen> {
   Widget _buildFilterButton() {
     return OutlinedButton.icon(
       onPressed: _showFilterModal,
-      icon: const Icon(Icons.filter_list_outlined, size: 18, color: AppColors.neutral800),
+      icon: const Icon(
+        Icons.filter_list_outlined,
+        size: 18,
+        color: AppColors.neutral800,
+      ),
       label: Text(
         'Filter',
         style: AppTypography.bodySRegular.copyWith(
@@ -396,16 +448,24 @@ class _PosProductScreenState extends State<PosProductScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.inventory_2_outlined, size: 48, color: AppColors.neutral400),
+          const Icon(
+            Icons.inventory_2_outlined,
+            size: 48,
+            color: AppColors.neutral400,
+          ),
           const SizedBox(height: 12),
           Text(
             'No products found',
-            style: AppTypography.bodyMBold.copyWith(color: AppColors.neutral600),
+            style: AppTypography.bodyMBold.copyWith(
+              color: AppColors.neutral600,
+            ),
           ),
           const SizedBox(height: 4),
           Text(
             'Try adjusting your search or filter keywords',
-            style: AppTypography.bodyXsRegular.copyWith(color: AppColors.neutral400),
+            style: AppTypography.bodyXsRegular.copyWith(
+              color: AppColors.neutral400,
+            ),
           ),
         ],
       ),
@@ -446,7 +506,11 @@ class _PosProductScreenState extends State<PosProductScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   alignment: Alignment.center,
-                  child: Icon(product.icon, color: AppColors.neutral700, size: 24),
+                  child: Icon(
+                    product.icon,
+                    color: AppColors.neutral700,
+                    size: 24,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -500,7 +564,9 @@ class _PosProductScreenState extends State<PosProductScreen> {
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
               style: AppTypography.bodySRegular.copyWith(
-                color: (product.stock == null || product.stock! <= 0) ? AppColors.neutral400 : AppColors.neutral800,
+                color: (product.stock == null || product.stock! <= 0)
+                    ? AppColors.neutral400
+                    : AppColors.neutral800,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -524,11 +590,7 @@ class _PosProductScreenState extends State<PosProductScreen> {
           Expanded(
             flex: 2,
             child: Row(
-              children: [
-                Flexible(
-                  child: _buildStatusBadge(product.status),
-                ),
-              ],
+              children: [Flexible(child: _buildStatusBadge(product.status))],
             ),
           ),
 
@@ -538,10 +600,16 @@ class _PosProductScreenState extends State<PosProductScreen> {
             child: Align(
               alignment: Alignment.centerRight,
               child: PopupMenuButton<String>(
-                icon: const Icon(Icons.more_vert, color: AppColors.neutral500, size: 20),
+                icon: const Icon(
+                  Icons.more_vert,
+                  color: AppColors.neutral500,
+                  size: 20,
+                ),
                 color: AppColors.white,
                 elevation: 4,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
                 onSelected: (val) {
                   if (val == 'edit') {
                     _showEditProductModal(product);
@@ -554,9 +622,18 @@ class _PosProductScreenState extends State<PosProductScreen> {
                     value: 'edit',
                     child: Row(
                       children: [
-                        const Icon(Icons.edit_outlined, size: 16, color: AppColors.neutral700),
+                        const Icon(
+                          Icons.edit_outlined,
+                          size: 16,
+                          color: AppColors.neutral700,
+                        ),
                         const SizedBox(width: 8),
-                        Text('Edit', style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral800)),
+                        Text(
+                          'Edit',
+                          style: AppTypography.bodySRegular.copyWith(
+                            color: AppColors.neutral800,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -564,9 +641,19 @@ class _PosProductScreenState extends State<PosProductScreen> {
                     value: 'delete',
                     child: Row(
                       children: [
-                        const Icon(Icons.delete_outline, size: 16, color: AppColors.error500),
+                        const Icon(
+                          Icons.delete_outline,
+                          size: 16,
+                          color: AppColors.error500,
+                        ),
                         const SizedBox(width: 8),
-                        Text('Delete', style: AppTypography.bodySRegular.copyWith(color: AppColors.error500, fontWeight: FontWeight.bold)),
+                        Text(
+                          'Delete',
+                          style: AppTypography.bodySRegular.copyWith(
+                            color: AppColors.error500,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -625,7 +712,9 @@ class _PosProductScreenState extends State<PosProductScreen> {
             children: [
               Text(
                 'Rows per page:',
-                style: AppTypography.bodyXsRegular.copyWith(color: AppColors.neutral500),
+                style: AppTypography.bodyXsRegular.copyWith(
+                  color: AppColors.neutral500,
+                ),
               ),
               const SizedBox(width: 8),
               Container(
@@ -639,7 +728,10 @@ class _PosProductScreenState extends State<PosProductScreen> {
                     value: _rowsPerPage,
                     isDense: true,
                     dropdownColor: AppColors.white,
-                    style: AppTypography.bodyXsRegular.copyWith(color: AppColors.neutral800, fontWeight: FontWeight.bold),
+                    style: AppTypography.bodyXsRegular.copyWith(
+                      color: AppColors.neutral800,
+                      fontWeight: FontWeight.bold,
+                    ),
                     onChanged: (val) {
                       if (val != null) {
                         setState(() {
@@ -648,7 +740,14 @@ class _PosProductScreenState extends State<PosProductScreen> {
                         });
                       }
                     },
-                    items: [5, 10, 20, 50].map((countVal) => DropdownMenuItem(value: countVal, child: Text('$countVal'))).toList(),
+                    items: [5, 10, 20, 50]
+                        .map(
+                          (countVal) => DropdownMenuItem(
+                            value: countVal,
+                            child: Text('$countVal'),
+                          ),
+                        )
+                        .toList(),
                   ),
                 ),
               ),
@@ -659,7 +758,9 @@ class _PosProductScreenState extends State<PosProductScreen> {
           Row(
             children: [
               IconButton(
-                onPressed: _currentPage > 1 ? () => setState(() => _currentPage--) : null,
+                onPressed: _currentPage > 1
+                    ? () => setState(() => _currentPage--)
+                    : null,
                 icon: const Icon(Icons.chevron_left),
                 color: AppColors.neutral800,
                 disabledColor: AppColors.neutral300,
@@ -681,15 +782,21 @@ class _PosProductScreenState extends State<PosProductScreen> {
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: isPageActive ? AppColors.primary500 : Colors.transparent,
-                      border: isPageActive ? null : Border.all(color: AppColors.neutral300),
+                      color: isPageActive
+                          ? AppColors.primary500
+                          : Colors.transparent,
+                      border: isPageActive
+                          ? null
+                          : Border.all(color: AppColors.neutral300),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     alignment: Alignment.center,
                     child: Text(
                       '$pageNum',
                       style: AppTypography.bodyXsRegular.copyWith(
-                        color: isPageActive ? AppColors.white : AppColors.neutral600,
+                        color: isPageActive
+                            ? AppColors.white
+                            : AppColors.neutral600,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -698,7 +805,9 @@ class _PosProductScreenState extends State<PosProductScreen> {
               }),
               const SizedBox(width: 8),
               IconButton(
-                onPressed: _currentPage < totalPages ? () => setState(() => _currentPage++) : null,
+                onPressed: _currentPage < totalPages
+                    ? () => setState(() => _currentPage++)
+                    : null,
                 icon: const Icon(Icons.chevron_right),
                 color: AppColors.neutral800,
                 disabledColor: AppColors.neutral300,
@@ -717,8 +826,12 @@ class _PosProductScreenState extends State<PosProductScreen> {
   // 1. Filter Overlay Modal
   void _showFilterModal() async {
     String tempCategory = _filterCategory;
-    final TextEditingController minPriceCtrl = TextEditingController(text: _filterMinPrice?.toString() ?? '');
-    final TextEditingController maxPriceCtrl = TextEditingController(text: _filterMaxPrice?.toString() ?? '');
+    final TextEditingController minPriceCtrl = TextEditingController(
+      text: _filterMinPrice?.toString() ?? '',
+    );
+    final TextEditingController maxPriceCtrl = TextEditingController(
+      text: _filterMaxPrice?.toString() ?? '',
+    );
     String tempStock = _filterStock;
 
     final bool? apply = await showDialog<bool>(
@@ -762,7 +875,13 @@ class _PosProductScreenState extends State<PosProductScreen> {
                   const SizedBox(height: 20),
 
                   // Category
-                  Text('Category', style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold, color: AppColors.neutral700)),
+                  Text(
+                    'Category',
+                    style: AppTypography.bodySRegular.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.neutral700,
+                    ),
+                  ),
                   const SizedBox(height: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -776,10 +895,21 @@ class _PosProductScreenState extends State<PosProductScreen> {
                         dropdownColor: AppColors.white,
                         isExpanded: true,
                         items: ['All', ..._globalCategories]
-                            .map((item) => DropdownMenuItem(value: item, child: Text(item, style: const TextStyle(color: AppColors.neutral800))))
+                            .map(
+                              (item) => DropdownMenuItem(
+                                value: item,
+                                child: Text(
+                                  item,
+                                  style: const TextStyle(
+                                    color: AppColors.neutral800,
+                                  ),
+                                ),
+                              ),
+                            )
                             .toList(),
                         onChanged: (val) {
-                          if (val != null) setModalState(() => tempCategory = val);
+                          if (val != null)
+                            setModalState(() => tempCategory = val);
                         },
                       ),
                     ),
@@ -793,24 +923,41 @@ class _PosProductScreenState extends State<PosProductScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Min Price', style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold, color: AppColors.neutral700)),
+                            Text(
+                              'Min Price',
+                              style: AppTypography.bodySRegular.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.neutral700,
+                              ),
+                            ),
                             const SizedBox(height: 8),
                             Container(
                               height: 42,
-                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                              ),
                               decoration: BoxDecoration(
                                 border: Border.all(color: AppColors.neutral300),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Row(
                                 children: [
-                                  Text('Rp', style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral500, fontWeight: FontWeight.bold)),
+                                  Text(
+                                    'Rp',
+                                    style: AppTypography.bodySRegular.copyWith(
+                                      color: AppColors.neutral500,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: TextField(
                                       controller: minPriceCtrl,
                                       keyboardType: TextInputType.number,
-                                      style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral800),
+                                      style: AppTypography.bodySRegular
+                                          .copyWith(
+                                            color: AppColors.neutral800,
+                                          ),
                                       decoration: const InputDecoration(
                                         hintText: '0.00',
                                         border: InputBorder.none,
@@ -830,24 +977,41 @@ class _PosProductScreenState extends State<PosProductScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Max Price', style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold, color: AppColors.neutral700)),
+                            Text(
+                              'Max Price',
+                              style: AppTypography.bodySRegular.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.neutral700,
+                              ),
+                            ),
                             const SizedBox(height: 8),
                             Container(
                               height: 42,
-                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                              ),
                               decoration: BoxDecoration(
                                 border: Border.all(color: AppColors.neutral300),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Row(
                                 children: [
-                                  Text('Rp', style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral500, fontWeight: FontWeight.bold)),
+                                  Text(
+                                    'Rp',
+                                    style: AppTypography.bodySRegular.copyWith(
+                                      color: AppColors.neutral500,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: TextField(
                                       controller: maxPriceCtrl,
                                       keyboardType: TextInputType.number,
-                                      style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral800),
+                                      style: AppTypography.bodySRegular
+                                          .copyWith(
+                                            color: AppColors.neutral800,
+                                          ),
                                       decoration: const InputDecoration(
                                         hintText: '0.00',
                                         border: InputBorder.none,
@@ -867,7 +1031,13 @@ class _PosProductScreenState extends State<PosProductScreen> {
                   const SizedBox(height: 16),
 
                   // Stock
-                  Text('Stock', style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold, color: AppColors.neutral700)),
+                  Text(
+                    'Stock',
+                    style: AppTypography.bodySRegular.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.neutral700,
+                    ),
+                  ),
                   const SizedBox(height: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -881,7 +1051,17 @@ class _PosProductScreenState extends State<PosProductScreen> {
                         dropdownColor: AppColors.white,
                         isExpanded: true,
                         items: ['All', 'In Stock', 'Out of Stock']
-                            .map((item) => DropdownMenuItem(value: item, child: Text(item, style: const TextStyle(color: AppColors.neutral800))))
+                            .map(
+                              (item) => DropdownMenuItem(
+                                value: item,
+                                child: Text(
+                                  item,
+                                  style: const TextStyle(
+                                    color: AppColors.neutral800,
+                                  ),
+                                ),
+                              ),
+                            )
                             .toList(),
                         onChanged: (val) {
                           if (val != null) setModalState(() => tempStock = val);
@@ -900,7 +1080,9 @@ class _PosProductScreenState extends State<PosProductScreen> {
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             side: const BorderSide(color: AppColors.neutral300),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                             foregroundColor: AppColors.neutral800,
                           ),
                           child: const Text('Cancel'),
@@ -911,8 +1093,12 @@ class _PosProductScreenState extends State<PosProductScreen> {
                         child: ElevatedButton(
                           onPressed: () {
                             _filterCategory = tempCategory;
-                            _filterMinPrice = double.tryParse(minPriceCtrl.text.trim());
-                            _filterMaxPrice = double.tryParse(maxPriceCtrl.text.trim());
+                            _filterMinPrice = double.tryParse(
+                              minPriceCtrl.text.trim(),
+                            );
+                            _filterMaxPrice = double.tryParse(
+                              maxPriceCtrl.text.trim(),
+                            );
                             _filterStock = tempStock;
                             Navigator.pop(ctx, true);
                           },
@@ -920,7 +1106,9 @@ class _PosProductScreenState extends State<PosProductScreen> {
                             backgroundColor: AppColors.primary500,
                             foregroundColor: AppColors.white,
                             padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                             elevation: 0,
                           ),
                           child: const Text('Apply'),
@@ -940,7 +1128,11 @@ class _PosProductScreenState extends State<PosProductScreen> {
       setState(() {
         _currentPage = 1;
       });
-      _triggerToast('Filter Applied', 'Product list updated per filter criteria', isSuccess: true);
+      _triggerToast(
+        'Filter Applied',
+        'Product list updated per filter criteria',
+        isSuccess: true,
+      );
     }
   }
 
@@ -949,20 +1141,28 @@ class _PosProductScreenState extends State<PosProductScreen> {
     final bool? confirm = await DeleteConfirmationModal.show(
       context,
       title: 'Delete Confirmation',
-      message: 'Are you sure you want to delete "${product.name}"? This action cannot be undone.',
+      message:
+          'Are you sure you want to delete "${product.name}"? This action cannot be undone.',
     );
 
     if (confirm == true) {
       setState(() {
         _products.removeWhere((p) => p.id == product.id);
       });
-      _triggerToast('Product Deleted', '${product.name} removed from inventory', isSuccess: true);
+      _triggerToast(
+        'Product Deleted',
+        '${product.name} removed from inventory',
+        isSuccess: true,
+      );
     }
   }
 
   // 3. Add Product Modal (Multi-step flow)
   void _showAddProductModal() async {
-    final ProductModel? newProduct = await AddProductModal.show(context, categories: _globalCategories);
+    final ProductModel? newProduct = await AddProductModal.show(
+      context,
+      categories: _globalCategories,
+    );
 
     if (newProduct != null) {
       setState(() {
@@ -1049,7 +1249,8 @@ class _PosProductScreenState extends State<PosProductScreen> {
       ProductModel(
         id: '#DR001X',
         name: 'Iced Green Tea Lemonade',
-        description: 'Refreshing jasmine green tea infused with real lemon juice',
+        description:
+            'Refreshing jasmine green tea infused with real lemon juice',
         category: 'Drink',
         stock: 200,
         price: 22000,

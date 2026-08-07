@@ -8,11 +8,7 @@ class AddProductModal extends StatefulWidget {
   final ProductModel? initialProduct;
   final List<String>? categories;
 
-  const AddProductModal({
-    super.key,
-    this.initialProduct,
-    this.categories,
-  });
+  const AddProductModal({super.key, this.initialProduct, this.categories});
 
   static Future<ProductModel?> show(
     BuildContext context, {
@@ -43,7 +39,7 @@ class _AddProductModalState extends State<AddProductModal> {
   late TextEditingController _nameController;
   late TextEditingController _skuController;
   late TextEditingController _descController;
-  
+
   String? _nameError;
   String? _skuError;
 
@@ -60,20 +56,42 @@ class _AddProductModalState extends State<AddProductModal> {
 
   // Step 3: Variants & Add-Ons
   final List<Map<String, dynamic>> _sizeVariants = [
-    {'enabled': true, 'ctrl': TextEditingController(text: 'Regular'), 'priceCtrl': TextEditingController(text: '0')},
-    {'enabled': true, 'ctrl': TextEditingController(text: 'Medium'), 'priceCtrl': TextEditingController(text: '5000')},
-    {'enabled': true, 'ctrl': TextEditingController(text: 'Large'), 'priceCtrl': TextEditingController(text: '10000')},
+    {
+      'enabled': true,
+      'ctrl': TextEditingController(text: 'Regular'),
+      'priceCtrl': TextEditingController(text: '0'),
+    },
+    {
+      'enabled': true,
+      'ctrl': TextEditingController(text: 'Medium'),
+      'priceCtrl': TextEditingController(text: '5000'),
+    },
+    {
+      'enabled': true,
+      'ctrl': TextEditingController(text: 'Large'),
+      'priceCtrl': TextEditingController(text: '10000'),
+    },
   ];
 
   final List<Map<String, dynamic>> _addonsList = [
-    {'enabled': true, 'ctrl': TextEditingController(text: 'Extra Cheese'), 'priceCtrl': TextEditingController(text: '8000')},
-    {'enabled': true, 'ctrl': TextEditingController(text: 'Extra Patty'), 'priceCtrl': TextEditingController(text: '15000')},
+    {
+      'enabled': true,
+      'ctrl': TextEditingController(text: 'Extra Cheese'),
+      'priceCtrl': TextEditingController(text: '8000'),
+    },
+    {
+      'enabled': true,
+      'ctrl': TextEditingController(text: 'Extra Patty'),
+      'priceCtrl': TextEditingController(text: '15000'),
+    },
   ];
 
   @override
   void initState() {
     super.initState();
-    _categories = widget.categories != null ? List.from(widget.categories!) : ['Burger', 'Fried Chicken', 'Drink', 'Snack'];
+    _categories = widget.categories != null
+        ? List.from(widget.categories!)
+        : ['Burger', 'Fried Chicken', 'Drink', 'Snack'];
 
     final p = widget.initialProduct;
     if (p != null) {
@@ -85,8 +103,12 @@ class _AddProductModalState extends State<AddProductModal> {
         _categories.add(p.category);
       }
       _selectedCategory = p.category;
-      _priceController = TextEditingController(text: p.price.toInt().toString());
-      _takeawayPriceController = TextEditingController(text: (p.price * 1.1).toInt().toString());
+      _priceController = TextEditingController(
+        text: p.price.toInt().toString(),
+      );
+      _takeawayPriceController = TextEditingController(
+        text: (p.price * 1.1).toInt().toString(),
+      );
       _statusEnabled = p.status == 'Active';
     } else {
       // Clean / Empty Initial State for New Product
@@ -149,7 +171,8 @@ class _AddProductModalState extends State<AddProductModal> {
 
     // Validate Step 2
     if (_currentStep == 2) {
-      if (_priceController.text.trim().isEmpty || double.tryParse(_priceController.text.trim()) == null) {
+      if (_priceController.text.trim().isEmpty ||
+          double.tryParse(_priceController.text.trim()) == null) {
         setState(() {
           _priceError = 'Valid Price is required';
         });
@@ -168,19 +191,23 @@ class _AddProductModalState extends State<AddProductModal> {
       final bool isEdit = widget.initialProduct != null;
       final bool? confirm = await AddProductConfirmationModal.show(
         context,
-        title: isEdit ? 'Update Product Confirmation' : 'Add Product Confirmation',
+        title: isEdit
+            ? 'Update Product Confirmation'
+            : 'Add Product Confirmation',
         message: isEdit
             ? 'Are you sure you want to save changes to this product?'
             : 'Are you sure you want to add this new product to the menu?',
       );
 
       if (confirm == true && mounted) {
-        final double priceVal = double.tryParse(_priceController.text.trim()) ?? 0;
+        final double priceVal =
+            double.tryParse(_priceController.text.trim()) ?? 0;
         final String nameVal = _nameController.text.trim();
         final String idVal = _skuController.text.trim();
 
         IconData iconData = Icons.lunch_dining_outlined;
-        if (_selectedCategory == 'Fried Chicken') iconData = Icons.kebab_dining_outlined;
+        if (_selectedCategory == 'Fried Chicken')
+          iconData = Icons.kebab_dining_outlined;
         if (_selectedCategory == 'Drink') iconData = Icons.local_drink_outlined;
         if (_selectedCategory == 'Snack') iconData = Icons.cookie_outlined;
 
@@ -210,12 +237,18 @@ class _AddProductModalState extends State<AddProductModal> {
     );
 
     if (confirm == true && mounted) {
-      final double priceVal = double.tryParse(_priceController.text.trim()) ?? 0;
-      final String nameVal = _nameController.text.trim().isEmpty ? 'Draft Product' : _nameController.text.trim();
-      final String idVal = _skuController.text.trim().isEmpty ? '#SKU-DRAFT' : _skuController.text.trim();
+      final double priceVal =
+          double.tryParse(_priceController.text.trim()) ?? 0;
+      final String nameVal = _nameController.text.trim().isEmpty
+          ? 'Draft Product'
+          : _nameController.text.trim();
+      final String idVal = _skuController.text.trim().isEmpty
+          ? '#SKU-DRAFT'
+          : _skuController.text.trim();
 
       IconData iconData = Icons.lunch_dining_outlined;
-      if (_selectedCategory == 'Fried Chicken') iconData = Icons.kebab_dining_outlined;
+      if (_selectedCategory == 'Fried Chicken')
+        iconData = Icons.kebab_dining_outlined;
       if (_selectedCategory == 'Drink') iconData = Icons.local_drink_outlined;
       if (_selectedCategory == 'Snack') iconData = Icons.cookie_outlined;
 
@@ -238,11 +271,14 @@ class _AddProductModalState extends State<AddProductModal> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-      child: Center(
-        child: Container(
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      behavior: HitTestBehavior.opaque,
+      child: Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        child: Center(
+          child: Container(
           width: 720,
           constraints: const BoxConstraints(maxHeight: 780),
           decoration: BoxDecoration(
@@ -262,13 +298,18 @@ class _AddProductModalState extends State<AddProductModal> {
               // 1. HEADER TITLE SECTION (With Close Button)
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
+                ),
                 color: const Color(0xFFF9FAFB),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      widget.initialProduct != null ? 'Edit Product' : 'Add Product',
+                      widget.initialProduct != null
+                          ? 'Edit Product'
+                          : 'Add Product',
                       style: AppTypography.bodyLBold.copyWith(
                         color: AppColors.neutral900,
                         fontWeight: FontWeight.bold,
@@ -276,7 +317,10 @@ class _AddProductModalState extends State<AddProductModal> {
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close, color: AppColors.neutral500),
+                      icon: const Icon(
+                        Icons.close,
+                        color: AppColors.neutral500,
+                      ),
                       onPressed: () => Navigator.pop(context, null),
                     ),
                   ],
@@ -290,10 +334,7 @@ class _AddProductModalState extends State<AddProductModal> {
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 color: AppColors.white,
                 child: Center(
-                  child: SizedBox(
-                    width: 580,
-                    child: _buildStepper(),
-                  ),
+                  child: SizedBox(width: 580, child: _buildStepper()),
                 ),
               ),
               const Divider(height: 1, color: AppColors.neutral200),
@@ -314,17 +355,14 @@ class _AddProductModalState extends State<AddProductModal> {
           ),
         ),
       ),
+    ),
     );
   }
 
   // --- STEPPER NAVIGATION WIDGET (Circle on top, Title below) ---
 
   Widget _buildStepper() {
-    final steps = [
-      'Product Info',
-      'Pricing',
-      'Variants & Add-Ons',
-    ];
+    final steps = ['Product Info', 'Pricing', 'Variants & Add-Ons'];
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -345,7 +383,11 @@ class _AddProductModalState extends State<AddProductModal> {
                   Expanded(
                     child: Container(
                       height: 2,
-                      color: index == 0 ? Colors.transparent : (isCompleted || isActive ? AppColors.primary500 : AppColors.neutral200),
+                      color: index == 0
+                          ? Colors.transparent
+                          : (isCompleted || isActive
+                                ? AppColors.primary500
+                                : AppColors.neutral200),
                     ),
                   ),
                   Container(
@@ -359,34 +401,44 @@ class _AddProductModalState extends State<AddProductModal> {
                       border: Border.all(
                         color: isCompleted
                             ? AppColors.primary500
-                            : (isActive ? AppColors.primary500 : AppColors.neutral300),
+                            : (isActive
+                                  ? AppColors.primary500
+                                  : AppColors.neutral300),
                         width: isActive ? 2.5 : 1.5,
                       ),
                     ),
                     alignment: Alignment.center,
                     child: isCompleted
-                        ? const Icon(Icons.check, size: 16, color: AppColors.white)
+                        ? const Icon(
+                            Icons.check,
+                            size: 16,
+                            color: AppColors.white,
+                          )
                         : (isActive
-                            ? Container(
-                                width: 10,
-                                height: 10,
-                                decoration: const BoxDecoration(
-                                  color: AppColors.primary500,
-                                  shape: BoxShape.circle,
-                                ),
-                              )
-                            : Text(
-                                '$stepNum',
-                                style: AppTypography.bodyXsRegular.copyWith(
-                                  color: AppColors.neutral400,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              )),
+                              ? Container(
+                                  width: 10,
+                                  height: 10,
+                                  decoration: const BoxDecoration(
+                                    color: AppColors.primary500,
+                                    shape: BoxShape.circle,
+                                  ),
+                                )
+                              : Text(
+                                  '$stepNum',
+                                  style: AppTypography.bodyXsRegular.copyWith(
+                                    color: AppColors.neutral400,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )),
                   ),
                   Expanded(
                     child: Container(
                       height: 2,
-                      color: isLast ? Colors.transparent : (isCompleted ? AppColors.primary500 : AppColors.neutral200),
+                      color: isLast
+                          ? Colors.transparent
+                          : (isCompleted
+                                ? AppColors.primary500
+                                : AppColors.neutral200),
                     ),
                   ),
                 ],
@@ -398,8 +450,12 @@ class _AddProductModalState extends State<AddProductModal> {
                 steps[index],
                 textAlign: TextAlign.center,
                 style: AppTypography.bodyXsRegular.copyWith(
-                  color: isActive || isCompleted ? AppColors.neutral900 : AppColors.neutral400,
-                  fontWeight: isActive || isCompleted ? FontWeight.bold : FontWeight.normal,
+                  color: isActive || isCompleted
+                      ? AppColors.neutral900
+                      : AppColors.neutral400,
+                  fontWeight: isActive || isCompleted
+                      ? FontWeight.bold
+                      : FontWeight.normal,
                   fontSize: 13,
                 ),
               ),
@@ -432,7 +488,13 @@ class _AddProductModalState extends State<AddProductModal> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Product Image Upload Area
-        Text('Product Image', style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold, color: AppColors.neutral800)),
+        Text(
+          'Product Image',
+          style: AppTypography.bodySRegular.copyWith(
+            fontWeight: FontWeight.bold,
+            color: AppColors.neutral800,
+          ),
+        ),
         const SizedBox(height: 8),
         GestureDetector(
           onTap: () {
@@ -462,7 +524,11 @@ class _AddProductModalState extends State<AddProductModal> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         alignment: Alignment.center,
-                        child: const Icon(Icons.lunch_dining_outlined, color: AppColors.neutral800, size: 28),
+                        child: const Icon(
+                          Icons.lunch_dining_outlined,
+                          color: AppColors.neutral800,
+                          size: 28,
+                        ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -470,16 +536,28 @@ class _AddProductModalState extends State<AddProductModal> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              _nameController.text.isNotEmpty ? '${_nameController.text.toLowerCase().replaceAll(' ', '_')}.png' : 'product_image.png',
-                              style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold),
+                              _nameController.text.isNotEmpty
+                                  ? '${_nameController.text.toLowerCase().replaceAll(' ', '_')}.png'
+                                  : 'product_image.png',
+                              style: AppTypography.bodySRegular.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             const SizedBox(height: 2),
-                            Text('873.1 kb', style: AppTypography.bodyXsRegular.copyWith(color: AppColors.neutral400)),
+                            Text(
+                              '873.1 kb',
+                              style: AppTypography.bodyXsRegular.copyWith(
+                                color: AppColors.neutral400,
+                              ),
+                            ),
                           ],
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.delete_outline, color: AppColors.error500),
+                        icon: const Icon(
+                          Icons.delete_outline,
+                          color: AppColors.error500,
+                        ),
                         onPressed: () {
                           setState(() {
                             _hasImage = false;
@@ -490,11 +568,18 @@ class _AddProductModalState extends State<AddProductModal> {
                   )
                 : Column(
                     children: [
-                      const Icon(Icons.cloud_upload_outlined, color: AppColors.primary500, size: 32),
+                      const Icon(
+                        Icons.cloud_upload_outlined,
+                        color: AppColors.primary500,
+                        size: 32,
+                      ),
                       const SizedBox(height: 8),
                       Text(
                         'Click to upload JPG, PNG (Max 2 MB)',
-                        style: AppTypography.bodySRegular.copyWith(color: AppColors.primary500, fontWeight: FontWeight.bold),
+                        style: AppTypography.bodySRegular.copyWith(
+                          color: AppColors.primary500,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
@@ -506,7 +591,13 @@ class _AddProductModalState extends State<AddProductModal> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Enable and show this product in menu', style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.w600, color: AppColors.neutral800)),
+            Text(
+              'Enable and show this product in menu',
+              style: AppTypography.bodySRegular.copyWith(
+                fontWeight: FontWeight.w600,
+                color: AppColors.neutral800,
+              ),
+            ),
             Switch(
               value: _statusEnabled,
               activeTrackColor: AppColors.primary500,
@@ -519,41 +610,99 @@ class _AddProductModalState extends State<AddProductModal> {
         // Product Name *
         Row(
           children: [
-            Text('Product Name ', style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold, color: AppColors.neutral800)),
-            Text('*', style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold, color: AppColors.error500)),
+            Text(
+              'Product Name ',
+              style: AppTypography.bodySRegular.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColors.neutral800,
+              ),
+            ),
+            Text(
+              '*',
+              style: AppTypography.bodySRegular.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColors.error500,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 6),
-        _buildTextField(_nameController, hint: 'e.g. Double Cheeseburger', errorText: _nameError),
+        _buildTextField(
+          _nameController,
+          hint: 'e.g. Double Cheeseburger',
+          errorText: _nameError,
+        ),
         const SizedBox(height: 16),
 
         // SKU (Stock Keeping Unit) *
         Row(
           children: [
-            Text('SKU (Stock Keeping Unit) ', style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold, color: AppColors.neutral800)),
-            Text('*', style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold, color: AppColors.error500)),
+            Text(
+              'SKU (Stock Keeping Unit) ',
+              style: AppTypography.bodySRegular.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColors.neutral800,
+              ),
+            ),
+            Text(
+              '*',
+              style: AppTypography.bodySRegular.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColors.error500,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 6),
-        _buildTextField(_skuController, hint: 'e.g. 003021M', errorText: _skuError),
+        _buildTextField(
+          _skuController,
+          hint: 'e.g. 003021M',
+          errorText: _skuError,
+        ),
         const SizedBox(height: 16),
 
         // Description
-        Text('Description', style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold, color: AppColors.neutral800)),
+        Text(
+          'Description',
+          style: AppTypography.bodySRegular.copyWith(
+            fontWeight: FontWeight.bold,
+            color: AppColors.neutral800,
+          ),
+        ),
         const SizedBox(height: 6),
-        _buildTextField(_descController, hint: 'Write product description...', maxLines: 3),
+        _buildTextField(
+          _descController,
+          hint: 'Write product description...',
+          maxLines: 3,
+        ),
         const SizedBox(height: 16),
 
         // Category Selection
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Category', style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold, color: AppColors.neutral800)),
+            Text(
+              'Category',
+              style: AppTypography.bodySRegular.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColors.neutral800,
+              ),
+            ),
             if (!_isAddingNewCategory)
               TextButton.icon(
                 onPressed: () => setState(() => _isAddingNewCategory = true),
-                icon: const Icon(Icons.add, size: 16, color: AppColors.primary500),
-                label: const Text('Add New Category', style: TextStyle(color: AppColors.primary500, fontWeight: FontWeight.bold)),
+                icon: const Icon(
+                  Icons.add,
+                  size: 16,
+                  color: AppColors.primary500,
+                ),
+                label: const Text(
+                  'Add New Category',
+                  style: TextStyle(
+                    color: AppColors.primary500,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
           ],
         ),
@@ -563,7 +712,10 @@ class _AddProductModalState extends State<AddProductModal> {
           Row(
             children: [
               Expanded(
-                child: _buildTextField(_newCategoryController, hint: 'Enter new category name'),
+                child: _buildTextField(
+                  _newCategoryController,
+                  hint: 'Enter new category name',
+                ),
               ),
               const SizedBox(width: 8),
               ElevatedButton(
@@ -574,7 +726,8 @@ class _AddProductModalState extends State<AddProductModal> {
                       if (!_categories.contains(newCat)) {
                         _categories.add(newCat);
                       }
-                      if (widget.categories != null && !widget.categories!.contains(newCat)) {
+                      if (widget.categories != null &&
+                          !widget.categories!.contains(newCat)) {
                         widget.categories!.add(newCat);
                       }
                       _selectedCategory = newCat;
@@ -583,8 +736,14 @@ class _AddProductModalState extends State<AddProductModal> {
                     });
                   }
                 },
-                style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary500, elevation: 0),
-                child: const Text('Save', style: TextStyle(color: AppColors.white)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary500,
+                  elevation: 0,
+                ),
+                child: const Text(
+                  'Save',
+                  style: TextStyle(color: AppColors.white),
+                ),
               ),
               const SizedBox(width: 4),
               IconButton(
@@ -607,7 +766,15 @@ class _AddProductModalState extends State<AddProductModal> {
                 isExpanded: true,
                 dropdownColor: AppColors.white,
                 items: _categories
-                    .map((cat) => DropdownMenuItem(value: cat, child: Text(cat, style: const TextStyle(color: AppColors.neutral800))))
+                    .map(
+                      (cat) => DropdownMenuItem(
+                        value: cat,
+                        child: Text(
+                          cat,
+                          style: const TextStyle(color: AppColors.neutral800),
+                        ),
+                      ),
+                    )
                     .toList(),
                 onChanged: (val) {
                   if (val != null) setState(() => _selectedCategory = val);
@@ -629,18 +796,45 @@ class _AddProductModalState extends State<AddProductModal> {
         // Price *
         Row(
           children: [
-            Text('Price ', style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold, color: AppColors.neutral800)),
-            Text('*', style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold, color: AppColors.error500)),
+            Text(
+              'Price ',
+              style: AppTypography.bodySRegular.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColors.neutral800,
+              ),
+            ),
+            Text(
+              '*',
+              style: AppTypography.bodySRegular.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColors.error500,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 6),
-        _buildTextFieldWithPrefix(_priceController, prefix: 'Rp', hint: 'e.g. 45000', errorText: _priceError),
+        _buildTextFieldWithPrefix(
+          _priceController,
+          prefix: 'Rp',
+          hint: 'e.g. 45000',
+          errorText: _priceError,
+        ),
         const SizedBox(height: 20),
 
         // Takeaway Price
-        Text('Takeaway Price', style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold, color: AppColors.neutral800)),
+        Text(
+          'Takeaway Price',
+          style: AppTypography.bodySRegular.copyWith(
+            fontWeight: FontWeight.bold,
+            color: AppColors.neutral800,
+          ),
+        ),
         const SizedBox(height: 6),
-        _buildTextFieldWithPrefix(_takeawayPriceController, prefix: 'Rp', hint: 'e.g. 50000'),
+        _buildTextFieldWithPrefix(
+          _takeawayPriceController,
+          prefix: 'Rp',
+          hint: 'e.g. 50000',
+        ),
       ],
     );
   }
@@ -652,9 +846,21 @@ class _AddProductModalState extends State<AddProductModal> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // --- 1. SIZE VARIANTS ---
-        Text('Size Variants', style: AppTypography.bodyLBold.copyWith(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.neutral900)),
+        Text(
+          'Size Variants',
+          style: AppTypography.bodyLBold.copyWith(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: AppColors.neutral900,
+          ),
+        ),
         const SizedBox(height: 4),
-        Text('Define size choices and their additional price adjustment', style: AppTypography.bodyXsRegular.copyWith(color: AppColors.neutral500)),
+        Text(
+          'Define size choices and their additional price adjustment',
+          style: AppTypography.bodyXsRegular.copyWith(
+            color: AppColors.neutral500,
+          ),
+        ),
         const SizedBox(height: 12),
 
         Container(
@@ -668,17 +874,33 @@ class _AddProductModalState extends State<AddProductModal> {
             children: [
               // Column Headers
               Padding(
-                padding: const EdgeInsets.only(bottom: 8.0, left: 40.0, right: 36.0),
+                padding: const EdgeInsets.only(
+                  bottom: 8.0,
+                  left: 40.0,
+                  right: 36.0,
+                ),
                 child: Row(
                   children: [
                     Expanded(
                       flex: 4,
-                      child: Text('SIZE NAME', style: AppTypography.bodyXsRegular.copyWith(fontWeight: FontWeight.bold, color: AppColors.neutral500)),
+                      child: Text(
+                        'SIZE NAME',
+                        style: AppTypography.bodyXsRegular.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.neutral500,
+                        ),
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       flex: 4,
-                      child: Text('ADDITIONAL PRICE (Rp)', style: AppTypography.bodyXsRegular.copyWith(fontWeight: FontWeight.bold, color: AppColors.neutral500)),
+                      child: Text(
+                        'ADDITIONAL PRICE (Rp)',
+                        style: AppTypography.bodyXsRegular.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.neutral500,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -714,8 +936,13 @@ class _AddProductModalState extends State<AddProductModal> {
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.delete_outline, color: AppColors.error500, size: 20),
-                        onPressed: () => setState(() => _sizeVariants.removeAt(idx)),
+                        icon: const Icon(
+                          Icons.delete_outline,
+                          color: AppColors.error500,
+                          size: 20,
+                        ),
+                        onPressed: () =>
+                            setState(() => _sizeVariants.removeAt(idx)),
                       ),
                     ],
                   ),
@@ -735,9 +962,21 @@ class _AddProductModalState extends State<AddProductModal> {
                       });
                     });
                   },
-                  icon: const Icon(Icons.add, size: 16, color: AppColors.primary500),
-                  label: const Text('Add Size Variant', style: TextStyle(color: AppColors.primary500, fontWeight: FontWeight.bold)),
-                  style: OutlinedButton.styleFrom(side: const BorderSide(color: AppColors.primary500)),
+                  icon: const Icon(
+                    Icons.add,
+                    size: 16,
+                    color: AppColors.primary500,
+                  ),
+                  label: const Text(
+                    'Add Size Variant',
+                    style: TextStyle(
+                      color: AppColors.primary500,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: AppColors.primary500),
+                  ),
                 ),
               ),
             ],
@@ -747,9 +986,21 @@ class _AddProductModalState extends State<AddProductModal> {
         const SizedBox(height: 28),
 
         // --- 2. ADD-ONS ---
-        Text('Add-Ons', style: AppTypography.bodyLBold.copyWith(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.neutral900)),
+        Text(
+          'Add-Ons',
+          style: AppTypography.bodyLBold.copyWith(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: AppColors.neutral900,
+          ),
+        ),
         const SizedBox(height: 4),
-        Text('Define extra customizable options cashier/customer can add', style: AppTypography.bodyXsRegular.copyWith(color: AppColors.neutral500)),
+        Text(
+          'Define extra customizable options cashier/customer can add',
+          style: AppTypography.bodyXsRegular.copyWith(
+            color: AppColors.neutral500,
+          ),
+        ),
         const SizedBox(height: 12),
 
         Container(
@@ -763,17 +1014,33 @@ class _AddProductModalState extends State<AddProductModal> {
             children: [
               // Column Headers
               Padding(
-                padding: const EdgeInsets.only(bottom: 8.0, left: 40.0, right: 36.0),
+                padding: const EdgeInsets.only(
+                  bottom: 8.0,
+                  left: 40.0,
+                  right: 36.0,
+                ),
                 child: Row(
                   children: [
                     Expanded(
                       flex: 4,
-                      child: Text('ADD-ON NAME', style: AppTypography.bodyXsRegular.copyWith(fontWeight: FontWeight.bold, color: AppColors.neutral500)),
+                      child: Text(
+                        'ADD-ON NAME',
+                        style: AppTypography.bodyXsRegular.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.neutral500,
+                        ),
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       flex: 4,
-                      child: Text('PRICE (Rp)', style: AppTypography.bodyXsRegular.copyWith(fontWeight: FontWeight.bold, color: AppColors.neutral500)),
+                      child: Text(
+                        'PRICE (Rp)',
+                        style: AppTypography.bodyXsRegular.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.neutral500,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -809,8 +1076,13 @@ class _AddProductModalState extends State<AddProductModal> {
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.delete_outline, color: AppColors.error500, size: 20),
-                        onPressed: () => setState(() => _addonsList.removeAt(idx)),
+                        icon: const Icon(
+                          Icons.delete_outline,
+                          color: AppColors.error500,
+                          size: 20,
+                        ),
+                        onPressed: () =>
+                            setState(() => _addonsList.removeAt(idx)),
                       ),
                     ],
                   ),
@@ -830,9 +1102,21 @@ class _AddProductModalState extends State<AddProductModal> {
                       });
                     });
                   },
-                  icon: const Icon(Icons.add, size: 16, color: AppColors.primary500),
-                  label: const Text('Add Add-On Option', style: TextStyle(color: AppColors.primary500, fontWeight: FontWeight.bold)),
-                  style: OutlinedButton.styleFrom(side: const BorderSide(color: AppColors.primary500)),
+                  icon: const Icon(
+                    Icons.add,
+                    size: 16,
+                    color: AppColors.primary500,
+                  ),
+                  label: const Text(
+                    'Add Add-On Option',
+                    style: TextStyle(
+                      color: AppColors.primary500,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: AppColors.primary500),
+                  ),
                 ),
               ),
             ],
@@ -857,7 +1141,9 @@ class _AddProductModalState extends State<AddProductModal> {
             onPressed: () => Navigator.pop(context, null),
             child: Text(
               'Cancel',
-              style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral600),
+              style: AppTypography.bodySRegular.copyWith(
+                color: AppColors.neutral600,
+              ),
             ),
           ),
           const Spacer(),
@@ -868,11 +1154,16 @@ class _AddProductModalState extends State<AddProductModal> {
             style: OutlinedButton.styleFrom(
               side: const BorderSide(color: AppColors.neutral300),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
             child: Text(
               'Save as Draft',
-              style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral800, fontWeight: FontWeight.w600),
+              style: AppTypography.bodySRegular.copyWith(
+                color: AppColors.neutral800,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
           const SizedBox(width: 10),
@@ -883,12 +1174,20 @@ class _AddProductModalState extends State<AddProductModal> {
               onPressed: () => setState(() => _currentStep--),
               style: OutlinedButton.styleFrom(
                 side: const BorderSide(color: AppColors.neutral300),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
               child: Text(
                 'Back',
-                style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral800, fontWeight: FontWeight.w600),
+                style: AppTypography.bodySRegular.copyWith(
+                  color: AppColors.neutral800,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           if (_currentStep > 1) const SizedBox(width: 10),
@@ -901,11 +1200,16 @@ class _AddProductModalState extends State<AddProductModal> {
               foregroundColor: AppColors.white,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
             child: Text(
               _currentStep == 3 ? (isEdit ? 'Save Changes' : 'Add') : 'Next',
-              style: AppTypography.bodySRegular.copyWith(color: AppColors.white, fontWeight: FontWeight.bold),
+              style: AppTypography.bodySRegular.copyWith(
+                color: AppColors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],
@@ -932,7 +1236,9 @@ class _AddProductModalState extends State<AddProductModal> {
         style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900),
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: AppTypography.bodySRegular.copyWith(color: AppColors.neutral400),
+          hintStyle: AppTypography.bodySRegular.copyWith(
+            color: AppColors.neutral400,
+          ),
           border: InputBorder.none,
           isDense: true,
           contentPadding: const EdgeInsets.symmetric(vertical: 10),
@@ -955,16 +1261,26 @@ class _AddProductModalState extends State<AddProductModal> {
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Row(
         children: [
-          Text('Rp', style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral500, fontWeight: FontWeight.bold)),
+          Text(
+            'Rp',
+            style: AppTypography.bodySRegular.copyWith(
+              color: AppColors.neutral500,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: TextField(
               controller: controller,
               keyboardType: TextInputType.number,
-              style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900),
+              style: AppTypography.bodySRegular.copyWith(
+                color: AppColors.neutral900,
+              ),
               decoration: InputDecoration(
                 hintText: hintText,
-                hintStyle: AppTypography.bodySRegular.copyWith(color: AppColors.neutral400),
+                hintStyle: AppTypography.bodySRegular.copyWith(
+                  color: AppColors.neutral400,
+                ),
                 border: InputBorder.none,
                 isDense: true,
                 contentPadding: const EdgeInsets.symmetric(vertical: 10),
@@ -988,25 +1304,49 @@ class _AddProductModalState extends State<AddProductModal> {
         TextField(
           controller: ctrl,
           maxLines: maxLines,
-          style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900),
+          style: AppTypography.bodySRegular.copyWith(
+            color: AppColors.neutral900,
+          ),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: AppTypography.bodySRegular.copyWith(color: AppColors.neutral400),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.neutral300)),
+            hintStyle: AppTypography.bodySRegular.copyWith(
+              color: AppColors.neutral400,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: AppColors.neutral300),
+            ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: errorText != null ? AppColors.error500 : AppColors.neutral300),
+              borderSide: BorderSide(
+                color: errorText != null
+                    ? AppColors.error500
+                    : AppColors.neutral300,
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: errorText != null ? AppColors.error500 : AppColors.primary500, width: 1.5),
+              borderSide: BorderSide(
+                color: errorText != null
+                    ? AppColors.error500
+                    : AppColors.primary500,
+                width: 1.5,
+              ),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 10,
+            ),
           ),
         ),
         if (errorText != null) ...[
           const SizedBox(height: 4),
-          Text(errorText, style: AppTypography.bodyXsRegular.copyWith(color: AppColors.error500)),
+          Text(
+            errorText,
+            style: AppTypography.bodyXsRegular.copyWith(
+              color: AppColors.error500,
+            ),
+          ),
         ],
       ],
     );
@@ -1024,22 +1364,36 @@ class _AddProductModalState extends State<AddProductModal> {
         Container(
           height: 44,
           decoration: BoxDecoration(
-            border: Border.all(color: errorText != null ? AppColors.error500 : AppColors.neutral300),
+            border: Border.all(
+              color: errorText != null
+                  ? AppColors.error500
+                  : AppColors.neutral300,
+            ),
             borderRadius: BorderRadius.circular(8),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Row(
             children: [
-              Text(prefix, style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral500, fontWeight: FontWeight.bold)),
+              Text(
+                prefix,
+                style: AppTypography.bodySRegular.copyWith(
+                  color: AppColors.neutral500,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(width: 8),
               Expanded(
                 child: TextField(
                   controller: ctrl,
                   keyboardType: TextInputType.number,
-                  style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900),
+                  style: AppTypography.bodySRegular.copyWith(
+                    color: AppColors.neutral900,
+                  ),
                   decoration: InputDecoration(
                     hintText: hint,
-                    hintStyle: AppTypography.bodySRegular.copyWith(color: AppColors.neutral400),
+                    hintStyle: AppTypography.bodySRegular.copyWith(
+                      color: AppColors.neutral400,
+                    ),
                     border: InputBorder.none,
                     isDense: true,
                     contentPadding: EdgeInsets.zero,
@@ -1051,7 +1405,12 @@ class _AddProductModalState extends State<AddProductModal> {
         ),
         if (errorText != null) ...[
           const SizedBox(height: 4),
-          Text(errorText, style: AppTypography.bodyXsRegular.copyWith(color: AppColors.error500)),
+          Text(
+            errorText,
+            style: AppTypography.bodyXsRegular.copyWith(
+              color: AppColors.error500,
+            ),
+          ),
         ],
       ],
     );

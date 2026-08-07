@@ -12,13 +12,14 @@ class AddCustomerModal extends StatefulWidget {
 class _AddCustomerModalState extends State<AddCustomerModal> {
   String _activeTab = 'New'; // 'New' atau 'Existing'
   final TextEditingController _nameController = TextEditingController();
-  
+
   // Tab New State
   String _selectedGender = 'Men'; // Default terpilih
 
   // Tab Existing State
   String _searchQuery = '';
-  String _selectedCustomerName = 'Olivia'; // Olivia terpilih sebagai default highlight
+  String _selectedCustomerName =
+      'Olivia'; // Olivia terpilih sebagai default highlight
 
   // Data Pelanggan Terdaftar
   final List<Map<String, String>> _existingCustomers = [
@@ -38,11 +39,13 @@ class _AddCustomerModalState extends State<AddCustomerModal> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
-      // Menghapus Center pembungkus agar dialog tidak terkompresi secara kasar oleh keyboard
-      child: Container(
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      behavior: HitTestBehavior.opaque,
+      child: Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
+        child: Container(
         constraints: const BoxConstraints(maxWidth: 480),
         decoration: BoxDecoration(
           color: AppColors.white,
@@ -52,7 +55,7 @@ class _AddCustomerModalState extends State<AddCustomerModal> {
               color: Colors.black.withValues(alpha: 0.15),
               blurRadius: 24,
               offset: const Offset(0, 8),
-            )
+            ),
           ],
         ),
         // Membungkus seluruh dialog ke dalam SingleChildScrollView agar scrollable saat keyboard muncul
@@ -87,12 +90,8 @@ class _AddCustomerModalState extends State<AddCustomerModal> {
                   ),
                   child: Row(
                     children: [
-                      Expanded(
-                        child: _buildTabPill('New'),
-                      ),
-                      Expanded(
-                        child: _buildTabPill('Existing'),
-                      ),
+                      Expanded(child: _buildTabPill('New')),
+                      Expanded(child: _buildTabPill('Existing')),
                     ],
                   ),
                 ),
@@ -102,11 +101,17 @@ class _AddCustomerModalState extends State<AddCustomerModal> {
               // 3. BODY CONTENT (New vs Existing)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: _activeTab == 'New' ? _buildNewTabContent() : _buildExistingTabContent(),
+                child: _activeTab == 'New'
+                    ? _buildNewTabContent()
+                    : _buildExistingTabContent(),
               ),
               const SizedBox(height: 12),
 
-              const Divider(height: 1, thickness: 1, color: AppColors.neutral200),
+              const Divider(
+                height: 1,
+                thickness: 1,
+                color: AppColors.neutral200,
+              ),
 
               // 4. FOOTER / AKSI
               Padding(
@@ -118,11 +123,19 @@ class _AddCustomerModalState extends State<AddCustomerModal> {
                         onPressed: () => Navigator.pop(context),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
-                          side: const BorderSide(color: AppColors.neutral300, width: 1.5),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          side: const BorderSide(
+                            color: AppColors.neutral300,
+                            width: 1.5,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                           foregroundColor: AppColors.neutral800,
                         ),
-                        child: const Text('Cancel', style: TextStyle(fontWeight: FontWeight.bold)),
+                        child: const Text(
+                          'Cancel',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -144,10 +157,15 @@ class _AddCustomerModalState extends State<AddCustomerModal> {
                           backgroundColor: AppColors.primary500,
                           foregroundColor: AppColors.white,
                           padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                           elevation: 0,
                         ),
-                        child: const Text('Add', style: TextStyle(fontWeight: FontWeight.bold)),
+                        child: const Text(
+                          'Add',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                   ],
@@ -157,6 +175,7 @@ class _AddCustomerModalState extends State<AddCustomerModal> {
           ),
         ),
       ),
+    ),
     );
   }
 
@@ -180,7 +199,7 @@ class _AddCustomerModalState extends State<AddCustomerModal> {
                     color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
-                  )
+                  ),
                 ]
               : null,
         ),
@@ -213,21 +232,35 @@ class _AddCustomerModalState extends State<AddCustomerModal> {
           controller: _nameController,
           decoration: InputDecoration(
             hintText: 'Misal: Stevan Cornerlius',
-            hintStyle: AppTypography.bodySRegular.copyWith(color: AppColors.neutral400),
+            hintStyle: AppTypography.bodySRegular.copyWith(
+              color: AppColors.neutral400,
+            ),
             fillColor: AppColors.neutral100,
             filled: true,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 12,
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: AppColors.neutral200, width: 1.5),
+              borderSide: const BorderSide(
+                color: AppColors.neutral200,
+                width: 1.5,
+              ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: AppColors.neutral200, width: 1.5),
+              borderSide: const BorderSide(
+                color: AppColors.neutral200,
+                width: 1.5,
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: AppColors.primary500, width: 1.5),
+              borderSide: const BorderSide(
+                color: AppColors.primary500,
+                width: 1.5,
+              ),
             ),
           ),
         ),
@@ -258,9 +291,15 @@ class _AddCustomerModalState extends State<AddCustomerModal> {
 
   Widget _buildGenderCard(String gender) {
     final bool isSelected = _selectedGender == gender;
-    final Color strokeColor = isSelected ? AppColors.primary500 : AppColors.neutral200;
-    final Color bgColor = isSelected ? AppColors.primary500.withValues(alpha: 0.1) : AppColors.white;
-    final Color contentColor = isSelected ? AppColors.primary500 : AppColors.neutral800;
+    final Color strokeColor = isSelected
+        ? AppColors.primary500
+        : AppColors.neutral200;
+    final Color bgColor = isSelected
+        ? AppColors.primary500.withValues(alpha: 0.1)
+        : AppColors.white;
+    final Color contentColor = isSelected
+        ? AppColors.primary500
+        : AppColors.neutral800;
 
     return GestureDetector(
       onTap: () {
@@ -312,11 +351,19 @@ class _AddCustomerModalState extends State<AddCustomerModal> {
                 _searchQuery = val;
               });
             },
-            style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900),
+            style: AppTypography.bodySRegular.copyWith(
+              color: AppColors.neutral900,
+            ),
             decoration: InputDecoration(
-              prefixIcon: const Icon(Icons.search, color: AppColors.neutral400, size: 18),
+              prefixIcon: const Icon(
+                Icons.search,
+                color: AppColors.neutral400,
+                size: 18,
+              ),
               hintText: 'Search...',
-              hintStyle: AppTypography.bodySRegular.copyWith(color: AppColors.neutral400),
+              hintStyle: AppTypography.bodySRegular.copyWith(
+                color: AppColors.neutral400,
+              ),
               border: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(vertical: 8),
             ),
@@ -340,8 +387,12 @@ class _AddCustomerModalState extends State<AddCustomerModal> {
               final String gender = customer['gender'] ?? '';
               final bool isSelected = _selectedCustomerName == name;
 
-              final Color bgColor = isSelected ? AppColors.primary500.withValues(alpha: 0.1) : Colors.transparent;
-              final Color strokeColor = isSelected ? AppColors.primary500 : Colors.transparent;
+              final Color bgColor = isSelected
+                  ? AppColors.primary500.withValues(alpha: 0.1)
+                  : Colors.transparent;
+              final Color strokeColor = isSelected
+                  ? AppColors.primary500
+                  : Colors.transparent;
 
               return GestureDetector(
                 onTap: () {
@@ -350,12 +401,18 @@ class _AddCustomerModalState extends State<AddCustomerModal> {
                   });
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
                   decoration: BoxDecoration(
                     color: bgColor,
                     border: Border(
                       bottom: const BorderSide(color: AppColors.neutral200),
-                      left: BorderSide(color: strokeColor, width: isSelected ? 4 : 0),
+                      left: BorderSide(
+                        color: strokeColor,
+                        width: isSelected ? 4 : 0,
+                      ),
                     ),
                   ),
                   child: Row(
@@ -365,7 +422,9 @@ class _AddCustomerModalState extends State<AddCustomerModal> {
                         name,
                         style: AppTypography.bodySRegular.copyWith(
                           color: AppColors.neutral900,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          fontWeight: isSelected
+                              ? FontWeight.bold
+                              : FontWeight.normal,
                         ),
                       ),
                       Row(

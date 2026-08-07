@@ -50,10 +50,13 @@ class ReceiptPreviewModal extends StatelessWidget {
   Widget build(BuildContext context) {
     final String formattedDate = _getFormattedDateTime();
 
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
-      child: Container(
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      behavior: HitTestBehavior.opaque,
+      child: Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
+        child: Container(
         width: 480,
         decoration: BoxDecoration(
           color: AppColors.white,
@@ -63,7 +66,7 @@ class ReceiptPreviewModal extends StatelessWidget {
               color: Colors.black.withValues(alpha: 0.15),
               blurRadius: 24,
               offset: const Offset(0, 8),
-            )
+            ),
           ],
         ),
         clipBehavior: Clip.antiAlias,
@@ -97,7 +100,10 @@ class ReceiptPreviewModal extends StatelessWidget {
                 child: Center(
                   child: Container(
                     width: 340,
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 24,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.white,
                       border: Border.all(color: AppColors.neutral300, width: 1),
@@ -175,65 +181,85 @@ class ReceiptPreviewModal extends StatelessWidget {
                           itemCount: cartItems.length,
                           itemBuilder: (context, index) {
                             final item = cartItems[index];
-                            final double itemTotal = item.product.price * item.quantity;
-                            final String baseName = item.product.name.split(' (').first;
+                            final double itemTotal =
+                                item.product.price * item.quantity;
+                            final String baseName = item.product.name
+                                .split(' (')
+                                .first;
 
                             return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 6.0),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 6.0,
+                              ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         '${item.quantity}  ',
-                                        style: AppTypography.bodySRegular.copyWith(
-                                          color: AppColors.neutral800,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                        style: AppTypography.bodySRegular
+                                            .copyWith(
+                                              color: AppColors.neutral800,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                       ),
                                       Expanded(
                                         child: Text(
                                           baseName,
-                                          style: AppTypography.bodySRegular.copyWith(
-                                            color: AppColors.neutral800,
-                                          ),
+                                          style: AppTypography.bodySRegular
+                                              .copyWith(
+                                                color: AppColors.neutral800,
+                                              ),
                                         ),
                                       ),
                                       const SizedBox(width: 12),
                                       Text(
                                         _formatRupiah(itemTotal),
-                                        style: AppTypography.bodySRegular.copyWith(
-                                          color: AppColors.neutral900,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                        style: AppTypography.bodySRegular
+                                            .copyWith(
+                                              color: AppColors.neutral900,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                       ),
                                     ],
                                   ),
                                   // Sub-details (Size, Add-ons)
-                                  if (item.size != null || (item.addons != null && item.addons!.isNotEmpty))
+                                  if (item.size != null ||
+                                      (item.addons != null &&
+                                          item.addons!.isNotEmpty))
                                     Padding(
-                                      padding: const EdgeInsets.only(left: 18.0, top: 2.0),
+                                      padding: const EdgeInsets.only(
+                                        left: 18.0,
+                                        top: 2.0,
+                                      ),
                                       child: Text(
                                         '${item.size ?? "Regular"}${item.addons != null && item.addons!.isNotEmpty ? " + " + item.addons!.join(", ") : ""}',
-                                        style: AppTypography.bodyXsRegular.copyWith(
-                                          color: AppColors.neutral500,
-                                          fontSize: 11,
-                                        ),
+                                        style: AppTypography.bodyXsRegular
+                                            .copyWith(
+                                              color: AppColors.neutral500,
+                                              fontSize: 11,
+                                            ),
                                       ),
                                     ),
                                   // Notes
-                                  if (item.notes != null && item.notes!.trim().isNotEmpty)
+                                  if (item.notes != null &&
+                                      item.notes!.trim().isNotEmpty)
                                     Padding(
-                                      padding: const EdgeInsets.only(left: 18.0, top: 2.0),
+                                      padding: const EdgeInsets.only(
+                                        left: 18.0,
+                                        top: 2.0,
+                                      ),
                                       child: Text(
                                         'Note: "${item.notes}"',
-                                        style: AppTypography.bodyXsRegular.copyWith(
-                                          color: AppColors.neutral500,
-                                          fontStyle: FontStyle.italic,
-                                          fontSize: 10,
-                                        ),
+                                        style: AppTypography.bodyXsRegular
+                                            .copyWith(
+                                              color: AppColors.neutral500,
+                                              fontStyle: FontStyle.italic,
+                                              fontSize: 10,
+                                            ),
                                       ),
                                     ),
                                 ],
@@ -248,7 +274,10 @@ class ReceiptPreviewModal extends StatelessWidget {
                         // Pricing summary
                         _buildSummaryRow('Sub Total', _formatRupiah(subtotal)),
                         if (discountAmount > 0)
-                          _buildSummaryRow('Discount', '- ' + _formatRupiah(discountAmount)),
+                          _buildSummaryRow(
+                            'Discount',
+                            '- ' + _formatRupiah(discountAmount),
+                          ),
                         _buildSummaryRow('Tax', _formatRupiah(tax)),
                         const SizedBox(height: 12),
                         Row(
@@ -278,7 +307,10 @@ class ReceiptPreviewModal extends StatelessWidget {
                         _buildSummaryRow('Payment Method', paymentMethod),
                         if (paymentMethod == 'Cash') ...[
                           _buildSummaryRow('Cash', _formatRupiah(paidAmount)),
-                          _buildSummaryRow('Change', _formatRupiah(changeAmount)),
+                          _buildSummaryRow(
+                            'Change',
+                            _formatRupiah(changeAmount),
+                          ),
                         ],
                       ],
                     ),
@@ -299,14 +331,21 @@ class ReceiptPreviewModal extends StatelessWidget {
                       onPressed: () => Navigator.pop(context, false),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        side: const BorderSide(color: AppColors.neutral300, width: 1.5),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        side: const BorderSide(
+                          color: AppColors.neutral300,
+                          width: 1.5,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                         foregroundColor: AppColors.neutral800,
                         backgroundColor: AppColors.white,
                       ),
                       child: Text(
                         'Cancel',
-                        style: AppTypography.bodyMRegular.copyWith(fontWeight: FontWeight.bold),
+                        style: AppTypography.bodyMRegular.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
@@ -318,7 +357,9 @@ class ReceiptPreviewModal extends StatelessWidget {
                         backgroundColor: AppColors.primary500,
                         foregroundColor: AppColors.white,
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                         elevation: 0,
                       ),
                       child: Text(
@@ -336,6 +377,7 @@ class ReceiptPreviewModal extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 
@@ -347,7 +389,10 @@ class ReceiptPreviewModal extends StatelessWidget {
         children: [
           Text(
             label,
-            style: AppTypography.bodyXsRegular.copyWith(color: AppColors.neutral500, fontSize: 11),
+            style: AppTypography.bodyXsRegular.copyWith(
+              color: AppColors.neutral500,
+              fontSize: 11,
+            ),
           ),
           Text(
             value,
@@ -370,7 +415,10 @@ class ReceiptPreviewModal extends StatelessWidget {
         children: [
           Text(
             label,
-            style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral500, fontSize: 12),
+            style: AppTypography.bodySRegular.copyWith(
+              color: AppColors.neutral500,
+              fontSize: 12,
+            ),
           ),
           Text(
             value,
@@ -389,11 +437,11 @@ class ReceiptPreviewModal extends StatelessWidget {
     final now = DateTime.now();
     final List<String> days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     final String dayName = days[now.weekday - 1];
-    
+
     final String dayStr = now.day.toString().padLeft(2, '0');
     final String monthStr = now.month.toString().padLeft(2, '0');
     final String yearStr = now.year.toString();
-    
+
     int hour = now.hour;
     final String period = hour >= 12 ? 'PM' : 'AM';
     if (hour > 12) hour -= 12;

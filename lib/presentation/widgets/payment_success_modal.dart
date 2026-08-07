@@ -43,7 +43,9 @@ class _PaymentSuccessModalState extends State<PaymentSuccessModal> {
   void initState() {
     super.initState();
     // Generates a unique PZ Order ID based on current timestamp
-    _orderId = 'PZ' + DateTime.now().millisecondsSinceEpoch.toString().substring(5, 13);
+    _orderId =
+        'PZ' +
+        DateTime.now().millisecondsSinceEpoch.toString().substring(5, 13);
   }
 
   // Rupiah formatting helper
@@ -65,10 +67,13 @@ class _PaymentSuccessModalState extends State<PaymentSuccessModal> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
-      child: Container(
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      behavior: HitTestBehavior.opaque,
+      child: Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
+        child: Container(
         width: 480,
         decoration: BoxDecoration(
           color: AppColors.white,
@@ -78,7 +83,7 @@ class _PaymentSuccessModalState extends State<PaymentSuccessModal> {
               color: Colors.black.withValues(alpha: 0.15),
               blurRadius: 24,
               offset: const Offset(0, 8),
-            )
+            ),
           ],
         ),
         padding: const EdgeInsets.all(24.0),
@@ -96,11 +101,7 @@ class _PaymentSuccessModalState extends State<PaymentSuccessModal> {
                 shape: BoxShape.circle,
               ),
               alignment: Alignment.center,
-              child: const Icon(
-                Icons.check,
-                color: AppColors.white,
-                size: 40,
-              ),
+              child: const Icon(Icons.check, color: AppColors.white, size: 40),
             ),
             const SizedBox(height: 16),
 
@@ -159,11 +160,7 @@ class _PaymentSuccessModalState extends State<PaymentSuccessModal> {
                       ],
                     ),
                   ),
-                  Container(
-                    width: 1,
-                    height: 40,
-                    color: AppColors.neutral300,
-                  ),
+                  Container(width: 1, height: 40, color: AppColors.neutral300),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -231,8 +228,13 @@ class _PaymentSuccessModalState extends State<PaymentSuccessModal> {
                     label: const Text('View Order'),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      side: const BorderSide(color: AppColors.neutral300, width: 1.5),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      side: const BorderSide(
+                        color: AppColors.neutral300,
+                        width: 1.5,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                       foregroundColor: AppColors.neutral800,
                       backgroundColor: AppColors.white,
                     ),
@@ -271,8 +273,13 @@ class _PaymentSuccessModalState extends State<PaymentSuccessModal> {
                     label: const Text('Print Receipt'),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      side: const BorderSide(color: AppColors.neutral300, width: 1.5),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      side: const BorderSide(
+                        color: AppColors.neutral300,
+                        width: 1.5,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                       foregroundColor: AppColors.neutral800,
                       backgroundColor: AppColors.white,
                     ),
@@ -291,7 +298,9 @@ class _PaymentSuccessModalState extends State<PaymentSuccessModal> {
                   backgroundColor: AppColors.primary500,
                   foregroundColor: AppColors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                   elevation: 0,
                 ),
                 child: Text(
@@ -306,6 +315,7 @@ class _PaymentSuccessModalState extends State<PaymentSuccessModal> {
           ],
         ),
       ),
+    ),
     );
   }
 }

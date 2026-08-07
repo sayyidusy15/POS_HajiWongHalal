@@ -13,7 +13,8 @@ class DeleteConfirmationModal extends StatelessWidget {
   const DeleteConfirmationModal({
     super.key,
     this.title = 'Delete Confirmation',
-    this.message = 'Are you sure you want to delete this item? This action cannot be undone.',
+    this.message =
+        'Are you sure you want to delete this item? This action cannot be undone.',
     this.confirmLabel = 'Delete',
     this.cancelLabel = 'Cancel',
     required this.onConfirm,
@@ -23,7 +24,8 @@ class DeleteConfirmationModal extends StatelessWidget {
   static Future<bool?> show(
     BuildContext context, {
     String title = 'Delete Confirmation',
-    String message = 'Are you sure you want to delete this item? This action cannot be undone.',
+    String message =
+        'Are you sure you want to delete this item? This action cannot be undone.',
     String confirmLabel = 'Delete',
     String cancelLabel = 'Cancel',
   }) {
@@ -44,11 +46,14 @@ class DeleteConfirmationModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      child: Center(
-        child: Container(
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      behavior: HitTestBehavior.opaque,
+      child: Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: Center(
+          child: Container(
           width: 400,
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
@@ -111,10 +116,14 @@ class DeleteConfirmationModal extends StatelessWidget {
                   // Cancel Button
                   Expanded(
                     child: OutlinedButton(
-                      onPressed: onCancel ?? () => Navigator.pop(context, false),
+                      onPressed:
+                          onCancel ?? () => Navigator.pop(context, false),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        side: const BorderSide(color: AppColors.neutral300, width: 1.2),
+                        side: const BorderSide(
+                          color: AppColors.neutral300,
+                          width: 1.2,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -159,6 +168,7 @@ class DeleteConfirmationModal extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 }

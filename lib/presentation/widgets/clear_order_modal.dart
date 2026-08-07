@@ -7,10 +7,13 @@ class ClearOrderModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
-      child: Container(
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      behavior: HitTestBehavior.opaque,
+      child: Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
+        child: Container(
         width: 420,
         decoration: BoxDecoration(
           color: AppColors.white,
@@ -20,7 +23,7 @@ class ClearOrderModal extends StatelessWidget {
               color: Colors.black.withValues(alpha: 0.15),
               blurRadius: 24,
               offset: const Offset(0, 8),
-            )
+            ),
           ],
         ),
         padding: const EdgeInsets.all(24.0),
@@ -41,14 +44,10 @@ class ClearOrderModal extends StatelessWidget {
                     color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
-                  )
+                  ),
                 ],
               ),
-              child: const Icon(
-                Icons.close,
-                color: AppColors.white,
-                size: 32,
-              ),
+              child: const Icon(Icons.close, color: AppColors.white, size: 32),
             ),
             const SizedBox(height: 20),
 
@@ -82,8 +81,13 @@ class ClearOrderModal extends StatelessWidget {
                     onPressed: () => Navigator.pop(context, false),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      side: const BorderSide(color: AppColors.neutral300, width: 1.5),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      side: const BorderSide(
+                        color: AppColors.neutral300,
+                        width: 1.5,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                       foregroundColor: AppColors.neutral800,
                       backgroundColor: AppColors.white,
                     ),
@@ -104,7 +108,9 @@ class ClearOrderModal extends StatelessWidget {
                       backgroundColor: AppColors.error500,
                       foregroundColor: AppColors.white,
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                       elevation: 0,
                     ),
                     child: Text(
@@ -121,6 +127,7 @@ class ClearOrderModal extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 }

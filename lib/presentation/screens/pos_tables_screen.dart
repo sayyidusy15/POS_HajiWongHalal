@@ -169,6 +169,7 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
     }).toList();
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.neutral100,
       body: SafeArea(
         child: Column(

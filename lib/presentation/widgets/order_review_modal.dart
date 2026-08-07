@@ -44,10 +44,13 @@ class OrderReviewModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
-      child: Container(
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      behavior: HitTestBehavior.opaque,
+      child: Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
+        child: Container(
         width: 520,
         decoration: BoxDecoration(
           color: AppColors.white,
@@ -340,6 +343,7 @@ class OrderReviewModal extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 
@@ -383,3 +387,4 @@ class OrderReviewModal extends StatelessWidget {
     );
   }
 }
+

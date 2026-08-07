@@ -19,7 +19,8 @@ class AddProductConfirmationModal extends StatelessWidget {
   static Future<bool?> show(
     BuildContext context, {
     String title = 'Add Product Confirmation',
-    String message = 'Are you sure you want to add this new product to the menu?',
+    String message =
+        'Are you sure you want to add this new product to the menu?',
     String confirmLabel = 'Confirm',
     String cancelLabel = 'Cancel',
   }) {
@@ -38,11 +39,14 @@ class AddProductConfirmationModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      child: Center(
-        child: Container(
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      behavior: HitTestBehavior.opaque,
+      child: Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: Center(
+          child: Container(
           width: 420,
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
@@ -108,7 +112,10 @@ class AddProductConfirmationModal extends StatelessWidget {
                       onPressed: () => Navigator.pop(context, false),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        side: const BorderSide(color: AppColors.neutral300, width: 1.2),
+                        side: const BorderSide(
+                          color: AppColors.neutral300,
+                          width: 1.2,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -153,6 +160,7 @@ class AddProductConfirmationModal extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 }

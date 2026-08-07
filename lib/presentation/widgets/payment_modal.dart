@@ -79,15 +79,18 @@ class _PaymentModalState extends State<PaymentModal> {
     final double paidAmount = double.tryParse(_inputAmount) ?? 0.0;
     final double balance = paidAmount - widget.totalAmount;
     final bool isUnderpaid = balance < 0;
-    
+
     // Enable confirm button only if QRIS is selected or if cash input is sufficient
     final bool canConfirm = _showQRISView || !isUnderpaid;
 
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
-      child: Center(
-        child: Container(
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      behavior: HitTestBehavior.opaque,
+      child: Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
+        child: Center(
+          child: Container(
           width: 820,
           height: 600,
           decoration: BoxDecoration(
@@ -98,14 +101,17 @@ class _PaymentModalState extends State<PaymentModal> {
                 color: Colors.black.withValues(alpha: 0.15),
                 blurRadius: 24,
                 offset: const Offset(0, 8),
-              )
+              ),
             ],
           ),
           child: Column(
             children: [
               // 1. HEADER MODAL
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
+                ),
                 decoration: const BoxDecoration(
                   color: Color(0xFFF9FAFB),
                   borderRadius: BorderRadius.only(
@@ -125,13 +131,20 @@ class _PaymentModalState extends State<PaymentModal> {
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close, color: AppColors.neutral500),
+                      icon: const Icon(
+                        Icons.close,
+                        color: AppColors.neutral500,
+                      ),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ],
                 ),
               ),
-              const Divider(height: 1, thickness: 1, color: AppColors.neutral200),
+              const Divider(
+                height: 1,
+                thickness: 1,
+                color: AppColors.neutral200,
+              ),
 
               // 2. BODY MODAL (GRID 2 KOLOM)
               Expanded(
@@ -143,23 +156,31 @@ class _PaymentModalState extends State<PaymentModal> {
                       flex: 11,
                       child: Padding(
                         padding: const EdgeInsets.all(24.0),
-                        child: _showQRISView 
+                        child: _showQRISView
                             ? _buildQRISLeftPane()
                             : Column(
                                 children: [
                                   // Input Field Display
                                   Container(
                                     width: double.infinity,
-                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 14,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: AppColors.neutral100,
                                       borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(color: AppColors.neutral200, width: 1.5),
+                                      border: Border.all(
+                                        color: AppColors.neutral200,
+                                        width: 1.5,
+                                      ),
                                     ),
                                     alignment: Alignment.centerRight,
                                     child: Text(
                                       _formatRupiah(paidAmount),
-                                      style: AppTypography.h3Bold.copyWith(color: AppColors.neutral900),
+                                      style: AppTypography.h3Bold.copyWith(
+                                        color: AppColors.neutral900,
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(height: 18),
@@ -167,7 +188,8 @@ class _PaymentModalState extends State<PaymentModal> {
                                   // Numpad Grid Layout (3x4 Kiri + 1x4 Kanan)
                                   Expanded(
                                     child: Row(
-                                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
                                       children: [
                                         // Numpad Angka Kiri (3x4)
                                         Expanded(
@@ -190,17 +212,35 @@ class _PaymentModalState extends State<PaymentModal> {
                                                     Expanded(
                                                       child: Container(
                                                         decoration: BoxDecoration(
-                                                          color: AppColors.white,
-                                                          borderRadius: BorderRadius.circular(10),
-                                                          border: Border.all(color: AppColors.neutral200, width: 1.5),
+                                                          color:
+                                                              AppColors.white,
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                10,
+                                                              ),
+                                                          border: Border.all(
+                                                            color: AppColors
+                                                                .neutral200,
+                                                            width: 1.5,
+                                                          ),
                                                         ),
                                                         child: Material(
-                                                          color: Colors.transparent,
+                                                          color: Colors
+                                                              .transparent,
                                                           child: InkWell(
                                                             onTap: _onBackspace,
-                                                            borderRadius: BorderRadius.circular(10),
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  10,
+                                                                ),
                                                             child: const Center(
-                                                              child: Icon(Icons.backspace_outlined, color: AppColors.neutral800, size: 20),
+                                                              child: Icon(
+                                                                Icons
+                                                                    .backspace_outlined,
+                                                                color: AppColors
+                                                                    .neutral800,
+                                                                size: 20,
+                                                              ),
                                                             ),
                                                           ),
                                                         ),
@@ -219,13 +259,25 @@ class _PaymentModalState extends State<PaymentModal> {
                                           flex: 1,
                                           child: Column(
                                             children: [
-                                              _buildShortcutButton('100k', 100000),
+                                              _buildShortcutButton(
+                                                '100k',
+                                                100000,
+                                              ),
                                               const SizedBox(height: 8),
-                                              _buildShortcutButton('50k', 50000),
+                                              _buildShortcutButton(
+                                                '50k',
+                                                50000,
+                                              ),
                                               const SizedBox(height: 8),
-                                              _buildShortcutButton('20k', 20000),
+                                              _buildShortcutButton(
+                                                '20k',
+                                                20000,
+                                              ),
                                               const SizedBox(height: 8),
-                                              _buildShortcutButton('10k', 10000),
+                                              _buildShortcutButton(
+                                                '10k',
+                                                10000,
+                                              ),
                                             ],
                                           ),
                                         ),
@@ -238,7 +290,11 @@ class _PaymentModalState extends State<PaymentModal> {
                     ),
 
                     // Divider Vertikal Pemisah Kolom
-                    const VerticalDivider(width: 1, thickness: 1, color: AppColors.neutral200),
+                    const VerticalDivider(
+                      width: 1,
+                      thickness: 1,
+                      color: AppColors.neutral200,
+                    ),
 
                     // KOLOM KANAN: Rincian & Aksi Pembayaran
                     Expanded(
@@ -251,11 +307,18 @@ class _PaymentModalState extends State<PaymentModal> {
                             // Bagian 1: Order Information
                             Row(
                               children: [
-                                const Icon(Icons.person_outline, size: 18, color: AppColors.neutral500),
+                                const Icon(
+                                  Icons.person_outline,
+                                  size: 18,
+                                  color: AppColors.neutral500,
+                                ),
                                 const SizedBox(width: 8),
                                 Text(
                                   'Customer: ${widget.customerName}',
-                                  style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral800, fontWeight: FontWeight.bold),
+                                  style: AppTypography.bodySRegular.copyWith(
+                                    color: AppColors.neutral800,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ],
                             ),
@@ -263,34 +326,52 @@ class _PaymentModalState extends State<PaymentModal> {
                             Row(
                               children: [
                                 Icon(
-                                  widget.isDineIn ? Icons.table_restaurant_outlined : Icons.delivery_dining_outlined,
+                                  widget.isDineIn
+                                      ? Icons.table_restaurant_outlined
+                                      : Icons.delivery_dining_outlined,
                                   size: 18,
                                   color: AppColors.neutral500,
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
                                   widget.isDineIn ? 'Dine In' : 'Take Away',
-                                  style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral600),
+                                  style: AppTypography.bodySRegular.copyWith(
+                                    color: AppColors.neutral600,
+                                  ),
                                 ),
                               ],
                             ),
                             const SizedBox(height: 12),
-                            const Divider(height: 1, thickness: 1, color: AppColors.neutral200),
+                            const Divider(
+                              height: 1,
+                              thickness: 1,
+                              color: AppColors.neutral200,
+                            ),
                             const SizedBox(height: 12),
 
                             // Bagian 2: Financial Breakdown
-                            _buildReceiptRow('Subtotal', _formatRupiah(widget.subtotal)),
+                            _buildReceiptRow(
+                              'Subtotal',
+                              _formatRupiah(widget.subtotal),
+                            ),
                             const SizedBox(height: 6),
-                            _buildReceiptRow('Tax (3%)', _formatRupiah(widget.tax)),
+                            _buildReceiptRow(
+                              'Tax (3%)',
+                              _formatRupiah(widget.tax),
+                            ),
                             const SizedBox(height: 6),
                             _buildReceiptRow(
                               'Discount',
-                              widget.discountAmount > 0 
-                                  ? '- ' + _formatRupiah(widget.discountAmount) 
+                              widget.discountAmount > 0
+                                  ? '- ' + _formatRupiah(widget.discountAmount)
                                   : _formatRupiah(0),
                             ),
                             const SizedBox(height: 12),
-                            const Divider(height: 1, thickness: 1, color: AppColors.neutral200),
+                            const Divider(
+                              height: 1,
+                              thickness: 1,
+                              color: AppColors.neutral200,
+                            ),
                             const SizedBox(height: 12),
 
                             // Bagian 3: Payment Methods (Hanya Cash & QRIS)
@@ -304,23 +385,44 @@ class _PaymentModalState extends State<PaymentModal> {
                             const SizedBox(height: 8),
                             Row(
                               children: [
-                                Expanded(child: _buildMethodCard('Cash', Icons.payments_outlined)),
+                                Expanded(
+                                  child: _buildMethodCard(
+                                    'Cash',
+                                    Icons.payments_outlined,
+                                  ),
+                                ),
                                 const SizedBox(width: 8),
-                                Expanded(child: _buildMethodCard('QRIS', Icons.qr_code_2_outlined)),
+                                Expanded(
+                                  child: _buildMethodCard(
+                                    'QRIS',
+                                    Icons.qr_code_2_outlined,
+                                  ),
+                                ),
                               ],
                             ),
                             const SizedBox(height: 16),
-                            const Divider(height: 1, thickness: 1, color: AppColors.neutral200),
+                            const Divider(
+                              height: 1,
+                              thickness: 1,
+                              color: AppColors.neutral200,
+                            ),
                             const SizedBox(height: 16),
 
                             // Bagian 4: Totals, Paid & Change (Kembalian Uang)
-                            _buildReceiptRow('Total', _formatRupiah(widget.totalAmount)),
+                            _buildReceiptRow(
+                              'Total',
+                              _formatRupiah(widget.totalAmount),
+                            ),
                             if (!_showQRISView) ...[
                               const SizedBox(height: 6),
-                              _buildReceiptRow('Paid', _formatRupiah(paidAmount)),
+                              _buildReceiptRow(
+                                'Paid',
+                                _formatRupiah(paidAmount),
+                              ),
                               const SizedBox(height: 10),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     isUnderpaid ? 'Underpaid' : 'Change',
@@ -330,9 +432,13 @@ class _PaymentModalState extends State<PaymentModal> {
                                     ),
                                   ),
                                   Text(
-                                    isUnderpaid ? '- ${_formatRupiah(balance.abs())}' : _formatRupiah(balance),
+                                    isUnderpaid
+                                        ? '- ${_formatRupiah(balance.abs())}'
+                                        : _formatRupiah(balance),
                                     style: AppTypography.bodyLBold.copyWith(
-                                      color: isUnderpaid ? AppColors.error500 : AppColors.primary500,
+                                      color: isUnderpaid
+                                          ? AppColors.error500
+                                          : AppColors.primary500,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -343,24 +449,28 @@ class _PaymentModalState extends State<PaymentModal> {
 
                             // Bagian 5: Call to Action (Confirm Payment)
                             ElevatedButton(
-                              onPressed: canConfirm 
+                              onPressed: canConfirm
                                   ? () {
                                       Navigator.pop(context, {
                                         'success': true,
                                         'method': _selectedMethod,
-                                        'paid': _showQRISView ? widget.totalAmount : paidAmount,
+                                        'paid': _showQRISView
+                                            ? widget.totalAmount
+                                            : paidAmount,
                                         'change': _showQRISView ? 0.0 : balance,
                                       });
                                     }
                                   : null,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: canConfirm 
-                                    ? const Color(0xFF289656) 
+                                backgroundColor: canConfirm
+                                    ? const Color(0xFF289656)
                                     : AppColors.neutral300,
                                 foregroundColor: AppColors.white,
                                 disabledBackgroundColor: AppColors.neutral300,
                                 disabledForegroundColor: AppColors.neutral500,
-                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
@@ -369,7 +479,9 @@ class _PaymentModalState extends State<PaymentModal> {
                               child: Text(
                                 'Confirm Payment',
                                 style: AppTypography.bodyMRegular.copyWith(
-                                  color: canConfirm ? AppColors.white : AppColors.neutral500,
+                                  color: canConfirm
+                                      ? AppColors.white
+                                      : AppColors.neutral500,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -385,6 +497,7 @@ class _PaymentModalState extends State<PaymentModal> {
           ),
         ),
       ),
+    ),
     );
   }
 
@@ -438,7 +551,10 @@ class _PaymentModalState extends State<PaymentModal> {
                     size: 200,
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.primary500,
                       borderRadius: BorderRadius.circular(4),
@@ -472,7 +588,6 @@ class _PaymentModalState extends State<PaymentModal> {
           ),
           textAlign: TextAlign.center,
         ),
-
       ],
     );
   }
@@ -552,9 +667,15 @@ class _PaymentModalState extends State<PaymentModal> {
 
   Widget _buildMethodCard(String method, IconData icon) {
     final bool isSelected = _selectedMethod == method;
-    final Color strokeColor = isSelected ? AppColors.primary500 : AppColors.neutral200;
-    final Color bgColor = isSelected ? AppColors.primary500.withValues(alpha: 0.1) : AppColors.white;
-    final Color contentColor = isSelected ? AppColors.primary500 : AppColors.neutral800;
+    final Color strokeColor = isSelected
+        ? AppColors.primary500
+        : AppColors.neutral200;
+    final Color bgColor = isSelected
+        ? AppColors.primary500.withValues(alpha: 0.1)
+        : AppColors.white;
+    final Color contentColor = isSelected
+        ? AppColors.primary500
+        : AppColors.neutral800;
 
     return GestureDetector(
       onTap: () {
@@ -600,7 +721,9 @@ class _PaymentModalState extends State<PaymentModal> {
       children: [
         Text(
           label,
-          style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral500),
+          style: AppTypography.bodySRegular.copyWith(
+            color: AppColors.neutral500,
+          ),
         ),
         Text(
           value,
