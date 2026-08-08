@@ -7,6 +7,7 @@ import '../screens/pos_order_screen.dart';
 import '../screens/pos_tables_editor_screen.dart';
 import '../screens/pos_product_screen.dart';
 import '../screens/pos_report_screen.dart';
+import '../screens/pos_setting_screen.dart';
 
 class PosNavigationDrawer extends StatelessWidget {
   final Function(String)? onTableSelected;
@@ -181,8 +182,10 @@ class PosNavigationDrawer extends StatelessWidget {
                       _buildMenuItem(
                         icon: Icons.settings_outlined,
                         label: 'Setting',
-                        isActive: false,
-                        onTap: () {},
+                        isActive: activeRoute == 'setting',
+                        onTap: activeRoute == 'setting'
+                            ? () => Navigator.pop(context)
+                            : () => _navigateToRoute(context, const PosSettingScreen()),
                       ),
                     ],
                   ),

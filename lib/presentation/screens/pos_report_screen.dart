@@ -17,7 +17,7 @@ class _PosReportScreenState extends State<PosReportScreen> {
   String _selectedTimeRange = 'Last 6 Months';
 
   // State untuk hover chart
-  int _hoveredChartIndex = 3; // Default ke Agustus 2024 (index 3)
+  int _hoveredChartIndex = 7; // Default ke Agustus 2024 (index 7)
 
   // State untuk Toast Notification (Konsisten dengan page lain)
   bool _showToast = false;
@@ -25,16 +25,26 @@ class _PosReportScreenState extends State<PosReportScreen> {
   String _toastSubtitle = '';
   bool _toastIsSuccess = true;
 
-  // Data Sales Chart
-  final List<double> _salesData = [2000, 3000, 2500, 4802, 4200, 6000];
-  final List<String> _salesMonths = ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'];
+  // Data Sales Chart (Januari - Desember 12 Bulan)
+  final List<double> _salesData = [
+    1800, 2400, 2900, 3100, 3800, 4200, 4500, 4802, 5100, 5600, 6200, 6800
+  ];
+  final List<String> _salesMonths = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  ];
   final List<String> _salesFullMonths = [
+    'January 2024',
+    'February 2024',
+    'March 2024',
+    'April 2024',
     'May 2024',
     'June 2024',
     'July 2024',
     'August 2024',
     'September 2024',
-    'October 2024'
+    'October 2024',
+    'November 2024',
+    'December 2024'
   ];
 
   void _triggerToast(String title, String subtitle, {bool isSuccess = true}) {
@@ -53,12 +63,63 @@ class _PosReportScreenState extends State<PosReportScreen> {
     });
   }
 
+  // Dialog Pemilih Custom Date Range
+  Future<void> _selectCustomDateRange(BuildContext context) async {
+    final DateTimeRange? picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2023),
+      lastDate: DateTime(2026, 12, 31),
+      initialDateRange: DateTimeRange(
+        start: DateTime.now().subtract(const Duration(days: 7)),
+        end: DateTime.now(),
+      ),
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: AppColors.primary500,
+              onPrimary: AppColors.white,
+              surface: AppColors.white,
+              onSurface: AppColors.neutral900,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      final String startStr =
+          "${picked.start.day.toString().padLeft(2, '0')}/${picked.start.month.toString().padLeft(2, '0')}/${picked.start.year}";
+      final String endStr =
+          "${picked.end.day.toString().padLeft(2, '0')}/${picked.end.month.toString().padLeft(2, '0')}/${picked.end.year}";
+      final String displayRange = "$startStr - $endStr";
+
+      setState(() {
+        _selectedTimeRange = displayRange;
+      });
+      _triggerToast('Custom Date Selected', 'Rentang waktu: $displayRange');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final bool isDesktop = screenWidth >= 1100;
     final bool isTablet = screenWidth >= 768 && screenWidth < 1100;
     final bool isMobile = screenWidth < 768;
+
+    // Menyiapkan opsi dropdown secara dinamis jika ada custom date range yang dipilih
+    final List<String> dropdownOptions = [
+      'Today',
+      'Last 7 Days',
+      'This Month',
+      'Last 6 Months',
+      'Custom Date Range',
+    ];
+    if (!dropdownOptions.contains(_selectedTimeRange)) {
+      dropdownOptions.add(_selectedTimeRange);
+    }
 
     return Scaffold(
       key: _scaffoldKey,
@@ -96,20 +157,16 @@ class _PosReportScreenState extends State<PosReportScreen> {
                     fontWeight: FontWeight.w600,
                   ),
                   onChanged: (String? newValue) {
-                    if (newValue != null) {
+                    if (newValue == 'Custom Date Range') {
+                      _selectCustomDateRange(context);
+                    } else if (newValue != null) {
                       setState(() {
                         _selectedTimeRange = newValue;
                       });
                       _triggerToast('Filter Ganti', 'Rentang waktu diubah menjadi $newValue');
                     }
                   },
-                  items: <String>[
-                    'Today',
-                    'Last 7 Days',
-                    'This Month',
-                    'Last 6 Months',
-                    'Custom Date Range'
-                  ].map<DropdownMenuItem<String>>((String value) {
+                  items: dropdownOptions.map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(value),
@@ -464,7 +521,7 @@ class _PosReportScreenState extends State<PosReportScreen> {
     );
   }
 
-  // Sales Overview Card (Left column middle)
+  // Sales Overview Card (Left column middle) - 12 Bulan (Januari - Desember)
   Widget _buildSalesOverviewCard() {
     return Container(
       width: double.infinity,
@@ -600,7 +657,7 @@ class _PosReportScreenState extends State<PosReportScreen> {
                                   'Sales: Rp ${_formatCurrency(_salesData[_hoveredChartIndex])}',
                                   style: AppTypography.bodyXsBold.copyWith(
                                     color: AppColors.neutral900,
-                                    fontSize: 10.5, // Dikecilkan agar tulisan tidak overflow
+                                    fontSize: 10.5,
                                   ),
                                 ),
                               ],
@@ -638,46 +695,45 @@ class _PosReportScreenState extends State<PosReportScreen> {
     }
   }
 
-  // Row of 3 Donut Charts
+  // Row of 3 Donut Charts (Order Type, Category Sales, Payment Method)
   Widget _buildDonutChartsRow({required bool isMobile}) {
     if (isMobile) {
       return Column(
         children: [
+          // Donut 1: Order Type (Dine In vs Take Away)
           _buildDonutCard(
-            title: 'Product Status',
-            totalLabel: '61\nTotal Product',
-            values: [52, 7, 2],
-            colors: [AppColors.primary500, Colors.orange, Colors.blue],
+            title: 'Order Type',
+            totalLabel: '100%\nOrder Type',
+            values: [68, 32],
+            colors: [AppColors.primary500, const Color(0xFFFF9F43)],
             legends: [
-              _buildLegendRow('Active', '52', AppColors.primary500),
-              _buildLegendRow('Inactive', '7', Colors.orange),
-              _buildLegendRow('Draft', '2', Colors.blue),
+              _buildLegendRow('Dine In', '68% (49.027 Orders)', AppColors.primary500),
+              _buildLegendRow('Take Away', '32% (23.072 Orders)', const Color(0xFFFF9F43)),
             ],
-            onShowAll: () {},
+            showShowAll: false,
           ),
           const SizedBox(height: 16),
+          // Donut 2: Category Sales (Main Course, Dimsum, Beverages, Dessert)
           _buildDonutCard(
-            title: 'Stock Status',
-            totalLabel: '36\nTotal Item',
-            values: [32, 1, 3],
-            colors: [AppColors.primary500, Colors.orange, AppColors.error500],
-            legends: [
-              _buildLegendRow('In Stock', '32', AppColors.primary500),
-              _buildLegendRow('Low Stock', '1', Colors.orange),
-              _buildLegendRow(
-                'Out of Stock',
-                '3',
-                AppColors.error500,
-                trailingIcon: const Icon(
-                  Icons.info_outline,
-                  color: AppColors.error500,
-                  size: 14,
-                ),
-              ),
+            title: 'Category Sales',
+            totalLabel: '4\nCategories',
+            values: [45, 30, 15, 10],
+            colors: [
+              AppColors.primary500,
+              const Color(0xFFFFAB00),
+              const Color(0xFF1D90FB),
+              const Color(0xFF9C27B0),
             ],
-            onShowAll: () {},
+            legends: [
+              _buildLegendRow('Main Course', '45%', AppColors.primary500),
+              _buildLegendRow('Dimsum', '30%', const Color(0xFFFFAB00)),
+              _buildLegendRow('Beverages', '15%', const Color(0xFF1D90FB)),
+              _buildLegendRow('Dessert', '10%', const Color(0xFF9C27B0)),
+            ],
+            showShowAll: false,
           ),
           const SizedBox(height: 16),
+          // Donut 3: Payment Method (Cash vs QRIS)
           _buildDonutCard(
             title: 'Payment Method',
             totalLabel: '100%\nTransactions',
@@ -695,45 +751,44 @@ class _PosReportScreenState extends State<PosReportScreen> {
 
     return Row(
       children: [
+        // Donut 1: Order Type (Dine In vs Take Away)
         Expanded(
           child: _buildDonutCard(
-            title: 'Product Status',
-            totalLabel: '61\nTotal Product',
-            values: [52, 7, 2],
-            colors: [AppColors.primary500, Colors.orange, Colors.blue],
+            title: 'Order Type',
+            totalLabel: '100%\nOrder Type',
+            values: [68, 32],
+            colors: [AppColors.primary500, const Color(0xFFFF9F43)],
             legends: [
-              _buildLegendRow('Active', '52', AppColors.primary500),
-              _buildLegendRow('Inactive', '7', Colors.orange),
-              _buildLegendRow('Draft', '2', Colors.blue),
+              _buildLegendRow('Dine In', '68% (49.027)', AppColors.primary500),
+              _buildLegendRow('Take Away', '32% (23.072)', const Color(0xFFFF9F43)),
             ],
-            onShowAll: () {},
+            showShowAll: false,
           ),
         ),
         const SizedBox(width: 16),
+        // Donut 2: Category Sales (Main Course, Dimsum, Beverages, Dessert)
         Expanded(
           child: _buildDonutCard(
-            title: 'Stock Status',
-            totalLabel: '36\nTotal Item',
-            values: [32, 1, 3],
-            colors: [AppColors.primary500, Colors.orange, AppColors.error500],
-            legends: [
-              _buildLegendRow('In Stock', '32', AppColors.primary500),
-              _buildLegendRow('Low Stock', '1', Colors.orange),
-              _buildLegendRow(
-                'Out of Stock',
-                '3',
-                AppColors.error500,
-                trailingIcon: const Icon(
-                  Icons.info_outline,
-                  color: AppColors.error500,
-                  size: 14,
-                ),
-              ),
+            title: 'Category Sales',
+            totalLabel: '4\nCategories',
+            values: [45, 30, 15, 10],
+            colors: [
+              AppColors.primary500,
+              const Color(0xFFFFAB00),
+              const Color(0xFF1D90FB),
+              const Color(0xFF9C27B0),
             ],
-            onShowAll: () {},
+            legends: [
+              _buildLegendRow('Main Course', '45%', AppColors.primary500),
+              _buildLegendRow('Dimsum', '30%', const Color(0xFFFFAB00)),
+              _buildLegendRow('Beverages', '15%', const Color(0xFF1D90FB)),
+              _buildLegendRow('Dessert', '10%', const Color(0xFF9C27B0)),
+            ],
+            showShowAll: false,
           ),
         ),
         const SizedBox(width: 16),
+        // Donut 3: Payment Method (Cash vs QRIS)
         Expanded(
           child: _buildDonutCard(
             title: 'Payment Method',
@@ -1300,7 +1355,6 @@ class _PosReportScreenState extends State<PosReportScreen> {
                                 ),
                               ),
                             ),
-                            // Perbaikan: Menghilangkan background color dari payment method
                             TableCell(
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(vertical: 16.0),
@@ -1526,7 +1580,7 @@ class SalesChartPainter extends CustomPainter {
         gridPaint,
       );
 
-      // Label teks di sebelah kanan (tidak akan overflow karena paddingRight = 60.0)
+      // Label teks di sebelah kanan
       final tp = TextPainter(
         text: TextSpan(
           text: val.toInt().toString(),
@@ -1615,7 +1669,7 @@ class SalesChartPainter extends CustomPainter {
           text: months[i],
           style: AppTypography.bodyXsBold.copyWith(
             color: selectedIndex == i ? AppColors.neutral900 : AppColors.neutral400,
-            fontSize: 11,
+            fontSize: 10,
           ),
         ),
         textDirection: TextDirection.ltr,
