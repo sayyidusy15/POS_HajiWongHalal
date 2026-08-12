@@ -271,14 +271,11 @@ class _AddProductModalState extends State<AddProductModal> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      behavior: HitTestBehavior.opaque,
-      child: Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-        child: Center(
-          child: Container(
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      child: Center(
+        child: Container(
           width: 720,
           constraints: const BoxConstraints(maxHeight: 780),
           decoration: BoxDecoration(
@@ -316,12 +313,23 @@ class _AddProductModalState extends State<AddProductModal> {
                         fontSize: 18,
                       ),
                     ),
-                    IconButton(
-                      icon: const Icon(
-                        Icons.close,
-                        color: AppColors.neutral500,
+                    Material(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(20),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(20),
+                        onTap: () {
+                          Navigator.of(context, rootNavigator: true).pop(null);
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Icon(
+                            Icons.close,
+                            color: AppColors.neutral500,
+                            size: 22,
+                          ),
+                        ),
                       ),
-                      onPressed: () => Navigator.pop(context, null),
                     ),
                   ],
                 ),
@@ -355,7 +363,6 @@ class _AddProductModalState extends State<AddProductModal> {
           ),
         ),
       ),
-    ),
     );
   }
 
@@ -689,20 +696,40 @@ class _AddProductModalState extends State<AddProductModal> {
               ),
             ),
             if (!_isAddingNewCategory)
-              TextButton.icon(
-                onPressed: () => setState(() => _isAddingNewCategory = true),
-                icon: const Icon(
-                  Icons.add,
-                  size: 16,
-                  color: AppColors.primary500,
-                ),
-                label: const Text(
-                  'Add New Category',
-                  style: TextStyle(
-                    color: AppColors.primary500,
-                    fontWeight: FontWeight.bold,
+              Row(
+                children: [
+                  TextButton.icon(
+                    onPressed: _showManageCategoriesDialog,
+                    icon: const Icon(
+                      Icons.tune,
+                      size: 16,
+                      color: AppColors.neutral700,
+                    ),
+                    label: const Text(
+                      'Manage List',
+                      style: TextStyle(
+                        color: AppColors.neutral700,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 4),
+                  TextButton.icon(
+                    onPressed: () => setState(() => _isAddingNewCategory = true),
+                    icon: const Icon(
+                      Icons.add,
+                      size: 16,
+                      color: AppColors.primary500,
+                    ),
+                    label: const Text(
+                      'Add New Category',
+                      style: TextStyle(
+                        color: AppColors.primary500,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
               ),
           ],
         ),
@@ -1413,6 +1440,372 @@ class _AddProductModalState extends State<AddProductModal> {
           ),
         ],
       ],
+    );
+  }
+
+  void _showManageCategoriesDialog() {
+    final TextEditingController newCatCtrl = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              child: Container(
+                width: 460,
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header Title
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.tune, color: AppColors.primary500, size: 22),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Manage Category List',
+                              style: AppTypography.h4Bold.copyWith(color: AppColors.neutral900),
+                            ),
+                          ],
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close, color: AppColors.neutral500),
+                          onPressed: () => Navigator.pop(ctx),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Add New Category Row
+                    Text('Add New Category', style: AppTypography.bodyMBold.copyWith(color: AppColors.neutral800)),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: SizedBox(
+                            height: 48,
+                            child: TextField(
+                              controller: newCatCtrl,
+                              decoration: InputDecoration(
+                                hintText: 'Enter category name...',
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        SizedBox(
+                          height: 48,
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              final name = newCatCtrl.text.trim();
+                              if (name.isNotEmpty && !_categories.contains(name)) {
+                                setState(() {
+                                  _categories.add(name);
+                                  if (widget.categories != null && !widget.categories!.contains(name)) {
+                                    widget.categories!.add(name);
+                                  }
+                                });
+                                setModalState(() {
+                                  newCatCtrl.clear();
+                                });
+                              }
+                            },
+                            icon: const Icon(Icons.add, size: 20),
+                            label: const Text(
+                              'Add',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary500,
+                              foregroundColor: AppColors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 22),
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    const Divider(height: 1, color: AppColors.neutral200),
+                    const SizedBox(height: 14),
+
+                    // Category List Header
+                    Text(
+                      'Categories (${_categories.length})',
+                      style: AppTypography.bodyMBold.copyWith(color: AppColors.neutral800),
+                    ),
+                    const SizedBox(height: 10),
+
+                    // Category List
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxHeight: 260),
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        itemCount: _categories.length,
+                        separatorBuilder: (context, index) => const SizedBox(height: 8),
+                        itemBuilder: (context, index) {
+                          final catName = _categories[index];
+
+                          return Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: AppColors.white,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: AppColors.neutral200),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.label_outline, size: 18, color: AppColors.primary500),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    catName,
+                                    style: AppTypography.bodyMRegular.copyWith(
+                                      color: AppColors.neutral900,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.edit_outlined, color: AppColors.neutral600, size: 18),
+                                  onPressed: () {
+                                    _confirmRenameCategory(ctx, catName, index, setModalState);
+                                  },
+                                  tooltip: 'Rename',
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete_outline, color: Color(0xFFDC2626), size: 18),
+                                  onPressed: () {
+                                    _confirmDeleteCategory(ctx, catName, index, setModalState);
+                                  },
+                                  tooltip: 'Delete',
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Actions
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () => Navigator.pop(ctx),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary500,
+                            foregroundColor: AppColors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          ),
+                          child: const Text('Done'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _confirmRenameCategory(
+    BuildContext parentCtx,
+    String oldName,
+    int index,
+    StateSetter setModalState,
+  ) {
+    final TextEditingController ctrl = TextEditingController(text: oldName);
+    showDialog(
+      context: parentCtx,
+      builder: (dialogCtx) {
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: Container(
+            width: 400,
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.edit_outlined, color: AppColors.primary500, size: 22),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Rename Category',
+                      style: AppTypography.h4Bold.copyWith(color: AppColors.neutral900),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Enter new name for category "$oldName":',
+                  style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral700),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: ctrl,
+                  autofocus: true,
+                  decoration: InputDecoration(
+                    hintText: 'Category name',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    OutlinedButton(
+                      onPressed: () => Navigator.pop(dialogCtx),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: AppColors.neutral300),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      child: const Text('Cancel', style: TextStyle(color: AppColors.neutral700)),
+                    ),
+                    const SizedBox(width: 10),
+                    ElevatedButton(
+                      onPressed: () {
+                        final newName = ctrl.text.trim();
+                        if (newName.isNotEmpty && newName != oldName) {
+                          setState(() {
+                            _categories[index] = newName;
+                            if (widget.categories != null) {
+                              final wIdx = widget.categories!.indexOf(oldName);
+                              if (wIdx != -1) {
+                                widget.categories![wIdx] = newName;
+                              }
+                            }
+                            if (_selectedCategory == oldName) {
+                              _selectedCategory = newName;
+                            }
+                          });
+                          setModalState(() {});
+                        }
+                        Navigator.pop(dialogCtx);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary500,
+                        foregroundColor: AppColors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      child: const Text('Save Changes'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _confirmDeleteCategory(
+    BuildContext parentCtx,
+    String catName,
+    int index,
+    StateSetter setModalState,
+  ) {
+    showDialog(
+      context: parentCtx,
+      builder: (dialogCtx) {
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: Container(
+            width: 400,
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.delete_outline, color: Color(0xFFDC2626), size: 24),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Delete Category',
+                      style: AppTypography.h4Bold.copyWith(color: AppColors.neutral900),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                RichText(
+                  text: TextSpan(
+                    style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral700),
+                    children: [
+                      const TextSpan(text: 'Are you sure you want to delete category '),
+                      TextSpan(
+                        text: '"$catName"',
+                        style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.neutral900),
+                      ),
+                      const TextSpan(text: '? This action cannot be undone.'),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    OutlinedButton(
+                      onPressed: () => Navigator.pop(dialogCtx),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: AppColors.neutral300),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      child: const Text('Cancel', style: TextStyle(color: AppColors.neutral700)),
+                    ),
+                    const SizedBox(width: 10),
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _categories.removeAt(index);
+                          if (widget.categories != null) {
+                            widget.categories!.remove(catName);
+                          }
+                          if (_selectedCategory == catName && _categories.isNotEmpty) {
+                            _selectedCategory = _categories.first;
+                          }
+                        });
+                        setModalState(() {});
+                        Navigator.pop(dialogCtx);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFDC2626),
+                        foregroundColor: AppColors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      child: const Text('Delete'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

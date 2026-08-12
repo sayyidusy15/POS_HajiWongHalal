@@ -311,6 +311,7 @@ class _PosOrderScreenState extends State<PosOrderScreen> {
                           _buildColumnHead('CUSTOMER', 3),
                           _buildColumnHead('ORDER TYPE', 2),
                           _buildColumnHead('QTY', 1),
+                          _buildColumnHead('PAYMENT METHOD', 3),
                           _buildColumnHead('TOTAL', 2),
                           _buildColumnHead('', 1), // Action column
                         ],
@@ -453,59 +454,77 @@ class _PosOrderScreenState extends State<PosOrderScreen> {
       child: Container(
         height: 120,
         decoration: BoxDecoration(
-          color: isActive ? AppColors.white : const Color(0xFFE5E7EB),
+          color: isActive ? AppColors.white : const Color(0xFFF9FAFB),
           borderRadius: BorderRadius.circular(12),
-          border: isActive
-              ? const Border(
-                  left: BorderSide(color: Color(0xFF289656), width: 6),
-                )
-              : null,
+          border: Border.all(
+            color: isActive ? AppColors.neutral300 : AppColors.neutral200,
+            width: 1.5,
+          ),
           boxShadow: isActive
               ? [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 8,
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 10,
                     offset: const Offset(0, 4),
                   )
                 ]
               : null,
         ),
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Stack(
           children: [
-            // Top Row: Icon and Title
-            Row(
-              children: [
-                Icon(
-                  icon,
-                  color: isActive ? AppColors.neutral800 : AppColors.neutral500,
-                  size: 20,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    title,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                    style: AppTypography.bodySRegular.copyWith(
-                      color: isActive ? AppColors.neutral800 : AppColors.neutral600,
-                      fontWeight: FontWeight.bold,
-                    ),
+            if (isActive)
+              Positioned(
+                left: 0,
+                top: 38,
+                bottom: 38,
+                width: 4,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF289656),
+                    borderRadius: BorderRadius.circular(4),
                   ),
                 ),
-              ],
-            ),
-            // Bottom count: Large text
-            Text(
-              '$count',
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: AppColors.neutral900,
+              ),
+            Padding(
+              padding: const EdgeInsets.only(left: 20, right: 16, top: 16, bottom: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Top Row: Icon and Title
+                  Row(
+                    children: [
+                      Icon(
+                        icon,
+                        color: isActive ? AppColors.neutral800 : AppColors.neutral500,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          title,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: AppTypography.bodySRegular.copyWith(
+                            color: isActive ? AppColors.neutral800 : AppColors.neutral600,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  // Bottom count: Large text
+                  Text(
+                    '$count',
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.neutral900,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -663,6 +682,59 @@ class _PosOrderScreenState extends State<PosOrderScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
+          ),
+          // 7. PAYMENT METHOD (Only if Completed, else '-')
+          Expanded(
+            flex: 3,
+            child: order.status == 'Completed'
+                ? Row(
+                    children: [
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF0FDF4),
+                            borderRadius: BorderRadius.circular(30),
+                            border: Border.all(color: const Color(0xFFBBF7D0)),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                order.paymentMethod.toLowerCase().contains('qris')
+                                    ? Icons.qr_code_2
+                                    : order.paymentMethod.toLowerCase().contains('cash')
+                                        ? Icons.payments_outlined
+                                        : Icons.credit_card_outlined,
+                                size: 14,
+                                color: const Color(0xFF16A34A),
+                              ),
+                              const SizedBox(width: 4),
+                              Flexible(
+                                child: Text(
+                                  order.paymentMethod,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  style: AppTypography.bodyXsRegular.copyWith(
+                                    color: const Color(0xFF15803D),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                : Text(
+                    '-',
+                    style: AppTypography.bodySRegular.copyWith(
+                      color: AppColors.neutral400,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
           ),
           // 7. TOTAL
           Expanded(
@@ -1232,7 +1304,13 @@ class _PosOrderScreenState extends State<PosOrderScreen> {
         orderType: isDine ? 'Dine In' : 'Take Away',
         qty: qtyVal,
         total: totalVal,
-        paymentMethod: i % 3 == 0 ? 'QRIS' : 'Cash',
+        paymentMethod: i % 4 == 0
+            ? 'QRIS'
+            : i % 4 == 1
+                ? 'Cash'
+                : i % 4 == 2
+                    ? 'Bank BCA'
+                    : 'Bank Mandiri',
         tableName: isDine ? 'Table ${(i % 15) + 1}' : null,
         items: [
           {'name': 'Deluxe Crispy Burger', 'price': 6900.0, 'qty': qtyVal, 'size': 'Regular', 'addons': [], 'notes': ''}

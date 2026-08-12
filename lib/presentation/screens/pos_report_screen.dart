@@ -3,7 +3,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../widgets/pos_navigation_drawer.dart';
 import '../widgets/custom_success_toast.dart';
-import 'pos_recent_orders_screen.dart';
+import 'pos_order_screen.dart';
 
 class PosReportScreen extends StatefulWidget {
   const PosReportScreen({super.key});
@@ -1203,10 +1203,9 @@ class _PosReportScreenState extends State<PosReportScreen> {
               ),
               TextButton(
                 onPressed: () {
-                  // Navigasi ke Halaman Recent Orders dengan Paginasi
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const PosRecentOrdersScreen()),
+                    MaterialPageRoute(builder: (context) => const PosOrderScreen()),
                   );
                 },
                 child: Text(

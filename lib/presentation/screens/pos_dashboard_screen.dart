@@ -44,7 +44,18 @@ class OrderItem {
 }
 
 class PosDashboardScreen extends StatefulWidget {
-  const PosDashboardScreen({super.key});
+  final String? initialCustomer;
+  final String? initialTable;
+  final List<OrderItem>? initialCartItems;
+  final String? initialOrderId;
+
+  const PosDashboardScreen({
+    super.key,
+    this.initialCustomer,
+    this.initialTable,
+    this.initialCartItems,
+    this.initialOrderId,
+  });
 
   @override
   State<PosDashboardScreen> createState() => _PosDashboardScreenState();
@@ -68,6 +79,20 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
   
   // Keranjang Belanja Dinamis
   final List<OrderItem> _cart = [];
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialCustomer != null && widget.initialCustomer!.isNotEmpty) {
+      _selectedCustomer = widget.initialCustomer!;
+    }
+    if (widget.initialTable != null && widget.initialTable!.isNotEmpty) {
+      _selectedTable = widget.initialTable!;
+    }
+    if (widget.initialCartItems != null && widget.initialCartItems!.isNotEmpty) {
+      _cart.addAll(widget.initialCartItems!);
+    }
+  }
 
   // Daftar Produk (Dikonversi ke mata uang Rupiah)
   final List<Product> _products = [
@@ -309,49 +334,44 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
             ),
           ),
           const SizedBox(width: 8),
-          Flexible(
-            child: Text(
-              'Haji Wong Halal',
-              overflow: TextOverflow.ellipsis,
-              style: AppTypography.bodyLBold.copyWith(color: AppColors.neutral900),
-            ),
+          Text(
+            'Haji Wong Halal',
+            style: AppTypography.bodyLBold.copyWith(color: AppColors.neutral900),
           ),
-          const Spacer(), // Mendorong search bar ke ujung kanan navbar
-          
-          // Search Bar di Ujung Kanan Navbar (lebar maksimal, responsif)
-          Flexible(
-            child: Container(
-              constraints: const BoxConstraints(maxWidth: 420),
-              height: 44,
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              decoration: BoxDecoration(
-                color: AppColors.neutral100,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: AppColors.neutral200, width: 1.5),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.search, color: AppColors.neutral400, size: 20),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: TextField(
-                      onChanged: (val) {
-                        setState(() {
-                          _searchQuery = val;
-                        });
-                      },
-                      style: AppTypography.bodyMRegular.copyWith(color: AppColors.neutral900),
-                      decoration: InputDecoration(
-                        hintText: 'Search Product...',
-                        hintStyle: AppTypography.bodyMRegular.copyWith(color: AppColors.neutral400),
-                        border: InputBorder.none,
-                        isDense: true,
-                        contentPadding: EdgeInsets.zero,
-                      ),
+          const Spacer(),
+
+          // Search Bar di Navbar (Background putih, panjang ~360px seukuran 2 card menu & menempel ke batas kanan)
+          Container(
+            constraints: const BoxConstraints(maxWidth: 360),
+            height: 44,
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppColors.neutral300, width: 1.5),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.search, color: AppColors.neutral400, size: 20),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: TextField(
+                    onChanged: (val) {
+                      setState(() {
+                        _searchQuery = val;
+                      });
+                    },
+                    style: AppTypography.bodyMRegular.copyWith(color: AppColors.neutral900),
+                    decoration: InputDecoration(
+                      hintText: 'Search Product...',
+                      hintStyle: AppTypography.bodyMRegular.copyWith(color: AppColors.neutral400),
+                      border: InputBorder.none,
+                      isDense: true,
+                      contentPadding: EdgeInsets.zero,
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],
@@ -385,10 +405,19 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
               margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
               height: 80,
               decoration: BoxDecoration(
-                color: isActive ? AppColors.primary500.withValues(alpha: 0.1) : AppColors.neutral100,
+                color: isActive ? AppColors.white : AppColors.neutral100,
                 borderRadius: BorderRadius.circular(12),
                 border: isActive
-                    ? Border.all(color: AppColors.primary500.withValues(alpha: 0.3), width: 1)
+                    ? Border.all(color: AppColors.primary500.withValues(alpha: 0.3), width: 1.5)
+                    : null,
+                boxShadow: isActive
+                    ? [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.04),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ]
                     : null,
               ),
               child: Stack(
@@ -711,7 +740,26 @@ class _PosDashboardScreenState extends State<PosDashboardScreen> {
                     }
                   }
                 }),
-                _buildActionGridButton('Save Bill', Icons.file_download_outlined, () {}),
+                _buildActionGridButton('Save Bill', Icons.file_download_outlined, () {
+                  if (_cart.isEmpty) {
+                    setState(() {
+                      _showToast = true;
+                      _toastTitle = 'Cart Empty';
+                      _toastSubtitle = 'Add products to cart before saving bill.';
+                      _toastHighlightText = null;
+                    });
+                    return;
+                  }
+                  final String tableInfo = _selectedTable ?? 'Dine-In';
+                  setState(() {
+                    _cart.clear();
+                    _appliedDiscount = null;
+                    _showToast = true;
+                    _toastTitle = 'Bill Saved!';
+                    _toastSubtitle = 'Order saved for $tableInfo ($_selectedCustomer)';
+                    _toastHighlightText = 'Saved';
+                  });
+                }),
               ],
             ),
           ),

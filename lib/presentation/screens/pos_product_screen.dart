@@ -1199,6 +1199,8 @@ class _PosProductScreenState extends State<PosProductScreen> {
     }
   }
 
+
+
   // Default Mock Products
   List<ProductModel> _generateMockProducts() {
     return [

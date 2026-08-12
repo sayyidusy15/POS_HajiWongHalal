@@ -4,6 +4,7 @@ import '../../core/theme/app_typography.dart';
 import '../../main.dart';
 import '../screens/login_screen.dart';
 import '../screens/pos_order_screen.dart';
+import '../screens/pos_customer_screen.dart';
 import '../screens/pos_tables_editor_screen.dart';
 import '../screens/pos_product_screen.dart';
 import '../screens/pos_report_screen.dart';
@@ -131,8 +132,10 @@ class PosNavigationDrawer extends StatelessWidget {
                       _buildMenuItem(
                         icon: Icons.people_outline,
                         label: 'Customer',
-                        isActive: false,
-                        onTap: () {},
+                        isActive: activeRoute == 'customer',
+                        onTap: activeRoute == 'customer'
+                            ? () => Navigator.pop(context)
+                            : () => _navigateToRoute(context, const PosCustomerScreen()),
                       ),
                       const SizedBox(height: 12),
 
@@ -166,15 +169,6 @@ class PosNavigationDrawer extends StatelessWidget {
                         onTap: activeRoute == 'report'
                             ? () => Navigator.pop(context)
                             : () => _navigateToRoute(context, const PosReportScreen()),
-                      ),
-                      const SizedBox(height: 12),
-
-                      // Inventory
-                      _buildMenuItem(
-                        icon: Icons.warehouse_outlined,
-                        label: 'Inventory',
-                        isActive: false,
-                        onTap: () {},
                       ),
                       const SizedBox(height: 12),
 

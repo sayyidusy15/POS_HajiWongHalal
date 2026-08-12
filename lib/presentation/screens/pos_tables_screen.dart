@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
+import '../widgets/payment_modal.dart';
+import '../widgets/payment_success_modal.dart';
+import 'pos_dashboard_screen.dart';
 
 // Model data untuk Meja
 class TableModel {
@@ -18,6 +21,7 @@ class TableModel {
   final double? price;
   final String floor; // 'Lantai 1', 'Lantai 2', 'Lantai 3'
   final int rotationAngle; // 0, 90, 180, 270
+  final List<OrderItem>? items;
 
   const TableModel({
     required this.id,
@@ -34,7 +38,34 @@ class TableModel {
     this.price,
     this.floor = 'Lantai 1',
     this.rotationAngle = 0,
+    this.items,
   });
+
+  TableModel copyWith({
+    bool? isUsed,
+    String? orderId,
+    String? customerName,
+    double? price,
+    List<OrderItem>? items,
+  }) {
+    return TableModel(
+      id: id,
+      name: name,
+      capacity: capacity,
+      shape: shape,
+      x: x,
+      y: y,
+      width: width,
+      height: height,
+      isUsed: isUsed ?? this.isUsed,
+      orderId: isUsed == false ? null : (orderId ?? this.orderId),
+      customerName: isUsed == false ? null : (customerName ?? this.customerName),
+      price: isUsed == false ? null : (price ?? this.price),
+      floor: floor,
+      rotationAngle: rotationAngle,
+      items: isUsed == false ? null : (items ?? this.items),
+    );
+  }
 }
 
 class PosTablesScreen extends StatefulWidget {
@@ -45,13 +76,15 @@ class PosTablesScreen extends StatefulWidget {
 }
 
 class _PosTablesScreenState extends State<PosTablesScreen> {
-  // TransformationController for InteractiveViewer scaling
   final TransformationController _transformationController = TransformationController();
 
-  // Active Floor layout filter
+  // Active Filters
   String _selectedFloor = 'Lantai 1'; // 'Lantai 1', 'Lantai 2', 'Lantai 3'
+  String _selectedStatusFilter = 'All Table'; // 'All Table', 'Available', 'Occupied'
+  String _selectedCapacityFilter = 'All Capacity'; // 'All Capacity', '2 Seats', '4 Seats', '6 Seats'
+  String _selectedTypeFilter = 'All Type'; // 'All Type', 'Circle', 'Square', 'Rectangle'
+  String _searchQuery = '';
 
-  // Cashier coordinates per floor (same as layout editor)
   double _cashierX1 = 440.0, _cashierY1 = 200.0;
   double _cashierX2 = 440.0, _cashierY2 = 200.0;
   double _cashierX3 = 440.0, _cashierY3 = 200.0;
@@ -68,435 +101,520 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
     return _cashierY1;
   }
 
-  // Mock Data Meja matching layout editor instances exactly
-  final List<TableModel> _tables = const [
-    // --- LANTAI 1 ---
-    // Circles (2 seats)
-    TableModel(id: 'T1', name: '01', capacity: 2, shape: 'circle', x: 80, y: 100, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
-    TableModel(id: 'T2', name: '02', capacity: 2, shape: 'circle', x: 170, y: 100, width: 50, height: 50, isUsed: true, orderId: 'Order #0293E10', customerName: 'Emily Brown', price: 245000, floor: 'Lantai 1'),
-    TableModel(id: 'T3', name: '03', capacity: 2, shape: 'circle', x: 260, y: 100, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
-    TableModel(id: 'T4', name: '04', capacity: 2, shape: 'circle', x: 350, y: 100, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
-
-    // Squares (4 seats)
-    TableModel(id: 'T5', name: '05', capacity: 4, shape: 'square', x: 80, y: 200, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
-    TableModel(id: 'T6', name: '06', capacity: 4, shape: 'square', x: 170, y: 200, width: 50, height: 50, isUsed: true, orderId: 'Order #201OB99', customerName: 'Michael Johnson', price: 345000, floor: 'Lantai 1'),
-    TableModel(id: 'T7', name: '07', capacity: 4, shape: 'square', x: 260, y: 200, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
-    TableModel(id: 'T8', name: '08', capacity: 4, shape: 'square', x: 350, y: 200, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
-
-    // Middle Squares (4 seats)
-    TableModel(id: 'T9', name: '09', capacity: 4, shape: 'square', x: 80, y: 320, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
-    TableModel(id: 'T10', name: '10', capacity: 4, shape: 'square', x: 170, y: 320, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
-    TableModel(id: 'T11', name: '11', capacity: 4, shape: 'square', x: 260, y: 320, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
-    TableModel(id: 'T12', name: '12', capacity: 4, shape: 'square', x: 350, y: 320, width: 50, height: 50, isUsed: true, orderId: 'Order #883AD90', customerName: 'Sophia Williams', price: 189000, floor: 'Lantai 1'),
-
-    // Long Rectangles (6 seats)
-    TableModel(id: 'T13', name: '13', capacity: 6, shape: 'rectangle', x: 580, y: 200, width: 110, height: 60, isUsed: false, floor: 'Lantai 1'),
-    TableModel(id: 'T14', name: '14', capacity: 6, shape: 'rectangle', x: 580, y: 320, width: 110, height: 60, isUsed: false, floor: 'Lantai 1'),
-    TableModel(id: 'T15', name: '15', capacity: 6, shape: 'rectangle', x: 580, y: 440, width: 110, height: 60, isUsed: true, orderId: 'Order #332FF88', customerName: 'Jack Reacher', price: 760000, floor: 'Lantai 1'),
-
-    // Bottom Circles (2 seats)
-    TableModel(id: 'T16', name: '16', capacity: 2, shape: 'circle', x: 80, y: 440, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
-    TableModel(id: 'T17', name: '17', capacity: 2, shape: 'circle', x: 170, y: 440, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
-    TableModel(id: 'T18', name: '18', capacity: 2, shape: 'circle', x: 260, y: 440, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
-    TableModel(id: 'T19', name: '19', capacity: 2, shape: 'circle', x: 350, y: 440, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
-    TableModel(id: 'T20', name: '20', capacity: 2, shape: 'circle', x: 440, y: 440, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
-
-    // --- LANTAI 2 ---
-    TableModel(id: 'T21', name: '21', capacity: 2, shape: 'circle', x: 100, y: 150, width: 50, height: 50, isUsed: false, floor: 'Lantai 2'),
-    TableModel(id: 'T22', name: '22', capacity: 2, shape: 'circle', x: 200, y: 150, width: 50, height: 50, isUsed: true, orderId: 'Order #L2O01', customerName: 'Bruce Wayne', price: 145000, floor: 'Lantai 2'),
-    TableModel(id: 'T23', name: '23', capacity: 2, shape: 'circle', x: 300, y: 150, width: 50, height: 50, isUsed: false, floor: 'Lantai 2'),
-    TableModel(id: 'T24', name: '24', capacity: 4, shape: 'square', x: 100, y: 250, width: 50, height: 50, isUsed: false, floor: 'Lantai 2'),
-    TableModel(id: 'T25', name: '25', capacity: 4, shape: 'square', x: 200, y: 250, width: 50, height: 50, isUsed: false, floor: 'Lantai 2'),
-    TableModel(id: 'T26', name: '26', capacity: 4, shape: 'square', x: 300, y: 250, width: 50, height: 50, isUsed: true, orderId: 'Order #L2O02', customerName: 'Clark Kent', price: 290000, floor: 'Lantai 2'),
-    TableModel(id: 'T27', name: '27', capacity: 6, shape: 'rectangle', x: 500, y: 200, width: 110, height: 60, isUsed: false, floor: 'Lantai 2'),
-    TableModel(id: 'T28', name: '28', capacity: 6, shape: 'rectangle', x: 500, y: 320, width: 110, height: 60, isUsed: false, floor: 'Lantai 2'),
-    TableModel(id: 'T29', name: '29', capacity: 2, shape: 'circle', x: 100, y: 400, width: 50, height: 50, isUsed: false, floor: 'Lantai 2'),
-    TableModel(id: 'T30', name: '30', capacity: 2, shape: 'circle', x: 200, y: 400, width: 50, height: 50, isUsed: false, floor: 'Lantai 2'),
-
-    // --- LANTAI 3 ---
-    TableModel(id: 'T31', name: '31', capacity: 2, shape: 'circle', x: 150, y: 120, width: 50, height: 50, isUsed: false, floor: 'Lantai 3'),
-    TableModel(id: 'T32', name: '32', capacity: 2, shape: 'circle', x: 250, y: 120, width: 50, height: 50, isUsed: false, floor: 'Lantai 3'),
-    TableModel(id: 'T33', name: '33', capacity: 4, shape: 'square', x: 150, y: 220, width: 50, height: 50, isUsed: false, floor: 'Lantai 3'),
-    TableModel(id: 'T34', name: '34', capacity: 4, shape: 'square', x: 250, y: 220, width: 50, height: 50, isUsed: true, orderId: 'Order #L3O01', customerName: 'Diana Prince', price: 95000, floor: 'Lantai 3'),
-    TableModel(id: 'T35', name: '35', capacity: 6, shape: 'rectangle', x: 450, y: 180, width: 110, height: 60, isUsed: false, floor: 'Lantai 3'),
-    TableModel(id: 'T36', name: '36', capacity: 6, shape: 'rectangle', x: 450, y: 300, width: 110, height: 60, isUsed: false, floor: 'Lantai 3'),
-    TableModel(id: 'T37', name: '37', capacity: 4, shape: 'square', x: 150, y: 340, width: 50, height: 50, isUsed: false, floor: 'Lantai 3'),
-    TableModel(id: 'T38', name: '38', capacity: 4, shape: 'square', x: 250, y: 340, width: 50, height: 50, isUsed: false, floor: 'Lantai 3'),
-    TableModel(id: 'T39', name: '39', capacity: 2, shape: 'circle', x: 150, y: 460, width: 50, height: 50, isUsed: false, floor: 'Lantai 3'),
-    TableModel(id: 'T40', name: '40', capacity: 2, shape: 'circle', x: 250, y: 460, width: 50, height: 50, isUsed: false, floor: 'Lantai 3'),
-  ];
-
-  // State Management Screen
-  String? _selectedTableId = 'T5'; // Table 5 selected by default
-  String _activeListTab = 'All Table'; // 'All Table', 'Available', 'Used'
-  String _searchQuery = '';
-  String _selectedCapacityFilter = 'All Capacity'; // 'All Capacity', '2 Seats', '4 Seats', '6 Seats'
-
-  final TextEditingController _searchController = TextEditingController();
+  // Stateful List Meja
+  late List<TableModel> _tablesList;
+  String? _selectedTableId;
 
   @override
   void initState() {
     super.initState();
-    // Zoom out canvas visually to match editor scale initially
-    _transformationController.value = Matrix4.diagonal3Values(0.6, 0.6, 1.0);
+    _tablesList = _generateInitialTables();
   }
 
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
+  List<TableModel> _generateInitialTables() {
+    return [
+      // --- LANTAI 1 ---
+      const TableModel(id: 'T1', name: '01', capacity: 2, shape: 'circle', x: 80, y: 100, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+      TableModel(
+        id: 'T2',
+        name: '02',
+        capacity: 2,
+        shape: 'circle',
+        x: 170,
+        y: 100,
+        width: 50,
+        height: 50,
+        isUsed: true,
+        orderId: 'Order #0293E10',
+        customerName: 'Emily Brown',
+        price: 245000,
+        floor: 'Lantai 1',
+        items: [
+          OrderItem(product: const Product(name: 'Deluxe Crispy Burger', price: 45000, category: 'Burger', icon: Icons.lunch_dining_outlined), quantity: 2),
+          OrderItem(product: const Product(name: 'Combo Drumstick', price: 55000, category: 'Fried Chicken', icon: Icons.restaurant_outlined), quantity: 2),
+          OrderItem(product: const Product(name: 'Chocolate Milkshake', price: 22000, category: 'Drink', icon: Icons.local_drink_outlined), quantity: 2),
+        ],
+      ),
+      const TableModel(id: 'T3', name: '03', capacity: 2, shape: 'circle', x: 260, y: 100, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+      const TableModel(id: 'T4', name: '04', capacity: 2, shape: 'circle', x: 350, y: 100, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+
+      const TableModel(id: 'T5', name: '05', capacity: 4, shape: 'square', x: 80, y: 200, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+      TableModel(
+        id: 'T6',
+        name: '06',
+        capacity: 4,
+        shape: 'square',
+        x: 170,
+        y: 200,
+        width: 50,
+        height: 50,
+        isUsed: true,
+        orderId: 'Order #201OB99',
+        customerName: 'Michael Johnson',
+        price: 345000,
+        floor: 'Lantai 1',
+        items: [
+          OrderItem(product: const Product(name: 'Double Cheeseburger', price: 48000, category: 'Burger', icon: Icons.lunch_dining_outlined), quantity: 4),
+          OrderItem(product: const Product(name: 'Coca Cola', price: 12000, category: 'Drink', icon: Icons.local_drink_outlined), quantity: 4),
+          OrderItem(product: const Product(name: '3 Cheese Wings', price: 28000, category: 'Fried Chicken', icon: Icons.restaurant_outlined), quantity: 3),
+        ],
+      ),
+      const TableModel(id: 'T7', name: '07', capacity: 4, shape: 'square', x: 260, y: 200, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+      const TableModel(id: 'T8', name: '08', capacity: 4, shape: 'square', x: 350, y: 200, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+
+      const TableModel(id: 'T9', name: '09', capacity: 4, shape: 'square', x: 80, y: 320, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+      const TableModel(id: 'T10', name: '10', capacity: 4, shape: 'square', x: 170, y: 320, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+      const TableModel(id: 'T11', name: '11', capacity: 4, shape: 'square', x: 260, y: 320, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+      TableModel(
+        id: 'T12',
+        name: '12',
+        capacity: 4,
+        shape: 'square',
+        x: 350,
+        y: 320,
+        width: 50,
+        height: 50,
+        isUsed: true,
+        orderId: 'Order #883AD90',
+        customerName: 'Sophia Williams',
+        price: 189000,
+        floor: 'Lantai 1',
+        items: [
+          OrderItem(product: const Product(name: 'Special Crispy Burger', price: 38000, category: 'Burger', icon: Icons.lunch_dining_outlined), quantity: 3),
+          OrderItem(product: const Product(name: 'Cappuccino', price: 25000, category: 'Coffee', icon: Icons.coffee_outlined), quantity: 3),
+        ],
+      ),
+
+      const TableModel(id: 'T13', name: '13', capacity: 6, shape: 'rectangle', x: 580, y: 200, width: 110, height: 60, isUsed: false, floor: 'Lantai 1'),
+      const TableModel(id: 'T14', name: '14', capacity: 6, shape: 'rectangle', x: 580, y: 320, width: 110, height: 60, isUsed: false, floor: 'Lantai 1'),
+      TableModel(
+        id: 'T15',
+        name: '15',
+        capacity: 6,
+        shape: 'rectangle',
+        x: 580,
+        y: 440,
+        width: 110,
+        height: 60,
+        isUsed: true,
+        orderId: 'Order #332FF88',
+        customerName: 'Jack Reacher',
+        price: 760000,
+        floor: 'Lantai 1',
+        items: [
+          OrderItem(product: const Product(name: 'Double Cheeseburger', price: 48000, category: 'Burger', icon: Icons.lunch_dining_outlined), quantity: 6),
+          OrderItem(product: const Product(name: 'Combo Drumstick', price: 55000, category: 'Fried Chicken', icon: Icons.restaurant_outlined), quantity: 6),
+          OrderItem(product: const Product(name: 'Sprite', price: 12000, category: 'Drink', icon: Icons.local_drink_outlined), quantity: 6),
+        ],
+      ),
+
+      const TableModel(id: 'T16', name: '16', capacity: 2, shape: 'circle', x: 80, y: 440, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+      const TableModel(id: 'T17', name: '17', capacity: 2, shape: 'circle', x: 170, y: 440, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+      const TableModel(id: 'T18', name: '18', capacity: 2, shape: 'circle', x: 260, y: 440, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+      const TableModel(id: 'T19', name: '19', capacity: 2, shape: 'circle', x: 350, y: 440, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+      const TableModel(id: 'T20', name: '20', capacity: 2, shape: 'circle', x: 440, y: 440, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+
+      // --- LANTAI 2 ---
+      const TableModel(id: 'T21', name: '21', capacity: 2, shape: 'circle', x: 100, y: 150, width: 50, height: 50, isUsed: false, floor: 'Lantai 2'),
+      const TableModel(id: 'T22', name: '22', capacity: 4, shape: 'square', x: 200, y: 150, width: 50, height: 50, isUsed: false, floor: 'Lantai 2'),
+
+      // --- LANTAI 3 ---
+      const TableModel(id: 'T23', name: '23', capacity: 6, shape: 'rectangle', x: 150, y: 200, width: 110, height: 60, isUsed: false, floor: 'Lantai 3'),
+    ];
   }
 
-  @override
-  Widget build(BuildContext context) {
-    // 1. Filter tables for this floor
-    final List<TableModel> floorTablesList = _tables.where((t) => t.floor == _selectedFloor).toList();
-
-    // 2. Filter list of tables for Left Panel
-    final filteredListTables = floorTablesList.where((table) {
-      // Filter by Search
-      final matchesSearch = table.name.toLowerCase().contains(_searchQuery.toLowerCase());
-      
-      // Filter by Tab
-      bool matchesTab = true;
-      if (_activeListTab == 'Available') {
-        matchesTab = !table.isUsed;
-      } else if (_activeListTab == 'Used') {
-        matchesTab = table.isUsed;
+  void _freeTable(String tableId) {
+    setState(() {
+      final idx = _tablesList.indexWhere((t) => t.id == tableId);
+      if (idx != -1) {
+        _tablesList[idx] = _tablesList[idx].copyWith(isUsed: false);
       }
-
-      return matchesSearch && matchesTab;
-    }).toList();
-
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      backgroundColor: AppColors.neutral100,
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // --- 1. HEADER HALAMAN ---
-            _buildHeader(),
-
-            // --- 2. BODY CONTENT (Daftar Kiri & Peta Kanan) ---
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // --- PANEL KIRI (Daftar Meja) ---
-                    SizedBox(
-                      width: 330,
-                      child: Card(
-                        color: AppColors.white,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          side: const BorderSide(color: AppColors.neutral200, width: 1),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              // Toggle Menu Pil
-                              _buildPillToggle(),
-                              const SizedBox(height: 16),
-
-                              // List Meja (Scrollable)
-                              Expanded(
-                                child: _buildTableListView(filteredListTables),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 24),
-
-                    // --- AREA KANAN (Peta Visual Meja) ---
-                    Expanded(
-                      child: Card(
-                        color: AppColors.white,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          side: const BorderSide(color: AppColors.neutral200, width: 1),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: Stack(
-                            children: [
-                              // Header Peta (Legend & Dropdown Kapasitas)
-                              Positioned(
-                                top: 20,
-                                left: 24,
-                                right: 24,
-                                child: _buildMapHeader(),
-                              ),
-
-                              // Interactive Tables Canvas Stack (Scrollable/Zoomable 4000x4000 canvas matching layout editor)
-                              Positioned.fill(
-                                child: InteractiveViewer(
-                                  transformationController: _transformationController,
-                                  boundaryMargin: const EdgeInsets.all(2500),
-                                  minScale: 0.1,
-                                  maxScale: 1.5,
-                                  child: SizedBox(
-                                    width: 4000,
-                                    height: 4000,
-                                    child: Stack(
-                                      children: [
-                                        // Subtle Dotted Grid Background (zooms & moves inside child container)
-                                        const Positioned.fill(
-                                          child: _DottedGridBackground(),
-                                        ),
-
-                                        // Cashier Block
-                                        _buildCashierBlock(),
-
-                                        // Map Tables for selected floor
-                                        ...floorTablesList.map((table) => _buildMapTableItem(table)),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.primary500,
+        content: Text('Table reset to Available!'),
       ),
     );
   }
 
-  // --- WIDGET BUILDERS ---
+  String _formatRupiah(double amount) {
+    int value = amount.toInt();
+    String str = value.toString();
+    String result = '';
+    int count = 0;
+    for (int i = str.length - 1; i >= 0; i--) {
+      result = str[i] + result;
+      count++;
+      if (count == 3 && i > 0) {
+        result = '.' + result;
+        count = 0;
+      }
+    }
+    return 'Rp ' + result;
+  }
 
-  // 1. Header Halaman (Atas)
-  Widget _buildHeader() {
-    final bool isAnyTableSelected = _selectedTableId != null;
+  @override
+  Widget build(BuildContext context) {
+    // Filter list meja
+    List<TableModel> filteredTables = _tablesList.where((t) {
+      if (t.floor != _selectedFloor) return false;
 
-    return Container(
-      height: 72,
-      decoration: const BoxDecoration(
-        color: AppColors.white,
-        border: Border(
-          bottom: BorderSide(color: AppColors.neutral200, width: 1),
+      if (_searchQuery.isNotEmpty) {
+        final query = _searchQuery.toLowerCase();
+        final matchName = t.name.toLowerCase().contains(query);
+        final matchCust = (t.customerName ?? '').toLowerCase().contains(query);
+        if (!matchName && !matchCust) return false;
+      }
+
+      if (_selectedStatusFilter == 'Available' && t.isUsed) return false;
+      if (_selectedStatusFilter == 'Occupied' && !t.isUsed) return false;
+
+      if (_selectedCapacityFilter == '2 Seats' && t.capacity != 2) return false;
+      if (_selectedCapacityFilter == '4 Seats' && t.capacity != 4) return false;
+      if (_selectedCapacityFilter == '6 Seats' && t.capacity != 6) return false;
+
+      if (_selectedTypeFilter == 'Circle' && t.shape != 'circle') return false;
+      if (_selectedTypeFilter == 'Square' && t.shape != 'square') return false;
+      if (_selectedTypeFilter == 'Rectangle' && t.shape != 'rectangle') return false;
+
+      return true;
+    }).toList();
+
+    // Floor layout canvas tables (hanya berdasarkan lantai yang dipilih)
+    final floorTables = _tablesList.where((t) => t.floor == _selectedFloor).toList();
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFF3F4F6),
+      appBar: AppBar(
+        title: const Text('Select Table'),
+        backgroundColor: AppColors.white,
+        foregroundColor: AppColors.neutral900,
+        elevation: 0,
+        centerTitle: false,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
         ),
+        actions: _buildAppBarActions(),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            'Tables',
-            style: AppTypography.h4Bold.copyWith(
-              color: AppColors.neutral900,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Row(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Search table name bar (perfectly centered icon & text)
-              Container(
-                width: 160,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppColors.white,
-                  border: Border.all(color: AppColors.neutral300),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.search, size: 18, color: AppColors.neutral500),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: TextField(
-                        controller: _searchController,
-                        onChanged: (val) {
-                          setState(() {
-                            _searchQuery = val;
-                          });
-                        },
-                        style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral800),
-                        decoration: InputDecoration(
-                          hintText: 'Search table...',
-                          hintStyle: AppTypography.bodyXsRegular.copyWith(color: AppColors.neutral400),
-                          border: InputBorder.none,
-                          isDense: true,
-                          contentPadding: EdgeInsets.zero,
+              // 1. Sidebar Kiri (Floating Card Panel untuk List Table)
+              SizedBox(
+                width: 320,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppColors.neutral200),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.03),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: Column(
+                    children: [
+                      // Header List Meja
+                      Container(
+                        padding: const EdgeInsets.all(16.0),
+                        color: AppColors.neutral50,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Tables List (${filteredTables.length})',
+                              style: AppTypography.bodyMBold.copyWith(
+                                color: AppColors.neutral900,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              _selectedFloor,
+                              style: AppTypography.bodyXsRegular.copyWith(
+                                color: AppColors.primary600,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              // Floor selector dropdown button
-              Container(
-                height: 42,
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                decoration: BoxDecoration(
-                  color: AppColors.white,
-                  border: Border.all(color: AppColors.neutral300),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    value: _selectedFloor,
-                    dropdownColor: AppColors.white,
-                    style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral800, fontWeight: FontWeight.bold),
-                    items: ['Lantai 1', 'Lantai 2', 'Lantai 3'].map((item) {
-                      return DropdownMenuItem(
-                        value: item,
-                        child: Text(item, style: const TextStyle(color: AppColors.neutral800)),
-                      );
-                    }).toList(),
-                    onChanged: (val) {
-                      if (val != null) {
-                        setState(() {
-                          _selectedFloor = val;
-                          _selectedTableId = null; // reset selection
-                        });
-                      }
-                    },
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              // Cancel Button
-              SizedBox(
-                height: 42,
-                child: OutlinedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: OutlinedButton.styleFrom(
-                    backgroundColor: AppColors.white,
-                    foregroundColor: AppColors.neutral700,
-                    side: const BorderSide(color: AppColors.neutral300, width: 1.2),
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: Text(
-                    'Cancel',
-                    style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
+                      const Divider(height: 1, color: AppColors.neutral200),
 
-              // Select Table Button
-              SizedBox(
-                height: 42,
-                child: ElevatedButton(
-                  onPressed: isAnyTableSelected
-                      ? () {
-                          final selectedTable = _tables.firstWhere((t) => t.id == _selectedTableId);
-                          Navigator.pop(context, selectedTable.name);
-                        }
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isAnyTableSelected ? AppColors.primary500 : AppColors.neutral300,
-                    foregroundColor: isAnyTableSelected ? AppColors.white : AppColors.neutral500,
-                    disabledBackgroundColor: AppColors.neutral200,
-                    disabledForegroundColor: AppColors.neutral400,
-                    elevation: 0,
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                      // List Meja Scrollable
+                      Expanded(
+                        child: _buildTablesListView(filteredTables),
+                      ),
+
+                      // Bottom Confirm Selection Button (jika meja kosong dipilih)
+                      if (_selectedTableId != null)
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: SizedBox(
+                            width: double.infinity,
+                            height: 48,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                final selTable = _tablesList.firstWhere((t) => t.id == _selectedTableId);
+                                Navigator.pop(context, 'Table ${selTable.name}');
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary500,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: Text(
+                                'Confirm Selection (${_tablesList.firstWhere((t) => t.id == _selectedTableId).name})',
+                                style: AppTypography.bodyMBold.copyWith(color: AppColors.white),
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
-                  child: Text(
-                    'Select Table',
-                    style: AppTypography.bodySRegular.copyWith(
-                      color: isAnyTableSelected ? AppColors.white : AppColors.neutral500,
-                      fontWeight: FontWeight.bold,
-                    ),
+                ),
+              ),
+
+              const SizedBox(width: 24),
+
+              // 2. Main Area (Floating Card Canvas Layout)
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppColors.neutral200),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.03),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: Column(
+                    children: [
+                      // Map Header Toolbar (Legend & Status)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+                        color: AppColors.white,
+                        child: _buildMapHeader(),
+                      ),
+                      const Divider(height: 1, color: AppColors.neutral200),
+
+                      // Layout Canvas Floor
+                      Expanded(
+                        child: Container(
+                          color: const Color(0xFFF8FAFC),
+                          child: ClipRect(
+                            child: InteractiveViewer(
+                              transformationController: _transformationController,
+                              minScale: 0.5,
+                              maxScale: 2.5,
+                              boundaryMargin: const EdgeInsets.all(400),
+                              child: Container(
+                                width: 1200,
+                                height: 800,
+                                color: const Color(0xFFF8FAFC),
+                                child: Stack(
+                                  children: [
+                                    // Cashier Desk
+                                    _buildCashierBlock(),
+
+                                    // List Meja di Canvas
+                                    ...floorTables.map((table) => _buildMapTableItem(table)),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
 
-  // 2. Left Panel: Toggle Pill Menu
-  Widget _buildPillToggle() {
-    return Container(
-      height: 48,
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: AppColors.neutral100,
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Row(
-        children: ['All Table', 'Available', 'Used'].map((tabName) {
-          final bool isActive = _activeListTab == tabName;
-          return Expanded(
-            child: GestureDetector(
-              onTap: () {
-                setState(() {
-                  _activeListTab = tabName;
-                });
-              },
-              child: Container(
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: isActive ? AppColors.white : Colors.transparent,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: isActive
-                      ? [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.05),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          )
-                        ]
-                      : [],
-                ),
-                child: Text(
-                  tabName,
-                  style: AppTypography.bodySRegular.copyWith(
-                    fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
-                    color: isActive ? AppColors.neutral900 : AppColors.neutral500,
+  List<Widget> _buildAppBarActions() {
+    return [
+      // 1. Search Table
+      Center(
+        child: Container(
+          width: 160,
+          height: 38,
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            border: Border.all(color: AppColors.neutral300),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Icon(Icons.search, size: 18, color: AppColors.neutral500),
+              const SizedBox(width: 8),
+              Expanded(
+                child: TextField(
+                  onChanged: (val) {
+                    setState(() {
+                      _searchQuery = val;
+                    });
+                  },
+                  style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral800),
+                  decoration: InputDecoration(
+                    hintText: 'Search table...',
+                    hintStyle: AppTypography.bodyXsRegular.copyWith(color: AppColors.neutral400),
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: EdgeInsets.zero,
                   ),
                 ),
               ),
-            ),
-          );
-        }).toList(),
+            ],
+          ),
+        ),
+      ),
+      const SizedBox(width: 8),
+
+      // 2. Floor Filter Dropdown
+      Center(
+        child: _buildDropdownFilter(
+          value: _selectedFloor,
+          items: ['Lantai 1', 'Lantai 2', 'Lantai 3'],
+          onChanged: (val) {
+            if (val != null) {
+              setState(() {
+                _selectedFloor = val;
+                _selectedTableId = null;
+              });
+            }
+          },
+        ),
+      ),
+      const SizedBox(width: 8),
+
+      // 3. Status Filter Dropdown
+      Center(
+        child: _buildDropdownFilter(
+          value: _selectedStatusFilter,
+          items: ['All Table', 'Available', 'Occupied'],
+          onChanged: (val) {
+            if (val != null) {
+              setState(() {
+                _selectedStatusFilter = val;
+              });
+            }
+          },
+        ),
+      ),
+      const SizedBox(width: 8),
+
+      // 4. Capacity Filter Dropdown
+      Center(
+        child: _buildDropdownFilter(
+          value: _selectedCapacityFilter,
+          items: ['All Capacity', '2 Seats', '4 Seats', '6 Seats'],
+          onChanged: (val) {
+            if (val != null) {
+              setState(() {
+                _selectedCapacityFilter = val;
+              });
+            }
+          },
+        ),
+      ),
+      const SizedBox(width: 8),
+
+      // 5. Type Filter Dropdown
+      Center(
+        child: _buildDropdownFilter(
+          value: _selectedTypeFilter,
+          items: ['All Type', 'Circle', 'Square', 'Rectangle'],
+          onChanged: (val) {
+            if (val != null) {
+              setState(() {
+                _selectedTypeFilter = val;
+              });
+            }
+          },
+        ),
+      ),
+      const SizedBox(width: 24),
+    ];
+  }
+
+  Widget _buildDropdownFilter({
+    required String value,
+    required List<String> items,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return Container(
+      height: 38,
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.neutral300, width: 1.2),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: value,
+          dropdownColor: AppColors.white,
+          icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.neutral600, size: 18),
+          style: AppTypography.bodyXsRegular.copyWith(
+            color: AppColors.neutral800,
+            fontWeight: FontWeight.bold,
+          ),
+          onChanged: onChanged,
+          items: items.map<DropdownMenuItem<String>>((String itemValue) {
+            return DropdownMenuItem<String>(
+              value: itemValue,
+              child: Text(itemValue),
+            );
+          }).toList(),
+        ),
       ),
     );
   }
 
-
-  // 2. Left Panel: Scrollable ListView
-  Widget _buildTableListView(List<TableModel> listTables) {
+  Widget _buildTablesListView(List<TableModel> listTables) {
     if (listTables.isEmpty) {
       return Center(
-        child: Text(
-          'No tables found',
-          style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral500),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.table_restaurant_outlined, size: 40, color: AppColors.neutral400),
+            const SizedBox(height: 8),
+            Text(
+              'No Tables Found',
+              style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral500),
+            ),
+          ],
         ),
       );
     }
 
     return ListView.separated(
+      padding: const EdgeInsets.all(12),
       itemCount: listTables.length,
-      separatorBuilder: (context, index) => const Divider(color: AppColors.neutral200, height: 1),
+      separatorBuilder: (context, index) => const Divider(height: 1, color: AppColors.neutral100),
       itemBuilder: (context, index) {
         final table = listTables[index];
         final bool isSelected = _selectedTableId == table.id;
@@ -505,18 +623,7 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
           contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
           onTap: () {
             if (table.isUsed) {
-              // Jika meja terpakai, tampilkan snackbar bahwa meja terpakai
-              ScaffoldMessenger.of(context).clearSnackBars();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  behavior: SnackBarBehavior.floating,
-                  backgroundColor: AppColors.error500,
-                  content: Text(
-                    '${table.name} is currently used by ${table.customerName}',
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              );
+              _showOccupiedTableModal(table);
             } else {
               setState(() {
                 _selectedTableId = (isSelected) ? null : table.id;
@@ -524,15 +631,15 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
             }
           },
           leading: Container(
-            width: 8,
-            height: 8,
+            width: 10,
+            height: 10,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: table.isUsed ? AppColors.error500 : AppColors.primary500,
+              color: table.isUsed ? const Color(0xFFFF5630) : AppColors.primary500,
             ),
           ),
           title: Text(
-            table.name,
+            'Table ${table.name}',
             style: AppTypography.bodyMBold.copyWith(
               color: isSelected ? AppColors.primary600 : AppColors.neutral900,
             ),
@@ -543,19 +650,23 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
                   child: Text(
                     '${table.orderId} • ${table.customerName}',
                     style: AppTypography.bodyXsRegular.copyWith(
-                      color: AppColors.neutral500,
+                      color: const Color(0xFFFF5630),
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 )
-              : null,
+              : Text(
+                  'Available (${table.capacity} Seats)',
+                  style: AppTypography.bodyXsRegular.copyWith(color: AppColors.primary600),
+                ),
           trailing: table.isUsed
               ? Text(
-                  table.price != null ? 'Rp ' + table.price!.toInt().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.') : 'Rp 0',
+                  _formatRupiah(table.price ?? 0),
                   style: AppTypography.bodyMBold.copyWith(
-                    color: AppColors.neutral900,
+                    color: const Color(0xFFFF5630),
                   ),
                 )
-              : null,
+              : const Icon(Icons.chevron_right, color: AppColors.neutral400, size: 20),
           tileColor: isSelected ? AppColors.primary50.withValues(alpha: 0.5) : Colors.transparent,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
@@ -565,12 +676,10 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
     );
   }
 
-  // 3. Right Area: Map Header (Legend & Capacity filter)
   Widget _buildMapHeader() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        // Legend Indicators
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
@@ -582,75 +691,40 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
             children: [
               _buildLegendItem('Available', const Color(0xFFFFFFFF), border: AppColors.neutral400),
               const SizedBox(width: 16),
-              _buildLegendItem('Used', Colors.transparent, isStriped: true),
+              _buildLegendItem('Occupied', const Color(0xFFFFF1F0), border: const Color(0xFFFF5630)),
               const SizedBox(width: 16),
               _buildLegendItem('Selected', AppColors.primary500),
             ],
           ),
         ),
 
-        // Dropdown Capacity Filter
-        Container(
-          height: 38,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: AppColors.neutral300, width: 1.2),
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: _selectedCapacityFilter,
-              dropdownColor: AppColors.white,
-              icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.neutral600),
-              style: AppTypography.bodySRegular.copyWith(
-                color: AppColors.neutral800,
-                fontWeight: FontWeight.bold,
-              ),
-              onChanged: (String? newValue) {
-                if (newValue != null) {
-                  setState(() {
-                    _selectedCapacityFilter = newValue;
-                  });
-                }
-              },
-              items: <String>['All Capacity', '2 Seats', '4 Seats', '6 Seats']
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value, style: const TextStyle(color: AppColors.neutral800)),
-                );
-              }).toList(),
-            ),
+        Text(
+          '$_selectedFloor • ${ _tablesList.where((t) => t.floor == _selectedFloor && t.isUsed).length } Occupied',
+          style: AppTypography.bodySRegular.copyWith(
+            color: AppColors.neutral700,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildLegendItem(String label, Color color, {Color? border, bool isStriped = false}) {
+  Widget _buildLegendItem(String label, Color color, {Color? border}) {
     return Row(
       children: [
         Container(
-          width: 18,
-          height: 18,
+          width: 16,
+          height: 16,
           decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: isStriped ? Colors.white : color,
-            border: border != null ? Border.all(color: border, width: 1.2) : null,
+            color: color,
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(color: border ?? color),
           ),
-          child: isStriped
-              ? ClipOval(
-                  child: CustomPaint(
-                    painter: DiagonalStripesPainter(color: AppColors.neutral300, stripeWidth: 1.5, gap: 3.0),
-                  ),
-                )
-              : null,
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 6),
         Text(
           label,
-          style: AppTypography.bodySRegular.copyWith(
+          style: AppTypography.bodyXsRegular.copyWith(
             color: AppColors.neutral700,
             fontWeight: FontWeight.w500,
           ),
@@ -659,7 +733,6 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
     );
   }
 
-  // 3. Right Area: Cashier Block widget
   Widget _buildCashierBlock() {
     return Positioned(
       left: _cashierX,
@@ -684,21 +757,33 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
     );
   }
 
-  // 3. Right Area: Individual Map Table Item
   Widget _buildMapTableItem(TableModel table) {
-    // Tentukan kecocokan filter kapasitas
     bool isFilteredOut = false;
-    if (_selectedCapacityFilter == '2 Seats' && table.capacity != 2) {
-      isFilteredOut = true;
-    } else if (_selectedCapacityFilter == '4 Seats' && table.capacity != 4) {
-      isFilteredOut = true;
-    } else if (_selectedCapacityFilter == '6 Seats' && table.capacity != 6) {
-      isFilteredOut = true;
+    
+    // Status filter
+    if (_selectedStatusFilter == 'Available' && table.isUsed) isFilteredOut = true;
+    if (_selectedStatusFilter == 'Occupied' && !table.isUsed) isFilteredOut = true;
+
+    // Capacity filter
+    if (_selectedCapacityFilter == '2 Seats' && table.capacity != 2) isFilteredOut = true;
+    if (_selectedCapacityFilter == '4 Seats' && table.capacity != 4) isFilteredOut = true;
+    if (_selectedCapacityFilter == '6 Seats' && table.capacity != 6) isFilteredOut = true;
+
+    // Type filter
+    if (_selectedTypeFilter == 'Circle' && table.shape != 'circle') isFilteredOut = true;
+    if (_selectedTypeFilter == 'Square' && table.shape != 'square') isFilteredOut = true;
+    if (_selectedTypeFilter == 'Rectangle' && table.shape != 'rectangle') isFilteredOut = true;
+
+    // Search query filter
+    if (_searchQuery.isNotEmpty) {
+      final query = _searchQuery.toLowerCase();
+      final matchName = table.name.toLowerCase().contains(query);
+      final matchCust = (table.customerName ?? '').toLowerCase().contains(query);
+      if (!matchName && !matchCust) isFilteredOut = true;
     }
 
     final bool isSelected = _selectedTableId == table.id;
 
-    // Dimensi Stack Pembungkus (untuk menampung overlay badge di top-right)
     final double padLeft = 0;
     final double padTop = 10;
     final double mainWidth = table.width;
@@ -708,7 +793,7 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
     final double stackHeight = mainHeight + 10;
 
     return Positioned(
-      left: table.x - 5, // Kurangi offset untuk meletakkan wadah Stack
+      left: table.x - 5,
       top: table.y - 10,
       width: stackWidth,
       height: stackHeight,
@@ -720,7 +805,7 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
           child: Stack(
             clipBehavior: Clip.none,
             children: [
-              // Shape Utama Meja
+              // Main Table Shape Container
               Positioned(
                 left: padLeft,
                 top: padTop,
@@ -729,17 +814,7 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
                 child: GestureDetector(
                   onTap: () {
                     if (table.isUsed) {
-                      ScaffoldMessenger.of(context).clearSnackBars();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          behavior: SnackBarBehavior.floating,
-                          backgroundColor: AppColors.error500,
-                          content: Text(
-                            '${table.name} is currently used by ${table.customerName}',
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      );
+                      _showOccupiedTableModal(table);
                     } else {
                       setState(() {
                         _selectedTableId = isSelected ? null : table.id;
@@ -750,55 +825,36 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
                     decoration: _buildTableDecoration(table, isSelected),
                     child: ClipPath(
                       clipper: _getTableClipper(table.shape),
-                      child: Stack(
-                        children: [
-                          // Hashing Pattern untuk meja terpakai
-                          if (table.isUsed && !isSelected)
-                            Positioned.fill(
-                              child: CustomPaint(
-                                painter: DiagonalStripesPainter(
-                                  color: AppColors.neutral300,
-                                  stripeWidth: 2,
-                                  gap: 5,
-                                ),
-                              ),
-                            ),
-                          
-                          // Nomor Meja
-                          Center(
-                            child: Text(
-                              table.name,
-                              style: AppTypography.bodyLBold.copyWith(
-                                color: isSelected 
-                                    ? AppColors.white 
-                                    : (table.isUsed ? AppColors.neutral600 : AppColors.neutral800),
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                      child: Center(
+                        child: Text(
+                          table.name,
+                          style: AppTypography.bodyMBold.copyWith(
+                            color: isSelected ? AppColors.white : AppColors.neutral900,
+                            fontWeight: FontWeight.bold,
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
 
-              // Badge Kapasitas di Pojok Kanan Atas
+              // Top-Right Capacity Badge overlay (Matching reference image)
               Positioned(
-                right: 0,
-                top: 0,
+                top: 2,
+                right: 2,
                 child: Container(
-                  width: 20,
-                  height: 20,
+                  width: 18,
+                  height: 18,
                   decoration: const BoxDecoration(
-                    color: AppColors.neutral900,
+                    color: Color(0xFF1E293B),
                     shape: BoxShape.circle,
                   ),
                   alignment: Alignment.center,
                   child: Text(
                     table.capacity.toString(),
-                    style: AppTypography.bodyXsRegular.copyWith(
-                      color: AppColors.white,
+                    style: const TextStyle(
+                      color: Colors.white,
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
                     ),
@@ -812,135 +868,392 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
     );
   }
 
-  // Helper Dekorasi Kontainer Meja
   BoxDecoration _buildTableDecoration(TableModel table, bool isSelected) {
-    Color bgColor = AppColors.white;
-    Border border = Border.all(color: AppColors.neutral300, width: 1.5);
-
     if (isSelected) {
-      bgColor = AppColors.primary500;
-      border = Border.all(color: AppColors.primary500, width: 1.5);
+      return BoxDecoration(
+        color: AppColors.primary500,
+        shape: table.shape == 'circle' ? BoxShape.circle : BoxShape.rectangle,
+        borderRadius: table.shape != 'circle' ? BorderRadius.circular(8) : null,
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary500.withValues(alpha: 0.4),
+            blurRadius: 10,
+            spreadRadius: 2,
+          ),
+        ],
+      );
+    }
+
+    if (table.isUsed) {
+      return BoxDecoration(
+        color: const Color(0xFFFFF1F0), // Soft Coral Tint (Merah Soft)
+        shape: table.shape == 'circle' ? BoxShape.circle : BoxShape.rectangle,
+        borderRadius: table.shape != 'circle' ? BorderRadius.circular(8) : null,
+        border: Border.all(color: const Color(0xFFFF5630), width: 2.0), // Vibrant Coral Outline
+      );
     }
 
     return BoxDecoration(
-      color: bgColor,
+      color: AppColors.white,
       shape: table.shape == 'circle' ? BoxShape.circle : BoxShape.rectangle,
-      borderRadius: table.shape != 'circle' ? BorderRadius.circular(12) : null,
-      border: border,
-      boxShadow: isSelected
-          ? [
-              BoxShadow(
-                color: AppColors.primary500.withValues(alpha: 0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              )
-            ]
-          : [],
+      borderRadius: table.shape != 'circle' ? BorderRadius.circular(8) : null,
+      border: Border.all(color: AppColors.neutral400, width: 1.5),
     );
   }
 
-  // Custom Clipper untuk memotong garis arsir di dalam bentuk meja
   CustomClipper<Path> _getTableClipper(String shape) {
-    if (shape == 'circle') {
-      return _CircleClipper();
-    } else {
-      return _RoundedRectClipper(radius: 12);
-    }
-  }
-}
-
-// Custom Painter untuk Menggambar Pola Garis Diagonal (Arsir)
-class DiagonalStripesPainter extends CustomPainter {
-  final Color color;
-  final double stripeWidth;
-  final double gap;
-
-  DiagonalStripesPainter({
-    required this.color,
-    this.stripeWidth = 2.0,
-    this.gap = 4.0,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final Paint paint = Paint()
-      ..color = color
-      ..strokeWidth = stripeWidth
-      ..style = PaintingStyle.stroke;
-
-    final double step = stripeWidth + gap;
-    // Gambar garis diagonal dari kiri-bawah ke kanan-atas
-    for (double i = -size.height; i < size.width; i += step) {
-      canvas.drawLine(
-        Offset(i, size.height),
-        Offset(i + size.height, 0),
-        paint,
-      );
-    }
+    return _TableClipper(shape);
   }
 
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
+  void _showOccupiedTableModal(TableModel table) {
+    final List<OrderItem> items = table.items ?? [
+      OrderItem(product: const Product(name: 'Deluxe Crispy Burger', price: 45000, category: 'Burger', icon: Icons.lunch_dining_outlined), quantity: 2),
+      OrderItem(product: const Product(name: 'Sprite', price: 12000, category: 'Drink', icon: Icons.local_drink_outlined), quantity: 2),
+    ];
 
-// Clipper Lingkaran
-class _CircleClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    return Path()..addOval(Rect.fromLTWH(0, 0, size.width, size.height));
+    final double totalPrice = table.price ?? items.fold(0.0, (sum, i) => sum + (i.product.price * i.quantity));
+    final double subtotal = totalPrice / 1.03;
+    final double tax = totalPrice - subtotal;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          width: 460,
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFF5630).withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.table_restaurant, color: Color(0xFFFF5630), size: 20),
+                      ),
+                      const SizedBox(width: 10),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Table ${table.name}',
+                            style: AppTypography.bodyLBold.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            '${table.floor} • Occupied',
+                            style: AppTypography.bodyXsRegular.copyWith(color: const Color(0xFFFF5630), fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    icon: const Icon(Icons.close, color: AppColors.neutral500),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // Customer & Order Info Card
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppColors.neutral100,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Customer: ${table.customerName ?? "Guest"}',
+                          style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold, color: AppColors.neutral900),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          table.orderId ?? "#201OE00",
+                          style: AppTypography.bodyXsRegular.copyWith(color: AppColors.neutral500, fontStyle: FontStyle.italic),
+                        ),
+                      ],
+                    ),
+                    Text(
+                      _formatRupiah(totalPrice),
+                      style: AppTypography.h4Bold.copyWith(color: AppColors.primary600),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Active Items List
+              Text(
+                'Ordered Items',
+                style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold, color: AppColors.neutral800),
+              ),
+              const SizedBox(height: 8),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 180),
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: items.length,
+                  separatorBuilder: (c, i) => const Divider(height: 12, thickness: 0.5, color: AppColors.neutral200),
+                  itemBuilder: (c, i) {
+                    final item = items[i];
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: AppColors.primary500.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                '${item.quantity}x',
+                                style: AppTypography.bodyXsRegular.copyWith(color: AppColors.primary600, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              item.product.name,
+                              style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral800),
+                            ),
+                          ],
+                        ),
+                        Text(
+                          _formatRupiah(item.product.price * item.quantity),
+                          style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900, fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // 3 Action Buttons: Edit / Tambah Pesanan, Proses Pembayaran, Batalkan Pesanan
+              Column(
+                children: [
+                  // 1. Edit / Tambah Pesanan (Primary Green Button)
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PosDashboardScreen(
+                            initialCustomer: table.customerName ?? 'Customer',
+                            initialTable: 'Table ${table.name}',
+                            initialOrderId: table.orderId,
+                            initialCartItems: items,
+                          ),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(double.infinity, 44),
+                      backgroundColor: AppColors.primary500,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    icon: const Icon(Icons.edit_note, color: Colors.white),
+                    label: const Text(
+                      'Edit / Tambah Pesanan',
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // 2. Proses Pembayaran & Batalkan Pesanan Row
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () async {
+                            Navigator.pop(ctx);
+                            final Map<String, dynamic>? paymentResult = await showDialog<Map<String, dynamic>>(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (c) => PaymentModal(
+                                totalAmount: totalPrice,
+                                subtotal: subtotal,
+                                tax: tax,
+                                discountAmount: 0.0,
+                                isDineIn: true,
+                                customerName: table.customerName ?? 'Guest',
+                              ),
+                            );
+
+                            if (paymentResult != null && paymentResult['success'] == true) {
+                              if (mounted) {
+                                await showDialog<bool>(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder: (c) => PaymentSuccessModal(
+                                    method: paymentResult['method'] ?? 'Cash',
+                                    total: totalPrice,
+                                    paid: paymentResult['paidAmount'] ?? totalPrice,
+                                    change: paymentResult['changeAmount'] ?? 0.0,
+                                    subtotal: subtotal,
+                                    discountAmount: 0.0,
+                                    tax: tax,
+                                    customerName: table.customerName ?? 'Guest',
+                                    cartItems: items,
+                                    isDineIn: true,
+                                    tableName: 'Table ${table.name}',
+                                  ),
+                                );
+
+                                _freeTable(table.id);
+                              }
+                            }
+                          },
+                          style: OutlinedButton.styleFrom(
+                            minimumSize: const Size(0, 44),
+                            side: const BorderSide(color: AppColors.primary500, width: 1.5),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          ),
+                          icon: const Icon(Icons.payment, color: AppColors.primary500, size: 18),
+                          label: const Text(
+                            'Proses Pembayaran',
+                            style: TextStyle(color: AppColors.primary500, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      OutlinedButton(
+                        onPressed: () => _confirmCancelTableOrder(table),
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size(0, 44),
+                          side: const BorderSide(color: AppColors.error500),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                        child: const Text(
+                          'Batalkan',
+                          style: TextStyle(color: AppColors.error500, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
-}
-
-// Clipper Rounded Rectangle
-class _RoundedRectClipper extends CustomClipper<Path> {
-  final double radius;
-  _RoundedRectClipper({required this.radius});
-
-  @override
-  Path getClip(Size size) {
-    return Path()
-      ..addRRect(RRect.fromRectAndRadius(
-        Rect.fromLTWH(0, 0, size.width, size.height),
-        Radius.circular(radius),
-      ));
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
-}
-
-// Custom Painter to draw a clean dotted grid background for layout alignment
-class _DottedGridBackground extends StatelessWidget {
-  const _DottedGridBackground();
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _GridPainter(),
+  void _confirmCancelTableOrder(TableModel table) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          width: 380,
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 56,
+                height: 56,
+                decoration: const BoxDecoration(
+                  color: AppColors.error500,
+                  shape: BoxShape.circle,
+                ),
+                alignment: Alignment.center,
+                child: const Icon(Icons.cancel_outlined, color: AppColors.white, size: 28),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Batalkan Pesanan Meja ${table.name}?',
+                style: AppTypography.bodyLBold.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Pesanan ${table.orderId ?? ""} milik ${table.customerName ?? "pelanggan"} akan dibatalkan dan Meja ${table.name} akan kembali kosong (Available).',
+                style: AppTypography.bodyXsRegular.copyWith(color: AppColors.neutral500),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size(0, 44),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      child: const Text('Batal'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(ctx);
+                        Navigator.pop(context);
+                        _freeTable(table.id);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(0, 44),
+                        backgroundColor: AppColors.error500,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      child: const Text('Ya, Batalkan', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
 
-class _GridPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final Paint paint = Paint()
-      ..color = AppColors.neutral300
-      ..strokeWidth = 1.0;
+class _TableClipper extends CustomClipper<Path> {
+  final String shape;
+  _TableClipper(this.shape);
 
-    const double gap = 20.0;
-    
-    // Draw horizontal/vertical dots
-    for (double x = 0; x < size.width; x += gap) {
-      for (double y = 0; y < size.height; y += gap) {
-        canvas.drawCircle(Offset(x, y), 1.0, paint);
-      }
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    if (shape == 'circle') {
+      path.addOval(Rect.fromLTWH(0, 0, size.width, size.height));
+    } else {
+      path.addRRect(RRect.fromRectAndRadius(
+        Rect.fromLTWH(0, 0, size.width, size.height),
+        const Radius.circular(8),
+      ));
     }
+    return path;
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }
