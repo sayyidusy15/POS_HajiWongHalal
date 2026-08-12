@@ -151,6 +151,7 @@ class _PosReportScreenState extends State<PosReportScreen> {
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<String>(
                   value: _selectedTimeRange,
+                  dropdownColor: AppColors.white,
                   icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.neutral500, size: 18),
                   style: AppTypography.bodySRegular.copyWith(
                     color: AppColors.neutral900,
@@ -169,7 +170,13 @@ class _PosReportScreenState extends State<PosReportScreen> {
                   items: dropdownOptions.map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
-                      child: Text(value),
+                      child: Text(
+                        value,
+                        style: AppTypography.bodySRegular.copyWith(
+                          color: AppColors.neutral900,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                     );
                   }).toList(),
                 ),
@@ -816,7 +823,7 @@ class _PosReportScreenState extends State<PosReportScreen> {
     VoidCallback? onShowAll,
   }) {
     return Container(
-      height: 290,
+      height: 310,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.white,

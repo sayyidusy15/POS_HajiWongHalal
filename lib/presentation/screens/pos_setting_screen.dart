@@ -1244,16 +1244,19 @@ class _PosSettingScreenState extends State<PosSettingScreen> {
                     const SizedBox(height: 8),
                     DropdownButtonFormField<String>(
                       initialValue: selectedCategory,
+                      dropdownColor: AppColors.white,
+                      style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900),
+                      icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.neutral600),
                       decoration: InputDecoration(
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                       ),
-                      items: const [
-                        DropdownMenuItem(value: 'Cash', child: Text('Cash')),
-                        DropdownMenuItem(value: 'QRIS', child: Text('QRIS')),
-                        DropdownMenuItem(value: 'E-Wallet', child: Text('E-Wallet')),
-                        DropdownMenuItem(value: 'Bank Transfer', child: Text('Bank Transfer')),
-                        DropdownMenuItem(value: 'Credit Card', child: Text('Credit Card')),
+                      items: [
+                        DropdownMenuItem(value: 'Cash', child: Text('Cash', style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900))),
+                        DropdownMenuItem(value: 'QRIS', child: Text('QRIS', style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900))),
+                        DropdownMenuItem(value: 'E-Wallet', child: Text('E-Wallet', style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900))),
+                        DropdownMenuItem(value: 'Bank Transfer', child: Text('Bank Transfer', style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900))),
+                        DropdownMenuItem(value: 'Credit Card', child: Text('Credit Card', style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900))),
                       ],
                       onChanged: (val) {
                         if (val != null) {
@@ -1771,6 +1774,7 @@ class _PosSettingScreenState extends State<PosSettingScreen> {
 
     return DropdownButtonFormField<String>(
       initialValue: validValue,
+      dropdownColor: AppColors.white,
       decoration: InputDecoration(
         filled: true,
         fillColor: AppColors.white,
@@ -2190,14 +2194,26 @@ class _PosSettingScreenState extends State<PosSettingScreen> {
                                 const SizedBox(height: 8),
                                 DropdownButtonFormField<String>(
                                   initialValue: paperWidth,
+                                  dropdownColor: AppColors.white,
+                                  style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900),
+                                  icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.neutral600),
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                                     contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                                   ),
-                                  items: const [
-                                    DropdownMenuItem(value: '80mm', child: Text('80mm (Thermal)')),
-                                    DropdownMenuItem(value: '58mm', child: Text('58mm (Mini)')),
-                                    DropdownMenuItem(value: 'A4 / Standard', child: Text('A4 Paper')),
+                                  items: [
+                                    DropdownMenuItem(
+                                      value: '80mm',
+                                      child: Text('80mm (Thermal)', style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900)),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: '58mm',
+                                      child: Text('58mm (Mini)', style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900)),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'A4 / Standard',
+                                      child: Text('A4 Paper', style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900)),
+                                    ),
                                   ],
                                   onChanged: (val) {
                                     if (val != null) setModalState(() => paperWidth = val);
@@ -2215,15 +2231,30 @@ class _PosSettingScreenState extends State<PosSettingScreen> {
                                 const SizedBox(height: 8),
                                 DropdownButtonFormField<String>(
                                   initialValue: target,
+                                  dropdownColor: AppColors.white,
+                                  style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900),
+                                  icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.neutral600),
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                                     contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                                   ),
-                                  items: const [
-                                    DropdownMenuItem(value: 'Receipt / Kasir', child: Text('Receipt / Kasir')),
-                                    DropdownMenuItem(value: 'Kitchen / Dapur', child: Text('Kitchen / Dapur')),
-                                    DropdownMenuItem(value: 'Bar', child: Text('Bar')),
-                                    DropdownMenuItem(value: 'Report', child: Text('Report')),
+                                  items: [
+                                    DropdownMenuItem(
+                                      value: 'Receipt / Kasir',
+                                      child: Text('Receipt / Kasir', style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900)),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'Kitchen / Dapur',
+                                      child: Text('Kitchen / Dapur', style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900)),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'Bar',
+                                      child: Text('Bar', style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900)),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'Report',
+                                      child: Text('Report', style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900)),
+                                    ),
                                   ],
                                   onChanged: (val) {
                                     if (val != null) setModalState(() => target = val);

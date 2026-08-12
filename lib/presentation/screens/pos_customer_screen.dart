@@ -775,7 +775,7 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
           return Dialog(
             backgroundColor: Colors.transparent,
             child: Container(
-              width: 380,
+              width: 440,
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 color: AppColors.white,
@@ -806,23 +806,22 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
                     style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  Row(
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
                     children: ['All', 'Male', 'Female'].map((g) {
                       final isSelected = tempGender == g;
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: ChoiceChip(
-                          label: Text(g),
-                          selected: isSelected,
-                          selectedColor: AppColors.primary500.withValues(alpha: 0.15),
-                          labelStyle: TextStyle(
-                            color: isSelected ? AppColors.primary500 : AppColors.neutral800,
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                          ),
-                          onSelected: (sel) {
-                            if (sel) setModalState(() => tempGender = g);
-                          },
+                      return ChoiceChip(
+                        label: Text(g),
+                        selected: isSelected,
+                        selectedColor: AppColors.primary500.withValues(alpha: 0.15),
+                        labelStyle: TextStyle(
+                          color: isSelected ? AppColors.primary500 : AppColors.neutral800,
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                         ),
+                        onSelected: (sel) {
+                          if (sel) setModalState(() => tempGender = g);
+                        },
                       );
                     }).toList(),
                   ),
@@ -834,23 +833,22 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
                     style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  Row(
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
                     children: ['All', 'Yes', 'No'].map((m) {
                       final isSelected = tempMemberStatus == m;
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: ChoiceChip(
-                          label: Text(m == 'Yes' ? 'Member (Yes)' : m == 'No' ? 'Non-Member (No)' : 'All'),
-                          selected: isSelected,
-                          selectedColor: AppColors.primary500.withValues(alpha: 0.15),
-                          labelStyle: TextStyle(
-                            color: isSelected ? AppColors.primary500 : AppColors.neutral800,
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                          ),
-                          onSelected: (sel) {
-                            if (sel) setModalState(() => tempMemberStatus = m);
-                          },
+                      return ChoiceChip(
+                        label: Text(m == 'Yes' ? 'Member (Yes)' : m == 'No' ? 'Non-Member (No)' : 'All'),
+                        selected: isSelected,
+                        selectedColor: AppColors.primary500.withValues(alpha: 0.15),
+                        labelStyle: TextStyle(
+                          color: isSelected ? AppColors.primary500 : AppColors.neutral800,
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                         ),
+                        onSelected: (sel) {
+                          if (sel) setModalState(() => tempMemberStatus = m);
+                        },
                       );
                     }).toList(),
                   ),
@@ -921,7 +919,7 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
           return Dialog(
             backgroundColor: Colors.transparent,
             child: Container(
-              width: 480,
+              width: 440,
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 color: AppColors.white,
@@ -1000,9 +998,12 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
                             const SizedBox(height: 6),
                             DropdownButtonFormField<String>(
                               value: selectedGender,
-                              items: const [
-                                DropdownMenuItem(value: 'Male', child: Text('Male')),
-                                DropdownMenuItem(value: 'Female', child: Text('Female')),
+                              dropdownColor: AppColors.white,
+                              style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900),
+                              icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.neutral600),
+                              items: [
+                                DropdownMenuItem(value: 'Male', child: Text('Male', style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900))),
+                                DropdownMenuItem(value: 'Female', child: Text('Female', style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900))),
                               ],
                               onChanged: (val) {
                                 if (val != null) setModalState(() => selectedGender = val);
@@ -1071,13 +1072,16 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
                     const SizedBox(height: 6),
                     DropdownButtonFormField<String>(
                       value: selectedExpiryType,
-                      items: const [
-                        DropdownMenuItem(value: 'Lifetime', child: Text('Lifetime (Never Expires)')),
-                        DropdownMenuItem(value: '1 Year', child: Text('1 Year')),
-                        DropdownMenuItem(value: '6 Months', child: Text('6 Months')),
-                        DropdownMenuItem(value: '1 Month', child: Text('1 Month')),
-                        DropdownMenuItem(value: '3 Weeks', child: Text('3 Weeks')),
-                        DropdownMenuItem(value: '5 Days', child: Text('5 Days')),
+                      dropdownColor: AppColors.white,
+                      style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900),
+                      icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.neutral600),
+                      items: [
+                        DropdownMenuItem(value: 'Lifetime', child: Text('Lifetime (Never Expires)', style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900))),
+                        DropdownMenuItem(value: '1 Year', child: Text('1 Year', style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900))),
+                        DropdownMenuItem(value: '6 Months', child: Text('6 Months', style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900))),
+                        DropdownMenuItem(value: '1 Month', child: Text('1 Month', style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900))),
+                        DropdownMenuItem(value: '3 Weeks', child: Text('3 Weeks', style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900))),
+                        DropdownMenuItem(value: '5 Days', child: Text('5 Days', style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900))),
                       ],
                       onChanged: (val) {
                         if (val != null) setModalState(() => selectedExpiryType = val);
