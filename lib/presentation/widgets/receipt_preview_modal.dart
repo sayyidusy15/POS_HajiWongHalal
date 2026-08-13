@@ -118,26 +118,18 @@ class ReceiptPreviewModal extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Restaurant Logo Box (Brown Burger)
-                        Container(
-                          width: 56,
-                          height: 56,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF6B4E3D), // Brown burger box
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          alignment: Alignment.center,
-                          child: const Icon(
-                            Icons.lunch_dining,
-                            color: AppColors.white,
-                            size: 32,
-                          ),
+                        // Restaurant Logo Box (Bakso Tjab Haji Logo)
+                        Image.asset(
+                          'assets/images/logo-app.png',
+                          width: 48,
+                          height: 48,
+                          fit: BoxFit.contain,
                         ),
                         const SizedBox(height: 12),
 
                         // Restaurant Header
                         Text(
-                          'Haji Wong Halal',
+                          'Bakso Tjab Haji',
                           style: AppTypography.bodyLBold.copyWith(
                             color: AppColors.neutral900,
                             fontWeight: FontWeight.bold,
@@ -352,7 +344,7 @@ class ReceiptPreviewModal extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () => Navigator.pop(context, true),
+                      onPressed: () => _showSelectPrinterModal(context),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary500,
                         foregroundColor: AppColors.white,
@@ -450,6 +442,275 @@ class ReceiptPreviewModal extends StatelessWidget {
     final String minuteStr = now.minute.toString().padLeft(2, '0');
 
     return '$dayName  $dayStr/$monthStr/$yearStr  •  $hourStr:$minuteStr $period';
+  }
+
+  void _showSelectPrinterModal(BuildContext context) {
+    String selectedPrinterId = 'p1'; // Default to Front Printer
+
+    final List<Map<String, dynamic>> printers = [
+      {
+        'id': 'p1',
+        'name': 'Front Printer',
+        'model': 'Epson TMT-82X',
+        'connectionType': 'Wireless (Wi-Fi)',
+        'target': 'Receipt / Kasir',
+        'ipOrMac': '192.168.1.101',
+        'paperWidth': '80mm',
+        'status': 'Connected',
+      },
+      {
+        'id': 'p2',
+        'name': 'Kitchen Printer',
+        'model': 'Epson TM-m30II-NT',
+        'connectionType': 'Wired (USB)',
+        'target': 'Kitchen / Dapur',
+        'ipOrMac': 'USB Port 1',
+        'paperWidth': '80mm',
+        'status': 'Connected',
+      },
+      {
+        'id': 'p3',
+        'name': 'Office & Report',
+        'model': 'PIXMA E3470',
+        'connectionType': 'Bluetooth',
+        'target': 'Report',
+        'ipOrMac': 'BT: 00:1B:44:11:3A:B7',
+        'paperWidth': 'A4 / Standard',
+        'status': 'Offline',
+      },
+    ];
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setModalState) {
+          return Dialog(
+            backgroundColor: Colors.transparent,
+            child: Container(
+              width: 480,
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.15),
+                    blurRadius: 24,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: const BoxDecoration(
+                              color: AppColors.primary50,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.print_outlined, color: AppColors.primary500, size: 20),
+                          ),
+                          const SizedBox(width: 10),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Select Connected Printer',
+                                style: AppTypography.bodyLBold.copyWith(fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                'Choose printer device to output receipt',
+                                style: AppTypography.bodyXsRegular.copyWith(color: AppColors.neutral500),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        icon: const Icon(Icons.close, color: AppColors.neutral500),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  const Divider(height: 1, color: AppColors.neutral200),
+                  const SizedBox(height: 16),
+
+                  // Printers List
+                  ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: printers.length,
+                    separatorBuilder: (c, i) => const SizedBox(height: 10),
+                    itemBuilder: (c, i) {
+                      final printer = printers[i];
+                      final bool isSelected = selectedPrinterId == printer['id'];
+                      final bool isConnected = printer['status'] == 'Connected';
+
+                      return InkWell(
+                        onTap: isConnected
+                            ? () {
+                                setModalState(() {
+                                  selectedPrinterId = printer['id'];
+                                });
+                              }
+                            : null,
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: isSelected ? AppColors.primary50 : (isConnected ? AppColors.white : AppColors.neutral100),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isSelected ? AppColors.primary500 : (isConnected ? AppColors.neutral300 : AppColors.neutral200),
+                              width: isSelected ? 2 : 1,
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Radio<String>(
+                                value: printer['id'],
+                                groupValue: selectedPrinterId,
+                                activeColor: AppColors.primary500,
+                                onChanged: isConnected
+                                    ? (val) {
+                                        if (val != null) {
+                                          setModalState(() {
+                                            selectedPrinterId = val;
+                                          });
+                                        }
+                                      }
+                                    : null,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text(
+                                          printer['name'],
+                                          style: AppTypography.bodySRegular.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            color: isConnected ? AppColors.neutral900 : AppColors.neutral400,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: isConnected ? const Color(0xFFF0FDF4) : AppColors.neutral200,
+                                            borderRadius: BorderRadius.circular(4),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Container(
+                                                width: 6,
+                                                height: 6,
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: isConnected ? const Color(0xFF16A34A) : AppColors.neutral500,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                printer['status'],
+                                                style: AppTypography.bodyXsRegular.copyWith(
+                                                  color: isConnected ? const Color(0xFF15803D) : AppColors.neutral600,
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      '${printer['model']} • ${printer['connectionType']} (${printer['ipOrMac']})',
+                                      style: AppTypography.bodyXsRegular.copyWith(
+                                        color: isConnected ? AppColors.neutral600 : AppColors.neutral400,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      'Target: ${printer['target']} • Width: ${printer['paperWidth']}',
+                                      style: AppTypography.bodyXsRegular.copyWith(
+                                        color: isConnected ? AppColors.primary600 : AppColors.neutral400,
+                                        fontSize: 11,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Actions
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      OutlinedButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size(0, 44),
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                        child: const Text('Cancel'),
+                      ),
+                      const SizedBox(width: 12),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          final selected = printers.firstWhere((p) => p['id'] == selectedPrinterId);
+                          Navigator.pop(ctx); // Close printer modal
+                          Navigator.pop(context, true); // Close preview modal with success
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Printing receipt via ${selected['name']} (${selected['model']})...'),
+                              backgroundColor: const Color(0xFF16A34A),
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size(0, 44),
+                          backgroundColor: AppColors.primary500,
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                        icon: const Icon(Icons.print, color: Colors.white, size: 18),
+                        label: const Text(
+                          'Print Now',
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
   }
 }
 

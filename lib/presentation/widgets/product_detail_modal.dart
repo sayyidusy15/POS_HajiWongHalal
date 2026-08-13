@@ -382,7 +382,7 @@ class _ProductDetailModalState extends State<ProductDetailModal> {
                               onPressed: () {
                                 final customProduct = Product(
                                   name:
-                                      '${widget.product.name} (${_selectedSize}${_selectedAddons.isNotEmpty ? ' + Addons' : ''})',
+                                      '${widget.product.name} (${_selectedSize}${_selectedAddons.isNotEmpty ? ' + ' + _selectedAddons.join(', ') : ''})',
                                   price: _currentSinglePrice,
                                   category: widget.product.category,
                                   icon: widget.product.icon,

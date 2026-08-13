@@ -556,15 +556,19 @@ class _PaymentModalState extends State<PaymentModal> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primary500,
-                      borderRadius: BorderRadius.circular(4),
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(6),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 4,
+                        ),
+                      ],
                     ),
-                    child: Text(
-                      'QRIS',
-                      style: AppTypography.bodyXsBold.copyWith(
-                        color: AppColors.white,
-                        fontSize: 10,
-                      ),
+                    child: Image.asset(
+                      'assets/images/logo-pembayaran/qris.png',
+                      height: 18,
+                      fit: BoxFit.contain,
                     ),
                   ),
                 ],
@@ -572,7 +576,7 @@ class _PaymentModalState extends State<PaymentModal> {
             ],
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 14),
         Text(
           'Scan QR Code to Pay',
           style: AppTypography.bodyMRegular.copyWith(
@@ -586,7 +590,19 @@ class _PaymentModalState extends State<PaymentModal> {
           style: AppTypography.bodyXsRegular.copyWith(
             color: AppColors.neutral500,
           ),
-          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 12),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset('assets/images/logo-pembayaran/bca.png', height: 18, fit: BoxFit.contain),
+            const SizedBox(width: 12),
+            Image.asset('assets/images/logo-pembayaran/bni.png', height: 18, fit: BoxFit.contain),
+            const SizedBox(width: 12),
+            Image.asset('assets/images/logo-pembayaran/mandiri.png', height: 18, fit: BoxFit.contain),
+            const SizedBox(width: 12),
+            Image.asset('assets/images/logo-pembayaran/qris.png', height: 18, fit: BoxFit.contain),
+          ],
         ),
       ],
     );
@@ -698,7 +714,13 @@ class _PaymentModalState extends State<PaymentModal> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: contentColor, size: 20),
+            method == 'QRIS'
+                ? Image.asset(
+                    'assets/images/logo-pembayaran/qris.png',
+                    height: 18,
+                    fit: BoxFit.contain,
+                  )
+                : Icon(icon, color: contentColor, size: 20),
             const SizedBox(height: 4),
             Text(
               method,

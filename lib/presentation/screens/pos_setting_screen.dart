@@ -25,7 +25,7 @@ class _PosSettingScreenState extends State<PosSettingScreen> {
 
   // Controllers Form
   final TextEditingController _storeNameController =
-      TextEditingController(text: 'Haji Wong Halal');
+      TextEditingController(text: 'Bakso Tjab Haji');
   final TextEditingController _phoneController =
       TextEditingController(text: '+62 812 3456 7890');
   final TextEditingController _whatsappController =
@@ -1046,20 +1046,17 @@ class _PosSettingScreenState extends State<PosSettingScreen> {
       return Container(
         width: 54,
         height: 38,
+        padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
           color: const Color(0xFFFEF2F2),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: const Color(0xFFFECACA)),
         ),
-        child: const Center(
-          child: Text(
-            'QRIS',
-            style: TextStyle(
-              color: Color(0xFFDC2626),
-              fontWeight: FontWeight.w900,
-              fontSize: 13,
-              letterSpacing: 0.5,
-            ),
+        child: Center(
+          child: Image.asset(
+            'assets/images/logo-pembayaran/qris.png',
+            height: 20,
+            fit: BoxFit.contain,
           ),
         ),
       );
@@ -1067,20 +1064,17 @@ class _PosSettingScreenState extends State<PosSettingScreen> {
       return Container(
         width: 54,
         height: 38,
+        padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
           color: const Color(0xFFEFF6FF),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: const Color(0xFFBFDBFE)),
         ),
-        child: const Center(
-          child: Text(
-            'BCA',
-            style: TextStyle(
-              color: Color(0xFF1D4ED8),
-              fontWeight: FontWeight.w900,
-              fontSize: 13,
-              fontStyle: FontStyle.italic,
-            ),
+        child: Center(
+          child: Image.asset(
+            'assets/images/logo-pembayaran/bca.png',
+            height: 20,
+            fit: BoxFit.contain,
           ),
         ),
       );
@@ -1088,19 +1082,17 @@ class _PosSettingScreenState extends State<PosSettingScreen> {
       return Container(
         width: 54,
         height: 38,
+        padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
           color: const Color(0xFFF0F9FF),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: const Color(0xFFBAE6FD)),
         ),
-        child: const Center(
-          child: Text(
-            'MANDIRI',
-            style: TextStyle(
-              color: Color(0xFF0369A1),
-              fontWeight: FontWeight.w900,
-              fontSize: 9,
-            ),
+        child: Center(
+          child: Image.asset(
+            'assets/images/logo-pembayaran/mandiri.png',
+            height: 20,
+            fit: BoxFit.contain,
           ),
         ),
       );
@@ -1108,19 +1100,17 @@ class _PosSettingScreenState extends State<PosSettingScreen> {
       return Container(
         width: 54,
         height: 38,
+        padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
           color: const Color(0xFFFFF7ED),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: const Color(0xFFFFEDD5)),
         ),
-        child: const Center(
-          child: Text(
-            'BNI',
-            style: TextStyle(
-              color: Color(0xFFEA580C),
-              fontWeight: FontWeight.w900,
-              fontSize: 13,
-            ),
+        child: Center(
+          child: Image.asset(
+            'assets/images/logo-pembayaran/bni.png',
+            height: 20,
+            fit: BoxFit.contain,
           ),
         ),
       );

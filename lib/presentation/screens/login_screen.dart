@@ -114,30 +114,20 @@ class _LoginScreenState extends State<LoginScreen> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // Logo Restoran: Haji Wong Halal
+                        // Logo Restoran: Bakso Tjab Haji
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: AppColors.primary500.withValues(alpha: 0.1),
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: AppColors.primary500.withValues(alpha: 0.3),
-                                  width: 1.5,
-                                ),
-                              ),
-                              child: const Icon(
-                                Icons.storefront,
-                                color: AppColors.primary500,
-                                size: 26,
-                              ),
+                            Image.asset(
+                              'assets/images/logo-app.png',
+                              width: 38,
+                              height: 38,
+                              fit: BoxFit.contain,
                             ),
                             const SizedBox(width: 12),
                             Flexible(
                               child: Text(
-                                'Haji Wong Halal',
+                                'Bakso Tjab Haji',
                                 overflow: TextOverflow.ellipsis,
                                 style: AppTypography.h4Bold.copyWith(
                                   color: AppColors.neutral900,

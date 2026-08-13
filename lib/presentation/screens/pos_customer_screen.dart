@@ -11,7 +11,8 @@ class CustomerModel {
   String gender; // 'Male', 'Female'
   String phoneNumber;
   bool isMember; // true = Yes, false = No
-  String expiryType; // 'Lifetime', '1 Year', '6 Months', '1 Month', '3 Weeks', '5 Days', 'Custom'
+  String
+  expiryType; // 'Lifetime', '1 Year', '6 Months', '1 Month', '3 Weeks', '5 Days', 'Custom'
   DateTime? expiryDate;
   DateTime dateAdded;
 
@@ -65,7 +66,8 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
 
   // State Management
   String _searchQuery = '';
-  String _sortOrder = 'Default'; // 'Default', 'First Name (A-Z)', 'First Name (Z-A)', 'Last Name (A-Z)', 'Last Name (Z-A)'
+  String _sortOrder =
+      'Default'; // 'Default', 'First Name (A-Z)', 'First Name (Z-A)', 'Last Name (A-Z)', 'Last Name (Z-A)'
 
   // Filter State
   String _filterGender = 'All'; // 'All', 'Male', 'Female'
@@ -199,8 +201,18 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
 
   String _formatDateTime(DateTime dt) {
     final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     final day = dt.day.toString().padLeft(2, '0');
     final month = months[dt.month - 1];
@@ -236,19 +248,32 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
 
     // Apply Sorting (First Name / Last Name)
     if (_sortOrder == 'First Name (A-Z)') {
-      filtered.sort((a, b) => a.firstName.toLowerCase().compareTo(b.firstName.toLowerCase()));
+      filtered.sort(
+        (a, b) =>
+            a.firstName.toLowerCase().compareTo(b.firstName.toLowerCase()),
+      );
     } else if (_sortOrder == 'First Name (Z-A)') {
-      filtered.sort((a, b) => b.firstName.toLowerCase().compareTo(a.firstName.toLowerCase()));
+      filtered.sort(
+        (a, b) =>
+            b.firstName.toLowerCase().compareTo(a.firstName.toLowerCase()),
+      );
     } else if (_sortOrder == 'Last Name (A-Z)') {
-      filtered.sort((a, b) => a.lastName.toLowerCase().compareTo(b.lastName.toLowerCase()));
+      filtered.sort(
+        (a, b) => a.lastName.toLowerCase().compareTo(b.lastName.toLowerCase()),
+      );
     } else if (_sortOrder == 'Last Name (Z-A)') {
-      filtered.sort((a, b) => b.lastName.toLowerCase().compareTo(a.lastName.toLowerCase()));
+      filtered.sort(
+        (a, b) => b.lastName.toLowerCase().compareTo(a.lastName.toLowerCase()),
+      );
     }
 
     // Pagination calculations
     final int totalItems = filtered.length;
     final int totalPages = (totalItems / _rowsPerPage).ceil().clamp(1, 999);
-    final int startIndex = ((_currentPage - 1) * _rowsPerPage).clamp(0, totalItems);
+    final int startIndex = ((_currentPage - 1) * _rowsPerPage).clamp(
+      0,
+      totalItems,
+    );
     final int endIndex = (startIndex + _rowsPerPage).clamp(0, totalItems);
     final List<CustomerModel> pageItems = startIndex < totalItems
         ? filtered.sublist(startIndex, endIndex)
@@ -296,10 +321,14 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
                           _currentPage = 1;
                         });
                       },
-                      style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral800),
+                      style: AppTypography.bodySRegular.copyWith(
+                        color: AppColors.neutral800,
+                      ),
                       decoration: InputDecoration(
                         hintText: 'Search name...',
-                        hintStyle: AppTypography.bodyXsRegular.copyWith(color: AppColors.neutral400),
+                        hintStyle: AppTypography.bodyXsRegular.copyWith(
+                          color: AppColors.neutral400,
+                        ),
                         border: InputBorder.none,
                         isDense: true,
                         contentPadding: EdgeInsets.zero,
@@ -341,7 +370,10 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
                 children: [
                   // Data Table Headers
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0,
+                      vertical: 10.0,
+                    ),
                     child: Row(
                       children: [
                         _buildColumnHead('ID', 2),
@@ -356,7 +388,11 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
                       ],
                     ),
                   ),
-                  const Divider(height: 1, thickness: 1, color: AppColors.neutral200),
+                  const Divider(
+                    height: 1,
+                    thickness: 1,
+                    color: AppColors.neutral200,
+                  ),
 
                   // Data Rows (List View)
                   Expanded(
@@ -375,11 +411,18 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
                           ),
                   ),
 
-                  const Divider(height: 1, thickness: 1, color: AppColors.neutral200),
+                  const Divider(
+                    height: 1,
+                    thickness: 1,
+                    color: AppColors.neutral200,
+                  ),
 
                   // Footer Pagination
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0,
+                      vertical: 10.0,
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -387,11 +430,16 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
                           children: [
                             Text(
                               'Rows per page:',
-                              style: AppTypography.bodyXsRegular.copyWith(color: AppColors.neutral500),
+                              style: AppTypography.bodyXsRegular.copyWith(
+                                color: AppColors.neutral500,
+                              ),
                             ),
                             const SizedBox(width: 8),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
                                 border: Border.all(color: AppColors.neutral300),
                                 borderRadius: BorderRadius.circular(6),
@@ -533,7 +581,9 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
               customer.gender,
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
-              style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral800),
+              style: AppTypography.bodySRegular.copyWith(
+                color: AppColors.neutral800,
+              ),
             ),
           ),
 
@@ -544,7 +594,9 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
               customer.phoneNumber,
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
-              style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral800),
+              style: AppTypography.bodySRegular.copyWith(
+                color: AppColors.neutral800,
+              ),
             ),
           ),
 
@@ -554,18 +606,27 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
-                    color: customer.isMember ? const Color(0xFFF0FDF4) : AppColors.neutral100,
+                    color: customer.isMember
+                        ? const Color(0xFFF0FDF4)
+                        : AppColors.neutral100,
                     borderRadius: BorderRadius.circular(30),
                     border: Border.all(
-                      color: customer.isMember ? const Color(0xFFBBF7D0) : AppColors.neutral300,
+                      color: customer.isMember
+                          ? const Color(0xFFBBF7D0)
+                          : AppColors.neutral300,
                     ),
                   ),
                   child: Text(
                     customer.isMember ? 'Yes' : 'No',
                     style: AppTypography.bodyXsRegular.copyWith(
-                      color: customer.isMember ? const Color(0xFF15803D) : AppColors.neutral600,
+                      color: customer.isMember
+                          ? const Color(0xFF15803D)
+                          : AppColors.neutral600,
                       fontWeight: FontWeight.bold,
                       fontSize: 11,
                     ),
@@ -583,12 +644,16 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
               style: AppTypography.bodySRegular.copyWith(
-                color: customer.isMember && customer.memberExpiryFormatted != 'Expired'
+                color:
+                    customer.isMember &&
+                        customer.memberExpiryFormatted != 'Expired'
                     ? AppColors.primary500
                     : customer.memberExpiryFormatted == 'Expired'
-                        ? AppColors.error500
-                        : AppColors.neutral500,
-                fontWeight: customer.isMember ? FontWeight.bold : FontWeight.normal,
+                    ? AppColors.error500
+                    : AppColors.neutral500,
+                fontWeight: customer.isMember
+                    ? FontWeight.bold
+                    : FontWeight.normal,
               ),
             ),
           ),
@@ -600,7 +665,9 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
               _formatDateTime(customer.dateAdded),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
-              style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral700),
+              style: AppTypography.bodySRegular.copyWith(
+                color: AppColors.neutral700,
+              ),
             ),
           ),
 
@@ -623,7 +690,11 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
                     value: 'edit',
                     child: Row(
                       children: [
-                        Icon(Icons.edit_outlined, size: 18, color: AppColors.neutral700),
+                        Icon(
+                          Icons.edit_outlined,
+                          size: 18,
+                          color: AppColors.neutral700,
+                        ),
                         SizedBox(width: 8),
                         Text('Edit'),
                       ],
@@ -633,9 +704,16 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
                     value: 'delete',
                     child: Row(
                       children: [
-                        Icon(Icons.delete_outline, size: 18, color: AppColors.error500),
+                        Icon(
+                          Icons.delete_outline,
+                          size: 18,
+                          color: AppColors.error500,
+                        ),
                         SizedBox(width: 8),
-                        Text('Delete', style: TextStyle(color: AppColors.error500)),
+                        Text(
+                          'Delete',
+                          style: TextStyle(color: AppColors.error500),
+                        ),
                       ],
                     ),
                   ),
@@ -659,17 +737,25 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
               color: AppColors.neutral100,
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.person_search_outlined, size: 48, color: AppColors.neutral400),
+            child: const Icon(
+              Icons.person_search_outlined,
+              size: 48,
+              color: AppColors.neutral400,
+            ),
           ),
           const SizedBox(height: 16),
           Text(
             'No Customers Found',
-            style: AppTypography.bodyLBold.copyWith(color: AppColors.neutral800),
+            style: AppTypography.bodyLBold.copyWith(
+              color: AppColors.neutral800,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
             'Try adjusting your search query or filter options.',
-            style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral500),
+            style: AppTypography.bodySRegular.copyWith(
+              color: AppColors.neutral500,
+            ),
           ),
         ],
       ),
@@ -685,10 +771,22 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
       },
       itemBuilder: (ctx) => [
         const PopupMenuItem(value: 'Default', child: Text('Default')),
-        const PopupMenuItem(value: 'First Name (A-Z)', child: Text('First Name (A-Z)')),
-        const PopupMenuItem(value: 'First Name (Z-A)', child: Text('First Name (Z-A)')),
-        const PopupMenuItem(value: 'Last Name (A-Z)', child: Text('Last Name (A-Z)')),
-        const PopupMenuItem(value: 'Last Name (Z-A)', child: Text('Last Name (Z-A)')),
+        const PopupMenuItem(
+          value: 'First Name (A-Z)',
+          child: Text('First Name (A-Z)'),
+        ),
+        const PopupMenuItem(
+          value: 'First Name (Z-A)',
+          child: Text('First Name (Z-A)'),
+        ),
+        const PopupMenuItem(
+          value: 'Last Name (A-Z)',
+          child: Text('Last Name (A-Z)'),
+        ),
+        const PopupMenuItem(
+          value: 'Last Name (Z-A)',
+          child: Text('Last Name (Z-A)'),
+        ),
       ],
       child: Container(
         height: 40,
@@ -716,7 +814,8 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
   }
 
   Widget _buildFilterButton() {
-    final bool isFiltered = _filterGender != 'All' || _filterMemberStatus != 'All';
+    final bool isFiltered =
+        _filterGender != 'All' || _filterMemberStatus != 'All';
     return OutlinedButton.icon(
       onPressed: _showFilterDialog,
       style: OutlinedButton.styleFrom(
@@ -725,7 +824,9 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
           color: isFiltered ? AppColors.primary500 : AppColors.neutral300,
           width: isFiltered ? 1.5 : 1.0,
         ),
-        backgroundColor: isFiltered ? AppColors.primary500.withValues(alpha: 0.05) : AppColors.white,
+        backgroundColor: isFiltered
+            ? AppColors.primary500.withValues(alpha: 0.05)
+            : AppColors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
       icon: Icon(
@@ -790,20 +891,27 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
                     children: [
                       Text(
                         'Filter Customers',
-                        style: AppTypography.bodyLBold.copyWith(fontWeight: FontWeight.bold),
+                        style: AppTypography.bodyLBold.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       IconButton(
                         onPressed: () => Navigator.pop(ctx),
-                        icon: const Icon(Icons.close, color: AppColors.neutral500),
+                        icon: const Icon(
+                          Icons.close,
+                          color: AppColors.neutral500,
+                        ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Gender Filter
                   Text(
                     'Gender',
-                    style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold),
+                    style: AppTypography.bodySRegular.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Wrap(
@@ -814,10 +922,16 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
                       return ChoiceChip(
                         label: Text(g),
                         selected: isSelected,
-                        selectedColor: AppColors.primary500.withValues(alpha: 0.15),
+                        selectedColor: AppColors.primary500.withValues(
+                          alpha: 0.15,
+                        ),
                         labelStyle: TextStyle(
-                          color: isSelected ? AppColors.primary500 : AppColors.neutral800,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          color: isSelected
+                              ? AppColors.primary500
+                              : AppColors.neutral800,
+                          fontWeight: isSelected
+                              ? FontWeight.bold
+                              : FontWeight.normal,
                         ),
                         onSelected: (sel) {
                           if (sel) setModalState(() => tempGender = g);
@@ -830,7 +944,9 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
                   // Member Status Filter
                   Text(
                     'Member Status',
-                    style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold),
+                    style: AppTypography.bodySRegular.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Wrap(
@@ -839,12 +955,24 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
                     children: ['All', 'Yes', 'No'].map((m) {
                       final isSelected = tempMemberStatus == m;
                       return ChoiceChip(
-                        label: Text(m == 'Yes' ? 'Member (Yes)' : m == 'No' ? 'Non-Member (No)' : 'All'),
+                        label: Text(
+                          m == 'Yes'
+                              ? 'Member (Yes)'
+                              : m == 'No'
+                              ? 'Non-Member (No)'
+                              : 'All',
+                        ),
                         selected: isSelected,
-                        selectedColor: AppColors.primary500.withValues(alpha: 0.15),
+                        selectedColor: AppColors.primary500.withValues(
+                          alpha: 0.15,
+                        ),
                         labelStyle: TextStyle(
-                          color: isSelected ? AppColors.primary500 : AppColors.neutral800,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          color: isSelected
+                              ? AppColors.primary500
+                              : AppColors.neutral800,
+                          fontWeight: isSelected
+                              ? FontWeight.bold
+                              : FontWeight.normal,
                         ),
                         onSelected: (sel) {
                           if (sel) setModalState(() => tempMemberStatus = m);
@@ -868,7 +996,9 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
                           },
                           style: OutlinedButton.styleFrom(
                             minimumSize: const Size(0, 44),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           ),
                           child: const Text('Reset'),
                         ),
@@ -887,9 +1017,14 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
                           style: ElevatedButton.styleFrom(
                             minimumSize: const Size(0, 44),
                             backgroundColor: AppColors.primary500,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           ),
-                          child: const Text('Apply Filter', style: TextStyle(color: Colors.white)),
+                          child: const Text(
+                            'Apply Filter',
+                            style: TextStyle(color: Colors.white),
+                          ),
                         ),
                       ),
                     ],
@@ -905,9 +1040,15 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
 
   void _showAddEditCustomerModal({CustomerModel? customer}) {
     final bool isEdit = customer != null;
-    final firstNameController = TextEditingController(text: customer?.firstName ?? '');
-    final lastNameController = TextEditingController(text: customer?.lastName ?? '');
-    final phoneController = TextEditingController(text: customer?.phoneNumber ?? '');
+    final firstNameController = TextEditingController(
+      text: customer?.firstName ?? '',
+    );
+    final lastNameController = TextEditingController(
+      text: customer?.lastName ?? '',
+    );
+    final phoneController = TextEditingController(
+      text: customer?.phoneNumber ?? '',
+    );
     String selectedGender = customer?.gender ?? 'Male';
     bool isMember = customer?.isMember ?? false;
     String selectedExpiryType = customer?.expiryType ?? 'Lifetime';
@@ -935,11 +1076,16 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
                     children: [
                       Text(
                         isEdit ? 'Edit Customer' : 'Add New Customer',
-                        style: AppTypography.bodyLBold.copyWith(fontWeight: FontWeight.bold),
+                        style: AppTypography.bodyLBold.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       IconButton(
                         onPressed: () => Navigator.pop(ctx),
-                        icon: const Icon(Icons.close, color: AppColors.neutral500),
+                        icon: const Icon(
+                          Icons.close,
+                          color: AppColors.neutral500,
+                        ),
                       ),
                     ],
                   ),
@@ -952,14 +1098,25 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('First Name *', style: AppTypography.bodyXsRegular.copyWith(color: AppColors.neutral700, fontWeight: FontWeight.bold)),
+                            Text(
+                              'First Name *',
+                              style: AppTypography.bodyXsRegular.copyWith(
+                                color: AppColors.neutral700,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                             const SizedBox(height: 6),
                             TextField(
                               controller: firstNameController,
                               decoration: InputDecoration(
                                 hintText: 'Enter first name',
-                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 10,
+                                ),
                               ),
                             ),
                           ],
@@ -970,14 +1127,25 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Last Name *', style: AppTypography.bodyXsRegular.copyWith(color: AppColors.neutral700, fontWeight: FontWeight.bold)),
+                            Text(
+                              'Last Name *',
+                              style: AppTypography.bodyXsRegular.copyWith(
+                                color: AppColors.neutral700,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                             const SizedBox(height: 6),
                             TextField(
                               controller: lastNameController,
                               decoration: InputDecoration(
                                 hintText: 'Enter last name',
-                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 10,
+                                ),
                               ),
                             ),
                           ],
@@ -994,23 +1162,56 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Gender', style: AppTypography.bodyXsRegular.copyWith(color: AppColors.neutral700, fontWeight: FontWeight.bold)),
+                            Text(
+                              'Gender',
+                              style: AppTypography.bodyXsRegular.copyWith(
+                                color: AppColors.neutral700,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                             const SizedBox(height: 6),
                             DropdownButtonFormField<String>(
                               value: selectedGender,
                               dropdownColor: AppColors.white,
-                              style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900),
-                              icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.neutral600),
+                              style: AppTypography.bodySRegular.copyWith(
+                                color: AppColors.neutral900,
+                              ),
+                              icon: const Icon(
+                                Icons.keyboard_arrow_down,
+                                color: AppColors.neutral600,
+                              ),
                               items: [
-                                DropdownMenuItem(value: 'Male', child: Text('Male', style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900))),
-                                DropdownMenuItem(value: 'Female', child: Text('Female', style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900))),
+                                DropdownMenuItem(
+                                  value: 'Male',
+                                  child: Text(
+                                    'Male',
+                                    style: AppTypography.bodySRegular.copyWith(
+                                      color: AppColors.neutral900,
+                                    ),
+                                  ),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'Female',
+                                  child: Text(
+                                    'Female',
+                                    style: AppTypography.bodySRegular.copyWith(
+                                      color: AppColors.neutral900,
+                                    ),
+                                  ),
+                                ),
                               ],
                               onChanged: (val) {
-                                if (val != null) setModalState(() => selectedGender = val);
+                                if (val != null)
+                                  setModalState(() => selectedGender = val);
                               },
                               decoration: InputDecoration(
-                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 10,
+                                ),
                               ),
                             ),
                           ],
@@ -1021,15 +1222,26 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Phone Number', style: AppTypography.bodyXsRegular.copyWith(color: AppColors.neutral700, fontWeight: FontWeight.bold)),
+                            Text(
+                              'Phone Number',
+                              style: AppTypography.bodyXsRegular.copyWith(
+                                color: AppColors.neutral700,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                             const SizedBox(height: 6),
                             TextField(
                               controller: phoneController,
                               keyboardType: TextInputType.phone,
                               decoration: InputDecoration(
                                 hintText: '+62 812...',
-                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 10,
+                                ),
                               ),
                             ),
                           ],
@@ -1046,10 +1258,19 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Member Status', style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold)),
                           Text(
-                            isMember ? 'Customer is a registered member' : 'Customer is a regular guest',
-                            style: AppTypography.bodyXsRegular.copyWith(color: AppColors.neutral500),
+                            'Member Status',
+                            style: AppTypography.bodySRegular.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            isMember
+                                ? 'Customer is a registered member'
+                                : 'Customer is a regular guest',
+                            style: AppTypography.bodyXsRegular.copyWith(
+                              color: AppColors.neutral500,
+                            ),
                           ),
                         ],
                       ),
@@ -1064,31 +1285,96 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
                       ),
                     ],
                   ),
-                  
+
                   // Member Expiry Option (If Member is Yes)
                   if (isMember) ...[
                     const SizedBox(height: 16),
-                    Text('Member Expiry Duration', style: AppTypography.bodyXsRegular.copyWith(color: AppColors.neutral700, fontWeight: FontWeight.bold)),
+                    Text(
+                      'Member Expiry Duration',
+                      style: AppTypography.bodyXsRegular.copyWith(
+                        color: AppColors.neutral700,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     const SizedBox(height: 6),
                     DropdownButtonFormField<String>(
                       value: selectedExpiryType,
                       dropdownColor: AppColors.white,
-                      style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900),
-                      icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.neutral600),
+                      style: AppTypography.bodySRegular.copyWith(
+                        color: AppColors.neutral900,
+                      ),
+                      icon: const Icon(
+                        Icons.keyboard_arrow_down,
+                        color: AppColors.neutral600,
+                      ),
                       items: [
-                        DropdownMenuItem(value: 'Lifetime', child: Text('Lifetime (Never Expires)', style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900))),
-                        DropdownMenuItem(value: '1 Year', child: Text('1 Year', style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900))),
-                        DropdownMenuItem(value: '6 Months', child: Text('6 Months', style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900))),
-                        DropdownMenuItem(value: '1 Month', child: Text('1 Month', style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900))),
-                        DropdownMenuItem(value: '3 Weeks', child: Text('3 Weeks', style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900))),
-                        DropdownMenuItem(value: '5 Days', child: Text('5 Days', style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900))),
+                        DropdownMenuItem(
+                          value: 'Lifetime',
+                          child: Text(
+                            'Lifetime (Never Expires)',
+                            style: AppTypography.bodySRegular.copyWith(
+                              color: AppColors.neutral900,
+                            ),
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: '1 Year',
+                          child: Text(
+                            '1 Year',
+                            style: AppTypography.bodySRegular.copyWith(
+                              color: AppColors.neutral900,
+                            ),
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: '6 Months',
+                          child: Text(
+                            '6 Months',
+                            style: AppTypography.bodySRegular.copyWith(
+                              color: AppColors.neutral900,
+                            ),
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: '1 Month',
+                          child: Text(
+                            '1 Month',
+                            style: AppTypography.bodySRegular.copyWith(
+                              color: AppColors.neutral900,
+                            ),
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: '3 Weeks',
+                          child: Text(
+                            '3 Weeks',
+                            style: AppTypography.bodySRegular.copyWith(
+                              color: AppColors.neutral900,
+                            ),
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: '5 Days',
+                          child: Text(
+                            '5 Days',
+                            style: AppTypography.bodySRegular.copyWith(
+                              color: AppColors.neutral900,
+                            ),
+                          ),
+                        ),
                       ],
                       onChanged: (val) {
-                        if (val != null) setModalState(() => selectedExpiryType = val);
+                        if (val != null)
+                          setModalState(() => selectedExpiryType = val);
                       },
                       decoration: InputDecoration(
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
                       ),
                     ),
                   ],
@@ -1104,7 +1390,9 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
                         style: OutlinedButton.styleFrom(
                           minimumSize: const Size(0, 44),
                           padding: const EdgeInsets.symmetric(horizontal: 20),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
                         child: const Text('Cancel'),
                       ),
@@ -1115,7 +1403,9 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
                           final last = lastNameController.text.trim();
                           if (first.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('First Name is required!')),
+                              const SnackBar(
+                                content: Text('First Name is required!'),
+                              ),
                             );
                             return;
                           }
@@ -1141,11 +1431,17 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
                               customer.firstName = first;
                               customer.lastName = last;
                               customer.gender = selectedGender;
-                              customer.phoneNumber = phoneController.text.trim();
+                              customer.phoneNumber = phoneController.text
+                                  .trim();
                               customer.isMember = isMember;
-                              customer.expiryType = isMember ? selectedExpiryType : 'None';
+                              customer.expiryType = isMember
+                                  ? selectedExpiryType
+                                  : 'None';
                               customer.expiryDate = expDate;
-                              _triggerToast('Customer Updated', '$first $last details updated successfully.');
+                              _triggerToast(
+                                'Customer Updated',
+                                '$first $last details updated successfully.',
+                              );
                             } else {
                               final newId = '#CST-00${_customers.length + 1}';
                               _customers.insert(
@@ -1157,12 +1453,17 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
                                   gender: selectedGender,
                                   phoneNumber: phoneController.text.trim(),
                                   isMember: isMember,
-                                  expiryType: isMember ? selectedExpiryType : 'None',
+                                  expiryType: isMember
+                                      ? selectedExpiryType
+                                      : 'None',
                                   expiryDate: expDate,
                                   dateAdded: DateTime.now(),
                                 ),
                               );
-                              _triggerToast('Customer Created', '$first $last added to customer list.');
+                              _triggerToast(
+                                'Customer Created',
+                                '$first $last added to customer list.',
+                              );
                             }
                           });
 
@@ -1172,11 +1473,16 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
                           minimumSize: const Size(0, 44),
                           padding: const EdgeInsets.symmetric(horizontal: 24),
                           backgroundColor: AppColors.primary500,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
                         child: Text(
                           isEdit ? 'Save Changes' : 'Add Customer',
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ],
@@ -1213,17 +1519,25 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
                   shape: BoxShape.circle,
                 ),
                 alignment: Alignment.center,
-                child: const Icon(Icons.delete_outline, color: AppColors.white, size: 28),
+                child: const Icon(
+                  Icons.delete_outline,
+                  color: AppColors.white,
+                  size: 28,
+                ),
               ),
               const SizedBox(height: 16),
               Text(
                 'Delete Customer?',
-                style: AppTypography.bodyLBold.copyWith(fontWeight: FontWeight.bold),
+                style: AppTypography.bodyLBold.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 8),
               Text(
                 'Are you sure you want to delete ${customer.fullName}? This action cannot be undone.',
-                style: AppTypography.bodyXsRegular.copyWith(color: AppColors.neutral500),
+                style: AppTypography.bodyXsRegular.copyWith(
+                  color: AppColors.neutral500,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
@@ -1234,7 +1548,9 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
                       onPressed: () => Navigator.pop(ctx),
                       style: OutlinedButton.styleFrom(
                         minimumSize: const Size(0, 44),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                       child: const Text('Cancel'),
                     ),
@@ -1245,16 +1561,28 @@ class _PosCustomerScreenState extends State<PosCustomerScreen> {
                       onPressed: () {
                         setState(() {
                           _customers.removeWhere((c) => c.id == customer.id);
-                          _triggerToast('Customer Deleted', '${customer.fullName} removed from database.', isSuccess: false);
+                          _triggerToast(
+                            'Customer Deleted',
+                            '${customer.fullName} removed from database.',
+                            isSuccess: false,
+                          );
                         });
                         Navigator.pop(ctx);
                       },
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size(0, 44),
                         backgroundColor: AppColors.error500,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
-                      child: const Text('Delete', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      child: const Text(
+                        'Delete',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
                 ],

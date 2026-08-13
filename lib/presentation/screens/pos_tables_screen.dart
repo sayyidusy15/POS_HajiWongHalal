@@ -59,7 +59,9 @@ class TableModel {
       height: height,
       isUsed: isUsed ?? this.isUsed,
       orderId: isUsed == false ? null : (orderId ?? this.orderId),
-      customerName: isUsed == false ? null : (customerName ?? this.customerName),
+      customerName: isUsed == false
+          ? null
+          : (customerName ?? this.customerName),
       price: isUsed == false ? null : (price ?? this.price),
       floor: floor,
       rotationAngle: rotationAngle,
@@ -76,13 +78,17 @@ class PosTablesScreen extends StatefulWidget {
 }
 
 class _PosTablesScreenState extends State<PosTablesScreen> {
-  final TransformationController _transformationController = TransformationController();
+  final TransformationController _transformationController =
+      TransformationController();
 
   // Active Filters
   String _selectedFloor = 'Lantai 1'; // 'Lantai 1', 'Lantai 2', 'Lantai 3'
-  String _selectedStatusFilter = 'All Table'; // 'All Table', 'Available', 'Occupied'
-  String _selectedCapacityFilter = 'All Capacity'; // 'All Capacity', '2 Seats', '4 Seats', '6 Seats'
-  String _selectedTypeFilter = 'All Type'; // 'All Type', 'Circle', 'Square', 'Rectangle'
+  String _selectedStatusFilter =
+      'All Table'; // 'All Table', 'Available', 'Occupied'
+  String _selectedCapacityFilter =
+      'All Capacity'; // 'All Capacity', '2 Seats', '4 Seats', '6 Seats'
+  String _selectedTypeFilter =
+      'All Type'; // 'All Type', 'Circle', 'Square', 'Rectangle'
   String _searchQuery = '';
 
   double _cashierX1 = 440.0, _cashierY1 = 200.0;
@@ -94,7 +100,7 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
     if (_selectedFloor == 'Lantai 3') return _cashierX3;
     return _cashierX1;
   }
-  
+
   double get _cashierY {
     if (_selectedFloor == 'Lantai 2') return _cashierY2;
     if (_selectedFloor == 'Lantai 3') return _cashierY3;
@@ -114,7 +120,18 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
   List<TableModel> _generateInitialTables() {
     return [
       // --- LANTAI 1 ---
-      const TableModel(id: 'T1', name: '01', capacity: 2, shape: 'circle', x: 80, y: 100, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+      const TableModel(
+        id: 'T1',
+        name: '01',
+        capacity: 2,
+        shape: 'circle',
+        x: 80,
+        y: 100,
+        width: 50,
+        height: 50,
+        isUsed: false,
+        floor: 'Lantai 1',
+      ),
       TableModel(
         id: 'T2',
         name: '02',
@@ -130,15 +147,72 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
         price: 245000,
         floor: 'Lantai 1',
         items: [
-          OrderItem(product: const Product(name: 'Deluxe Crispy Burger', price: 45000, category: 'Burger', icon: Icons.lunch_dining_outlined), quantity: 2),
-          OrderItem(product: const Product(name: 'Combo Drumstick', price: 55000, category: 'Fried Chicken', icon: Icons.restaurant_outlined), quantity: 2),
-          OrderItem(product: const Product(name: 'Chocolate Milkshake', price: 22000, category: 'Drink', icon: Icons.local_drink_outlined), quantity: 2),
+          OrderItem(
+            product: const Product(
+              name: 'Deluxe Crispy Burger',
+              price: 45000,
+              category: 'Burger',
+              icon: Icons.lunch_dining_outlined,
+            ),
+            quantity: 2,
+          ),
+          OrderItem(
+            product: const Product(
+              name: 'Combo Drumstick',
+              price: 55000,
+              category: 'Fried Chicken',
+              icon: Icons.restaurant_outlined,
+            ),
+            quantity: 2,
+          ),
+          OrderItem(
+            product: const Product(
+              name: 'Chocolate Milkshake',
+              price: 22000,
+              category: 'Drink',
+              icon: Icons.local_drink_outlined,
+            ),
+            quantity: 2,
+          ),
         ],
       ),
-      const TableModel(id: 'T3', name: '03', capacity: 2, shape: 'circle', x: 260, y: 100, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
-      const TableModel(id: 'T4', name: '04', capacity: 2, shape: 'circle', x: 350, y: 100, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+      const TableModel(
+        id: 'T3',
+        name: '03',
+        capacity: 2,
+        shape: 'circle',
+        x: 260,
+        y: 100,
+        width: 50,
+        height: 50,
+        isUsed: false,
+        floor: 'Lantai 1',
+      ),
+      const TableModel(
+        id: 'T4',
+        name: '04',
+        capacity: 2,
+        shape: 'circle',
+        x: 350,
+        y: 100,
+        width: 50,
+        height: 50,
+        isUsed: false,
+        floor: 'Lantai 1',
+      ),
 
-      const TableModel(id: 'T5', name: '05', capacity: 4, shape: 'square', x: 80, y: 200, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+      const TableModel(
+        id: 'T5',
+        name: '05',
+        capacity: 4,
+        shape: 'square',
+        x: 80,
+        y: 200,
+        width: 50,
+        height: 50,
+        isUsed: false,
+        floor: 'Lantai 1',
+      ),
       TableModel(
         id: 'T6',
         name: '06',
@@ -154,17 +228,96 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
         price: 345000,
         floor: 'Lantai 1',
         items: [
-          OrderItem(product: const Product(name: 'Double Cheeseburger', price: 48000, category: 'Burger', icon: Icons.lunch_dining_outlined), quantity: 4),
-          OrderItem(product: const Product(name: 'Coca Cola', price: 12000, category: 'Drink', icon: Icons.local_drink_outlined), quantity: 4),
-          OrderItem(product: const Product(name: '3 Cheese Wings', price: 28000, category: 'Fried Chicken', icon: Icons.restaurant_outlined), quantity: 3),
+          OrderItem(
+            product: const Product(
+              name: 'Double Cheeseburger',
+              price: 48000,
+              category: 'Burger',
+              icon: Icons.lunch_dining_outlined,
+            ),
+            quantity: 4,
+          ),
+          OrderItem(
+            product: const Product(
+              name: 'Coca Cola',
+              price: 12000,
+              category: 'Drink',
+              icon: Icons.local_drink_outlined,
+            ),
+            quantity: 4,
+          ),
+          OrderItem(
+            product: const Product(
+              name: '3 Cheese Wings',
+              price: 28000,
+              category: 'Fried Chicken',
+              icon: Icons.restaurant_outlined,
+            ),
+            quantity: 3,
+          ),
         ],
       ),
-      const TableModel(id: 'T7', name: '07', capacity: 4, shape: 'square', x: 260, y: 200, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
-      const TableModel(id: 'T8', name: '08', capacity: 4, shape: 'square', x: 350, y: 200, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+      const TableModel(
+        id: 'T7',
+        name: '07',
+        capacity: 4,
+        shape: 'square',
+        x: 260,
+        y: 200,
+        width: 50,
+        height: 50,
+        isUsed: false,
+        floor: 'Lantai 1',
+      ),
+      const TableModel(
+        id: 'T8',
+        name: '08',
+        capacity: 4,
+        shape: 'square',
+        x: 350,
+        y: 200,
+        width: 50,
+        height: 50,
+        isUsed: false,
+        floor: 'Lantai 1',
+      ),
 
-      const TableModel(id: 'T9', name: '09', capacity: 4, shape: 'square', x: 80, y: 320, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
-      const TableModel(id: 'T10', name: '10', capacity: 4, shape: 'square', x: 170, y: 320, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
-      const TableModel(id: 'T11', name: '11', capacity: 4, shape: 'square', x: 260, y: 320, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+      const TableModel(
+        id: 'T9',
+        name: '09',
+        capacity: 4,
+        shape: 'square',
+        x: 80,
+        y: 320,
+        width: 50,
+        height: 50,
+        isUsed: false,
+        floor: 'Lantai 1',
+      ),
+      const TableModel(
+        id: 'T10',
+        name: '10',
+        capacity: 4,
+        shape: 'square',
+        x: 170,
+        y: 320,
+        width: 50,
+        height: 50,
+        isUsed: false,
+        floor: 'Lantai 1',
+      ),
+      const TableModel(
+        id: 'T11',
+        name: '11',
+        capacity: 4,
+        shape: 'square',
+        x: 260,
+        y: 320,
+        width: 50,
+        height: 50,
+        isUsed: false,
+        floor: 'Lantai 1',
+      ),
       TableModel(
         id: 'T12',
         name: '12',
@@ -180,13 +333,51 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
         price: 189000,
         floor: 'Lantai 1',
         items: [
-          OrderItem(product: const Product(name: 'Special Crispy Burger', price: 38000, category: 'Burger', icon: Icons.lunch_dining_outlined), quantity: 3),
-          OrderItem(product: const Product(name: 'Cappuccino', price: 25000, category: 'Coffee', icon: Icons.coffee_outlined), quantity: 3),
+          OrderItem(
+            product: const Product(
+              name: 'Special Crispy Burger',
+              price: 38000,
+              category: 'Burger',
+              icon: Icons.lunch_dining_outlined,
+            ),
+            quantity: 3,
+          ),
+          OrderItem(
+            product: const Product(
+              name: 'Cappuccino',
+              price: 25000,
+              category: 'Coffee',
+              icon: Icons.coffee_outlined,
+            ),
+            quantity: 3,
+          ),
         ],
       ),
 
-      const TableModel(id: 'T13', name: '13', capacity: 6, shape: 'rectangle', x: 580, y: 200, width: 110, height: 60, isUsed: false, floor: 'Lantai 1'),
-      const TableModel(id: 'T14', name: '14', capacity: 6, shape: 'rectangle', x: 580, y: 320, width: 110, height: 60, isUsed: false, floor: 'Lantai 1'),
+      const TableModel(
+        id: 'T13',
+        name: '13',
+        capacity: 6,
+        shape: 'rectangle',
+        x: 580,
+        y: 200,
+        width: 110,
+        height: 60,
+        isUsed: false,
+        floor: 'Lantai 1',
+      ),
+      const TableModel(
+        id: 'T14',
+        name: '14',
+        capacity: 6,
+        shape: 'rectangle',
+        x: 580,
+        y: 320,
+        width: 110,
+        height: 60,
+        isUsed: false,
+        floor: 'Lantai 1',
+      ),
       TableModel(
         id: 'T15',
         name: '15',
@@ -202,24 +393,136 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
         price: 760000,
         floor: 'Lantai 1',
         items: [
-          OrderItem(product: const Product(name: 'Double Cheeseburger', price: 48000, category: 'Burger', icon: Icons.lunch_dining_outlined), quantity: 6),
-          OrderItem(product: const Product(name: 'Combo Drumstick', price: 55000, category: 'Fried Chicken', icon: Icons.restaurant_outlined), quantity: 6),
-          OrderItem(product: const Product(name: 'Sprite', price: 12000, category: 'Drink', icon: Icons.local_drink_outlined), quantity: 6),
+          OrderItem(
+            product: const Product(
+              name: 'Double Cheeseburger',
+              price: 48000,
+              category: 'Burger',
+              icon: Icons.lunch_dining_outlined,
+            ),
+            quantity: 6,
+          ),
+          OrderItem(
+            product: const Product(
+              name: 'Combo Drumstick',
+              price: 55000,
+              category: 'Fried Chicken',
+              icon: Icons.restaurant_outlined,
+            ),
+            quantity: 6,
+          ),
+          OrderItem(
+            product: const Product(
+              name: 'Sprite',
+              price: 12000,
+              category: 'Drink',
+              icon: Icons.local_drink_outlined,
+            ),
+            quantity: 6,
+          ),
         ],
       ),
 
-      const TableModel(id: 'T16', name: '16', capacity: 2, shape: 'circle', x: 80, y: 440, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
-      const TableModel(id: 'T17', name: '17', capacity: 2, shape: 'circle', x: 170, y: 440, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
-      const TableModel(id: 'T18', name: '18', capacity: 2, shape: 'circle', x: 260, y: 440, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
-      const TableModel(id: 'T19', name: '19', capacity: 2, shape: 'circle', x: 350, y: 440, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
-      const TableModel(id: 'T20', name: '20', capacity: 2, shape: 'circle', x: 440, y: 440, width: 50, height: 50, isUsed: false, floor: 'Lantai 1'),
+      const TableModel(
+        id: 'T16',
+        name: '16',
+        capacity: 2,
+        shape: 'circle',
+        x: 80,
+        y: 440,
+        width: 50,
+        height: 50,
+        isUsed: false,
+        floor: 'Lantai 1',
+      ),
+      const TableModel(
+        id: 'T17',
+        name: '17',
+        capacity: 2,
+        shape: 'circle',
+        x: 170,
+        y: 440,
+        width: 50,
+        height: 50,
+        isUsed: false,
+        floor: 'Lantai 1',
+      ),
+      const TableModel(
+        id: 'T18',
+        name: '18',
+        capacity: 2,
+        shape: 'circle',
+        x: 260,
+        y: 440,
+        width: 50,
+        height: 50,
+        isUsed: false,
+        floor: 'Lantai 1',
+      ),
+      const TableModel(
+        id: 'T19',
+        name: '19',
+        capacity: 2,
+        shape: 'circle',
+        x: 350,
+        y: 440,
+        width: 50,
+        height: 50,
+        isUsed: false,
+        floor: 'Lantai 1',
+      ),
+      const TableModel(
+        id: 'T20',
+        name: '20',
+        capacity: 2,
+        shape: 'circle',
+        x: 440,
+        y: 440,
+        width: 50,
+        height: 50,
+        isUsed: false,
+        floor: 'Lantai 1',
+      ),
 
       // --- LANTAI 2 ---
-      const TableModel(id: 'T21', name: '21', capacity: 2, shape: 'circle', x: 100, y: 150, width: 50, height: 50, isUsed: false, floor: 'Lantai 2'),
-      const TableModel(id: 'T22', name: '22', capacity: 4, shape: 'square', x: 200, y: 150, width: 50, height: 50, isUsed: false, floor: 'Lantai 2'),
+      const TableModel(
+        id: 'T21',
+        name: '21',
+        capacity: 2,
+        shape: 'circle',
+        x: 100,
+        y: 150,
+        width: 50,
+        height: 50,
+        isUsed: false,
+        floor: 'Lantai 2',
+      ),
+      const TableModel(
+        id: 'T22',
+        name: '22',
+        capacity: 4,
+        shape: 'square',
+        x: 200,
+        y: 150,
+        width: 50,
+        height: 50,
+        isUsed: false,
+        floor: 'Lantai 2',
+      ),
 
       // --- LANTAI 3 ---
-      const TableModel(id: 'T23', name: '23', capacity: 6, shape: 'rectangle', x: 150, y: 200, width: 110, height: 60, isUsed: false, floor: 'Lantai 3'),
+      const TableModel(
+        id: 'T23',
+        name: '23',
+        capacity: 6,
+        shape: 'rectangle',
+        x: 150,
+        y: 200,
+        width: 110,
+        height: 60,
+        isUsed: false,
+        floor: 'Lantai 3',
+      ),
     ];
   }
 
@@ -277,13 +580,16 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
 
       if (_selectedTypeFilter == 'Circle' && t.shape != 'circle') return false;
       if (_selectedTypeFilter == 'Square' && t.shape != 'square') return false;
-      if (_selectedTypeFilter == 'Rectangle' && t.shape != 'rectangle') return false;
+      if (_selectedTypeFilter == 'Rectangle' && t.shape != 'rectangle')
+        return false;
 
       return true;
     }).toList();
 
     // Floor layout canvas tables (hanya berdasarkan lantai yang dipilih)
-    final floorTables = _tablesList.where((t) => t.floor == _selectedFloor).toList();
+    final floorTables = _tablesList
+        .where((t) => t.floor == _selectedFloor)
+        .toList();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF3F4F6),
@@ -351,9 +657,7 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
                       const Divider(height: 1, color: AppColors.neutral200),
 
                       // List Meja Scrollable
-                      Expanded(
-                        child: _buildTablesListView(filteredTables),
-                      ),
+                      Expanded(child: _buildTablesListView(filteredTables)),
 
                       // Bottom Confirm Selection Button (jika meja kosong dipilih)
                       if (_selectedTableId != null)
@@ -364,8 +668,13 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
                             height: 48,
                             child: ElevatedButton(
                               onPressed: () {
-                                final selTable = _tablesList.firstWhere((t) => t.id == _selectedTableId);
-                                Navigator.pop(context, 'Table ${selTable.name}');
+                                final selTable = _tablesList.firstWhere(
+                                  (t) => t.id == _selectedTableId,
+                                );
+                                Navigator.pop(
+                                  context,
+                                  'Table ${selTable.name}',
+                                );
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.primary500,
@@ -375,7 +684,9 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
                               ),
                               child: Text(
                                 'Confirm Selection (${_tablesList.firstWhere((t) => t.id == _selectedTableId).name})',
-                                style: AppTypography.bodyMBold.copyWith(color: AppColors.white),
+                                style: AppTypography.bodyMBold.copyWith(
+                                  color: AppColors.white,
+                                ),
                               ),
                             ),
                           ),
@@ -407,7 +718,10 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
                     children: [
                       // Map Header Toolbar (Legend & Status)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20.0,
+                          vertical: 12.0,
+                        ),
                         color: AppColors.white,
                         child: _buildMapHeader(),
                       ),
@@ -419,7 +733,8 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
                           color: const Color(0xFFF8FAFC),
                           child: ClipRect(
                             child: InteractiveViewer(
-                              transformationController: _transformationController,
+                              transformationController:
+                                  _transformationController,
                               minScale: 0.5,
                               maxScale: 2.5,
                               boundaryMargin: const EdgeInsets.all(400),
@@ -433,7 +748,9 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
                                     _buildCashierBlock(),
 
                                     // List Meja di Canvas
-                                    ...floorTables.map((table) => _buildMapTableItem(table)),
+                                    ...floorTables.map(
+                                      (table) => _buildMapTableItem(table),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -477,10 +794,14 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
                       _searchQuery = val;
                     });
                   },
-                  style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral800),
+                  style: AppTypography.bodySRegular.copyWith(
+                    color: AppColors.neutral800,
+                  ),
                   decoration: InputDecoration(
                     hintText: 'Search table...',
-                    hintStyle: AppTypography.bodyXsRegular.copyWith(color: AppColors.neutral400),
+                    hintStyle: AppTypography.bodyXsRegular.copyWith(
+                      color: AppColors.neutral400,
+                    ),
                     border: InputBorder.none,
                     isDense: true,
                     contentPadding: EdgeInsets.zero,
@@ -577,7 +898,11 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
         child: DropdownButton<String>(
           value: value,
           dropdownColor: AppColors.white,
-          icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.neutral600, size: 18),
+          icon: const Icon(
+            Icons.keyboard_arrow_down,
+            color: AppColors.neutral600,
+            size: 18,
+          ),
           style: AppTypography.bodyXsRegular.copyWith(
             color: AppColors.neutral800,
             fontWeight: FontWeight.bold,
@@ -600,11 +925,17 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.table_restaurant_outlined, size: 40, color: AppColors.neutral400),
+            const Icon(
+              Icons.table_restaurant_outlined,
+              size: 40,
+              color: AppColors.neutral400,
+            ),
             const SizedBox(height: 8),
             Text(
               'No Tables Found',
-              style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral500),
+              style: AppTypography.bodySRegular.copyWith(
+                color: AppColors.neutral500,
+              ),
             ),
           ],
         ),
@@ -614,13 +945,17 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
     return ListView.separated(
       padding: const EdgeInsets.all(12),
       itemCount: listTables.length,
-      separatorBuilder: (context, index) => const Divider(height: 1, color: AppColors.neutral100),
+      separatorBuilder: (context, index) =>
+          const Divider(height: 1, color: AppColors.neutral100),
       itemBuilder: (context, index) {
         final table = listTables[index];
         final bool isSelected = _selectedTableId == table.id;
 
         return ListTile(
-          contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 8,
+            horizontal: 8,
+          ),
           onTap: () {
             if (table.isUsed) {
               _showOccupiedTableModal(table);
@@ -635,7 +970,9 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
             height: 10,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: table.isUsed ? const Color(0xFFFF5630) : AppColors.primary500,
+              color: table.isUsed
+                  ? const Color(0xFFFF5630)
+                  : AppColors.primary500,
             ),
           ),
           title: Text(
@@ -657,7 +994,9 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
                 )
               : Text(
                   'Available (${table.capacity} Seats)',
-                  style: AppTypography.bodyXsRegular.copyWith(color: AppColors.primary600),
+                  style: AppTypography.bodyXsRegular.copyWith(
+                    color: AppColors.primary600,
+                  ),
                 ),
           trailing: table.isUsed
               ? Text(
@@ -666,11 +1005,15 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
                     color: const Color(0xFFFF5630),
                   ),
                 )
-              : const Icon(Icons.chevron_right, color: AppColors.neutral400, size: 20),
-          tileColor: isSelected ? AppColors.primary50.withValues(alpha: 0.5) : Colors.transparent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+              : const Icon(
+                  Icons.chevron_right,
+                  color: AppColors.neutral400,
+                  size: 20,
+                ),
+          tileColor: isSelected
+              ? AppColors.primary50.withValues(alpha: 0.5)
+              : Colors.transparent,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         );
       },
     );
@@ -689,9 +1032,17 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
           ),
           child: Row(
             children: [
-              _buildLegendItem('Available', const Color(0xFFFFFFFF), border: AppColors.neutral400),
+              _buildLegendItem(
+                'Available',
+                const Color(0xFFFFFFFF),
+                border: AppColors.neutral400,
+              ),
               const SizedBox(width: 16),
-              _buildLegendItem('Occupied', const Color(0xFFFFF1F0), border: const Color(0xFFFF5630)),
+              _buildLegendItem(
+                'Occupied',
+                const Color(0xFFFFF1F0),
+                border: const Color(0xFFFF5630),
+              ),
               const SizedBox(width: 16),
               _buildLegendItem('Selected', AppColors.primary500),
             ],
@@ -699,7 +1050,7 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
         ),
 
         Text(
-          '$_selectedFloor • ${ _tablesList.where((t) => t.floor == _selectedFloor && t.isUsed).length } Occupied',
+          '$_selectedFloor • ${_tablesList.where((t) => t.floor == _selectedFloor && t.isUsed).length} Occupied',
           style: AppTypography.bodySRegular.copyWith(
             color: AppColors.neutral700,
             fontWeight: FontWeight.bold,
@@ -759,26 +1110,36 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
 
   Widget _buildMapTableItem(TableModel table) {
     bool isFilteredOut = false;
-    
+
     // Status filter
-    if (_selectedStatusFilter == 'Available' && table.isUsed) isFilteredOut = true;
-    if (_selectedStatusFilter == 'Occupied' && !table.isUsed) isFilteredOut = true;
+    if (_selectedStatusFilter == 'Available' && table.isUsed)
+      isFilteredOut = true;
+    if (_selectedStatusFilter == 'Occupied' && !table.isUsed)
+      isFilteredOut = true;
 
     // Capacity filter
-    if (_selectedCapacityFilter == '2 Seats' && table.capacity != 2) isFilteredOut = true;
-    if (_selectedCapacityFilter == '4 Seats' && table.capacity != 4) isFilteredOut = true;
-    if (_selectedCapacityFilter == '6 Seats' && table.capacity != 6) isFilteredOut = true;
+    if (_selectedCapacityFilter == '2 Seats' && table.capacity != 2)
+      isFilteredOut = true;
+    if (_selectedCapacityFilter == '4 Seats' && table.capacity != 4)
+      isFilteredOut = true;
+    if (_selectedCapacityFilter == '6 Seats' && table.capacity != 6)
+      isFilteredOut = true;
 
     // Type filter
-    if (_selectedTypeFilter == 'Circle' && table.shape != 'circle') isFilteredOut = true;
-    if (_selectedTypeFilter == 'Square' && table.shape != 'square') isFilteredOut = true;
-    if (_selectedTypeFilter == 'Rectangle' && table.shape != 'rectangle') isFilteredOut = true;
+    if (_selectedTypeFilter == 'Circle' && table.shape != 'circle')
+      isFilteredOut = true;
+    if (_selectedTypeFilter == 'Square' && table.shape != 'square')
+      isFilteredOut = true;
+    if (_selectedTypeFilter == 'Rectangle' && table.shape != 'rectangle')
+      isFilteredOut = true;
 
     // Search query filter
     if (_searchQuery.isNotEmpty) {
       final query = _searchQuery.toLowerCase();
       final matchName = table.name.toLowerCase().contains(query);
-      final matchCust = (table.customerName ?? '').toLowerCase().contains(query);
+      final matchCust = (table.customerName ?? '').toLowerCase().contains(
+        query,
+      );
       if (!matchName && !matchCust) isFilteredOut = true;
     }
 
@@ -829,7 +1190,9 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
                         child: Text(
                           table.name,
                           style: AppTypography.bodyMBold.copyWith(
-                            color: isSelected ? AppColors.white : AppColors.neutral900,
+                            color: isSelected
+                                ? AppColors.white
+                                : AppColors.neutral900,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -889,7 +1252,10 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
         color: const Color(0xFFFFF1F0), // Soft Coral Tint (Merah Soft)
         shape: table.shape == 'circle' ? BoxShape.circle : BoxShape.rectangle,
         borderRadius: table.shape != 'circle' ? BorderRadius.circular(8) : null,
-        border: Border.all(color: const Color(0xFFFF5630), width: 2.0), // Vibrant Coral Outline
+        border: Border.all(
+          color: const Color(0xFFFF5630),
+          width: 2.0,
+        ), // Vibrant Coral Outline
       );
     }
 
@@ -906,12 +1272,32 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
   }
 
   void _showOccupiedTableModal(TableModel table) {
-    final List<OrderItem> items = table.items ?? [
-      OrderItem(product: const Product(name: 'Deluxe Crispy Burger', price: 45000, category: 'Burger', icon: Icons.lunch_dining_outlined), quantity: 2),
-      OrderItem(product: const Product(name: 'Sprite', price: 12000, category: 'Drink', icon: Icons.local_drink_outlined), quantity: 2),
-    ];
+    final List<OrderItem> items =
+        table.items ??
+        [
+          OrderItem(
+            product: const Product(
+              name: 'Deluxe Crispy Burger',
+              price: 45000,
+              category: 'Burger',
+              icon: Icons.lunch_dining_outlined,
+            ),
+            quantity: 2,
+          ),
+          OrderItem(
+            product: const Product(
+              name: 'Sprite',
+              price: 12000,
+              category: 'Drink',
+              icon: Icons.local_drink_outlined,
+            ),
+            quantity: 2,
+          ),
+        ];
 
-    final double totalPrice = table.price ?? items.fold(0.0, (sum, i) => sum + (i.product.price * i.quantity));
+    final double totalPrice =
+        table.price ??
+        items.fold(0.0, (sum, i) => sum + (i.product.price * i.quantity));
     final double subtotal = totalPrice / 1.03;
     final double tax = totalPrice - subtotal;
 
@@ -942,7 +1328,11 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
                           color: const Color(0xFFFF5630).withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.table_restaurant, color: Color(0xFFFF5630), size: 20),
+                        child: const Icon(
+                          Icons.table_restaurant,
+                          color: Color(0xFFFF5630),
+                          size: 20,
+                        ),
                       ),
                       const SizedBox(width: 10),
                       Column(
@@ -950,11 +1340,16 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
                         children: [
                           Text(
                             'Table ${table.name}',
-                            style: AppTypography.bodyLBold.copyWith(fontWeight: FontWeight.bold),
+                            style: AppTypography.bodyLBold.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           Text(
                             '${table.floor} • Occupied',
-                            style: AppTypography.bodyXsRegular.copyWith(color: const Color(0xFFFF5630), fontWeight: FontWeight.bold),
+                            style: AppTypography.bodyXsRegular.copyWith(
+                              color: const Color(0xFFFF5630),
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ],
                       ),
@@ -983,18 +1378,26 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
                       children: [
                         Text(
                           'Customer: ${table.customerName ?? "Guest"}',
-                          style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold, color: AppColors.neutral900),
+                          style: AppTypography.bodySRegular.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.neutral900,
+                          ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           table.orderId ?? "#201OE00",
-                          style: AppTypography.bodyXsRegular.copyWith(color: AppColors.neutral500, fontStyle: FontStyle.italic),
+                          style: AppTypography.bodyXsRegular.copyWith(
+                            color: AppColors.neutral500,
+                            fontStyle: FontStyle.italic,
+                          ),
                         ),
                       ],
                     ),
                     Text(
                       _formatRupiah(totalPrice),
-                      style: AppTypography.h4Bold.copyWith(color: AppColors.primary600),
+                      style: AppTypography.h4Bold.copyWith(
+                        color: AppColors.primary600,
+                      ),
                     ),
                   ],
                 ),
@@ -1004,7 +1407,10 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
               // Active Items List
               Text(
                 'Ordered Items',
-                style: AppTypography.bodySRegular.copyWith(fontWeight: FontWeight.bold, color: AppColors.neutral800),
+                style: AppTypography.bodySRegular.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.neutral800,
+                ),
               ),
               const SizedBox(height: 8),
               ConstrainedBox(
@@ -1012,7 +1418,11 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
                 child: ListView.separated(
                   shrinkWrap: true,
                   itemCount: items.length,
-                  separatorBuilder: (c, i) => const Divider(height: 12, thickness: 0.5, color: AppColors.neutral200),
+                  separatorBuilder: (c, i) => const Divider(
+                    height: 12,
+                    thickness: 0.5,
+                    color: AppColors.neutral200,
+                  ),
                   itemBuilder: (c, i) {
                     final item = items[i];
                     return Row(
@@ -1021,26 +1431,39 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
                         Row(
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
-                                color: AppColors.primary500.withValues(alpha: 0.1),
+                                color: AppColors.primary500.withValues(
+                                  alpha: 0.1,
+                                ),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
                                 '${item.quantity}x',
-                                style: AppTypography.bodyXsRegular.copyWith(color: AppColors.primary600, fontWeight: FontWeight.bold),
+                                style: AppTypography.bodyXsRegular.copyWith(
+                                  color: AppColors.primary600,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 8),
                             Text(
                               item.product.name,
-                              style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral800),
+                              style: AppTypography.bodySRegular.copyWith(
+                                color: AppColors.neutral800,
+                              ),
                             ),
                           ],
                         ),
                         Text(
                           _formatRupiah(item.product.price * item.quantity),
-                          style: AppTypography.bodySRegular.copyWith(color: AppColors.neutral900, fontWeight: FontWeight.w500),
+                          style: AppTypography.bodySRegular.copyWith(
+                            color: AppColors.neutral900,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ],
                     );
@@ -1071,12 +1494,17 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size(double.infinity, 44),
                       backgroundColor: AppColors.primary500,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                     icon: const Icon(Icons.edit_note, color: Colors.white),
                     label: const Text(
                       'Edit / Tambah Pesanan',
-                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -1088,20 +1516,22 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
                         child: OutlinedButton.icon(
                           onPressed: () async {
                             Navigator.pop(ctx);
-                            final Map<String, dynamic>? paymentResult = await showDialog<Map<String, dynamic>>(
-                              context: context,
-                              barrierDismissible: false,
-                              builder: (c) => PaymentModal(
-                                totalAmount: totalPrice,
-                                subtotal: subtotal,
-                                tax: tax,
-                                discountAmount: 0.0,
-                                isDineIn: true,
-                                customerName: table.customerName ?? 'Guest',
-                              ),
-                            );
+                            final Map<String, dynamic>? paymentResult =
+                                await showDialog<Map<String, dynamic>>(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder: (c) => PaymentModal(
+                                    totalAmount: totalPrice,
+                                    subtotal: subtotal,
+                                    tax: tax,
+                                    discountAmount: 0.0,
+                                    isDineIn: true,
+                                    customerName: table.customerName ?? 'Guest',
+                                  ),
+                                );
 
-                            if (paymentResult != null && paymentResult['success'] == true) {
+                            if (paymentResult != null &&
+                                paymentResult['success'] == true) {
                               if (mounted) {
                                 await showDialog<bool>(
                                   context: context,
@@ -1109,8 +1539,11 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
                                   builder: (c) => PaymentSuccessModal(
                                     method: paymentResult['method'] ?? 'Cash',
                                     total: totalPrice,
-                                    paid: paymentResult['paidAmount'] ?? totalPrice,
-                                    change: paymentResult['changeAmount'] ?? 0.0,
+                                    paid:
+                                        paymentResult['paidAmount'] ??
+                                        totalPrice,
+                                    change:
+                                        paymentResult['changeAmount'] ?? 0.0,
                                     subtotal: subtotal,
                                     discountAmount: 0.0,
                                     tax: tax,
@@ -1127,13 +1560,25 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
                           },
                           style: OutlinedButton.styleFrom(
                             minimumSize: const Size(0, 44),
-                            side: const BorderSide(color: AppColors.primary500, width: 1.5),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            side: const BorderSide(
+                              color: AppColors.primary500,
+                              width: 1.5,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           ),
-                          icon: const Icon(Icons.payment, color: AppColors.primary500, size: 18),
+                          icon: const Icon(
+                            Icons.payment,
+                            color: AppColors.primary500,
+                            size: 18,
+                          ),
                           label: const Text(
                             'Proses Pembayaran',
-                            style: TextStyle(color: AppColors.primary500, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              color: AppColors.primary500,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
@@ -1143,11 +1588,16 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
                         style: OutlinedButton.styleFrom(
                           minimumSize: const Size(0, 44),
                           side: const BorderSide(color: AppColors.error500),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
                         child: const Text(
                           'Batalkan',
-                          style: TextStyle(color: AppColors.error500, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            color: AppColors.error500,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ],
@@ -1184,17 +1634,25 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
                   shape: BoxShape.circle,
                 ),
                 alignment: Alignment.center,
-                child: const Icon(Icons.cancel_outlined, color: AppColors.white, size: 28),
+                child: const Icon(
+                  Icons.cancel_outlined,
+                  color: AppColors.white,
+                  size: 28,
+                ),
               ),
               const SizedBox(height: 16),
               Text(
                 'Batalkan Pesanan Meja ${table.name}?',
-                style: AppTypography.bodyLBold.copyWith(fontWeight: FontWeight.bold),
+                style: AppTypography.bodyLBold.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 8),
               Text(
                 'Pesanan ${table.orderId ?? ""} milik ${table.customerName ?? "pelanggan"} akan dibatalkan dan Meja ${table.name} akan kembali kosong (Available).',
-                style: AppTypography.bodyXsRegular.copyWith(color: AppColors.neutral500),
+                style: AppTypography.bodyXsRegular.copyWith(
+                  color: AppColors.neutral500,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
@@ -1205,7 +1663,9 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
                       onPressed: () => Navigator.pop(ctx),
                       style: OutlinedButton.styleFrom(
                         minimumSize: const Size(0, 44),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                       child: const Text('Batal'),
                     ),
@@ -1221,9 +1681,17 @@ class _PosTablesScreenState extends State<PosTablesScreen> {
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size(0, 44),
                         backgroundColor: AppColors.error500,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
-                      child: const Text('Ya, Batalkan', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      child: const Text(
+                        'Ya, Batalkan',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -1246,10 +1714,12 @@ class _TableClipper extends CustomClipper<Path> {
     if (shape == 'circle') {
       path.addOval(Rect.fromLTWH(0, 0, size.width, size.height));
     } else {
-      path.addRRect(RRect.fromRectAndRadius(
-        Rect.fromLTWH(0, 0, size.width, size.height),
-        const Radius.circular(8),
-      ));
+      path.addRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(0, 0, size.width, size.height),
+          const Radius.circular(8),
+        ),
+      );
     }
     return path;
   }

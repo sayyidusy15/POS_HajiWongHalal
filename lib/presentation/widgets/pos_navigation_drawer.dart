@@ -71,22 +71,16 @@ class PosNavigationDrawer extends StatelessWidget {
               // 2. STORE LOGO AND NAME
               Row(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary500.withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.storefront,
-                      color: AppColors.primary500,
-                      size: 24,
-                    ),
+                  Image.asset(
+                    'assets/images/logo-app.png',
+                    width: 30,
+                    height: 30,
+                    fit: BoxFit.contain,
                   ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'Haji Wong Halal',
+                      'Bakso Tjab Haji',
                       style: AppTypography.bodyLBold.copyWith(
                         color: AppColors.neutral900,
                         fontWeight: FontWeight.bold,
